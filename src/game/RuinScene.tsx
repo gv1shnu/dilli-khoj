@@ -1,11 +1,23 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { buildWorld } from "./environment";
+import { createCharacter } from "./character";
+import { createAmbience } from "./ambience";
+import { createGuideArrows } from "./guide";
 
 interface RuinSceneProps {
   onProximityChange: (nearTerminal: boolean) => void;
 }
 
 const TERMINAL = new THREE.Vector3(0, 0, 0);
+const WALK_SPEED = 4.2;
+const RUN_SPEED = 8.4;
+const WORLD_RADIUS = 92;
 
 export function RuinScene({ onProximityChange }: RuinSceneProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -19,184 +31,280 @@ export function RuinScene({ onProximityChange }: RuinSceneProps) {
     const host = hostRef.current;
     if (!host) return;
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0d0c);
-    scene.fog = new THREE.FogExp2(0x101614, 0.025);
-
-    const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 120);
-    camera.position.set(0, 11, 18);
-
+    // ---- Renderer -----------------------------------------------------------
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.32;
     host.appendChild(renderer.domElement);
 
-    scene.add(new THREE.HemisphereLight(0x9bd5c8, 0x3b2618, 1.25));
-    const moon = new THREE.DirectionalLight(0xffd7a0, 2.8);
-    moon.position.set(-8, 14, 10);
-    moon.castShadow = true;
-    moon.shadow.mapSize.set(1024, 1024);
-    scene.add(moon);
+    // ---- Scene, dusk sky & fog ---------------------------------------------
+    const scene = new THREE.Scene();
+    const horizon = new THREE.Color(0xd98a4e);
+    scene.fog = new THREE.Fog(0xcaa06a, 46, 190);
 
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(52, 52),
-      new THREE.MeshStandardMaterial({ color: 0x25241f, roughness: 0.98, metalness: 0.02 }),
+    const sky = new THREE.Mesh(
+      new THREE.SphereGeometry(400, 32, 16),
+      new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        uniforms: {
+          top: { value: new THREE.Color(0x243a63) },
+          mid: { value: new THREE.Color(0x8f6a8c) },
+          bottom: { value: new THREE.Color(0xe0a35c) },
+        },
+        vertexShader: `varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+        fragmentShader: `varying vec3 vP; uniform vec3 top; uniform vec3 mid; uniform vec3 bottom;
+          void main(){ float h = normalize(vP).y; vec3 c = h > 0.0 ? mix(mid, top, pow(h,0.7)) : mix(mid, bottom, pow(-h,0.5)); gl_FragColor = vec4(c,1.0); }`,
+      }),
     );
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    scene.add(ground);
+    scene.add(sky);
 
-    const lane = new THREE.Mesh(
-      new THREE.PlaneGeometry(7, 48),
-      new THREE.MeshStandardMaterial({ color: 0x3a3027, roughness: 1 }),
-    );
-    lane.rotation.x = -Math.PI / 2;
-    lane.position.y = 0.012;
-    scene.add(lane);
+    // ---- Camera & third-person orbit controls -------------------------------
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 500);
+    camera.position.set(0, 6, 20);
 
-    const rubbleMaterial = new THREE.MeshStandardMaterial({ color: 0x6a5843, roughness: 0.95 });
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x725844, roughness: 0.9 });
-    const obstacles: THREE.Box3[] = [];
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.minDistance = 6;
+    controls.maxDistance = 26;
+    controls.maxPolarAngle = Math.PI * 0.49;
+    controls.minPolarAngle = Math.PI * 0.12;
+    controls.target.set(0, 1.4, 12);
 
-    const addBuilding = (x: number, z: number, width: number, height: number, depth: number) => {
-      const building = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), wallMaterial);
-      building.position.set(x, height / 2, z);
-      building.castShadow = true;
-      building.receiveShadow = true;
-      scene.add(building);
-      obstacles.push(new THREE.Box3().setFromObject(building).expandByScalar(0.35));
+    // ---- Lighting -----------------------------------------------------------
+    scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x6a4a2c, 1.45));
+    const sun = new THREE.DirectionalLight(0xffcf92, 3.4);
+    sun.position.set(38, 44, 26);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 160;
+    sun.shadow.camera.left = -60;
+    sun.shadow.camera.right = 60;
+    sun.shadow.camera.top = 60;
+    sun.shadow.camera.bottom = -60;
+    sun.shadow.bias = -0.0004;
+    scene.add(sun);
+    const sunTarget = new THREE.Object3D();
+    scene.add(sunTarget);
+    sun.target = sunTarget;
 
-      const missingCorner = new THREE.Mesh(
-        new THREE.BoxGeometry(width * 0.34, 0.35, depth * 0.4),
-        rubbleMaterial,
-      );
-      missingCorner.position.set(x + width * 0.25, 0.18, z + depth * 0.4);
-      missingCorner.rotation.y = 0.35;
-      missingCorner.castShadow = true;
-      scene.add(missingCorner);
-    };
+    // ---- World & character --------------------------------------------------
+    const world = buildWorld();
+    scene.add(world.group);
 
-    addBuilding(-7.2, -7, 6, 4.8, 6);
-    addBuilding(7.5, -6, 6.5, 6.2, 5.5);
-    addBuilding(-7.8, 5.5, 7, 7.5, 6);
-    addBuilding(7.7, 7.5, 6.8, 4.2, 7);
-    addBuilding(-8.8, 15.2, 7.5, 5.5, 5);
-    addBuilding(8.8, 16.5, 7.5, 7.8, 6);
+    // The Soldier model's front is its -Z axis, so faced-direction yaw is offset by PI.
+    const MODEL_YAW_OFFSET = Math.PI;
+    const character = createCharacter();
+    character.object.position.set(0, 0, 12);
+    character.object.rotation.y = 0; // face into the scene (-Z), toward the archive
+    scene.add(character.object);
 
+    // Warm lantern the character carries.
+    const playerLamp = new THREE.PointLight(0xffcf8a, 3.2, 8, 2);
+    playerLamp.position.set(0, 1.6, 0);
+    character.object.add(playerLamp);
+
+    // ---- The SQL archive beacon (blooms) ------------------------------------
     const beacon = new THREE.Group();
-    const beaconBase = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.2, 1.5, 0.7, 8),
-      new THREE.MeshStandardMaterial({ color: 0x222824, metalness: 0.7, roughness: 0.3 }),
+    const pedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.1, 1.5, 1.1, 8),
+      new THREE.MeshStandardMaterial({ map: null, color: 0x2a2620, metalness: 0.6, roughness: 0.4 }),
     );
-    beaconBase.position.y = 0.35;
-    beaconBase.castShadow = true;
-    beacon.add(beaconBase);
-    const beaconCore = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.7),
-      new THREE.MeshStandardMaterial({ color: 0xf5c26b, emissive: 0xe88324, emissiveIntensity: 2.5 }),
+    pedestal.position.y = 0.55;
+    pedestal.castShadow = true;
+    pedestal.receiveShadow = true;
+    beacon.add(pedestal);
+    const core = new THREE.Mesh(
+      new THREE.OctahedronGeometry(0.8),
+      new THREE.MeshStandardMaterial({ color: 0xf7d9a0, emissive: 0xffa62e, emissiveIntensity: 3.2 }),
     );
-    beaconCore.position.y = 1.55;
-    beacon.add(beaconCore);
-    const beaconLight = new THREE.PointLight(0xffa342, 14, 16, 2);
-    beaconLight.position.y = 2;
+    core.position.y = 2.1;
+    beacon.add(core);
+    const beaconLight = new THREE.PointLight(0xffb454, 16, 20, 2);
+    beaconLight.position.y = 2.4;
     beacon.add(beaconLight);
     beacon.position.copy(TERMINAL);
     scene.add(beacon);
 
-    const player = new THREE.Group();
-    const cloak = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.42, 0.8, 5, 10),
-      new THREE.MeshStandardMaterial({ color: 0x36b798, roughness: 0.7 }),
-    );
-    cloak.position.y = 0.8;
-    cloak.castShadow = true;
-    player.add(cloak);
-    const lamp = new THREE.PointLight(0x78ffe0, 4, 5);
-    lamp.position.set(0, 1.2, 0.5);
-    player.add(lamp);
-    player.position.set(0, 0, 12);
-    scene.add(player);
+    // Amber archive positions (one today; the array lets the guide point at the
+    // nearest as more ruins come online).
+    const archives = [TERMINAL.clone()];
+    const guide = createGuideArrows();
+    scene.add(guide.group);
 
+    // ---- Postprocessing (bloom) --------------------------------------------
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.5, 0.86);
+    composer.addPass(bloom);
+    composer.addPass(new OutputPass());
+
+    // ---- Input --------------------------------------------------------------
+    const ambience = createAmbience();
     const keys = new Set<string>();
+    const isTyping = (target: EventTarget | null) =>
+      target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement) return;
+      if (isTyping(event.target)) return;
       keys.add(event.code);
+      if (event.code === "KeyM") ambience.setEnabled(!ambience.enabled());
+      ambience.resume();
     };
     const onKeyUp = (event: KeyboardEvent) => keys.delete(event.code);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
 
-    const timer = new THREE.Timer();
-    timer.connect(document);
-    let animationFrame = 0;
-    let wasNear = false;
-    const direction = new THREE.Vector3();
-    const nextPosition = new THREE.Vector3();
-    const cameraTarget = new THREE.Vector3();
+    const onFirstPointer = () => ambience.resume();
+    renderer.domElement.addEventListener("pointerdown", onFirstPointer);
 
+    // ---- Resize -------------------------------------------------------------
     const resize = () => {
       const width = host.clientWidth;
-      const height = host.clientHeight;
+      const height = Math.max(host.clientHeight, 1);
       renderer.setSize(width, height, false);
-      camera.aspect = width / Math.max(height, 1);
+      composer.setSize(width, height);
+      bloom.setSize(width, height);
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
 
-    const animate = (timestamp?: number) => {
-      timer.update(timestamp);
-      const delta = Math.min(timer.getDelta(), 0.04);
-      direction.set(0, 0, 0);
-      if (keys.has("KeyW") || keys.has("ArrowUp")) direction.z -= 1;
-      if (keys.has("KeyS") || keys.has("ArrowDown")) direction.z += 1;
-      if (keys.has("KeyA") || keys.has("ArrowLeft")) direction.x -= 1;
-      if (keys.has("KeyD") || keys.has("ArrowRight")) direction.x += 1;
+    // ---- Frame loop ---------------------------------------------------------
+    const clock = new THREE.Clock();
+    let frame = 0;
+    let wasNear = false;
+    const forward = new THREE.Vector3();
+    const right = new THREE.Vector3();
+    const move = new THREE.Vector3();
+    const nextPos = new THREE.Vector3();
+    const prevTarget = new THREE.Vector3().copy(controls.target);
+    const desiredTarget = new THREE.Vector3();
+    const playerBox = new THREE.Box3();
+    const halfExtent = new THREE.Vector3(0.4, 1.0, 0.4);
 
-      if (direction.lengthSq() > 0) {
-        direction.normalize();
-        nextPosition.copy(player.position).addScaledVector(direction, delta * 6.2);
-        nextPosition.x = THREE.MathUtils.clamp(nextPosition.x, -12.5, 12.5);
-        nextPosition.z = THREE.MathUtils.clamp(nextPosition.z, -18, 20);
-        const playerBox = new THREE.Box3(
-          new THREE.Vector3(nextPosition.x - 0.45, 0, nextPosition.z - 0.45),
-          new THREE.Vector3(nextPosition.x + 0.45, 1.7, nextPosition.z + 0.45),
-        );
-        if (!obstacles.some((obstacle) => obstacle.intersectsBox(playerBox))) {
-          player.position.copy(nextPosition);
+    const blocked = (x: number, z: number): boolean => {
+      playerBox.min.set(x - halfExtent.x, 0.1, z - halfExtent.z);
+      playerBox.max.set(x + halfExtent.x, halfExtent.y * 2, z + halfExtent.z);
+      return world.obstacles.some((box) => box.intersectsBox(playerBox));
+    };
+
+    const animate = () => {
+      const delta = Math.min(clock.getDelta(), 0.05);
+      const elapsed = clock.elapsedTime;
+
+      // Camera-relative movement basis (flattened to ground plane).
+      camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+      // Screen-right = forward x worldUp, so D strafes right, A strafes left.
+      right.set(-forward.z, 0, forward.x);
+
+      move.set(0, 0, 0);
+      if (keys.has("KeyW") || keys.has("ArrowUp")) move.add(forward);
+      if (keys.has("KeyS") || keys.has("ArrowDown")) move.sub(forward);
+      if (keys.has("KeyD") || keys.has("ArrowRight")) move.add(right);
+      if (keys.has("KeyA") || keys.has("ArrowLeft")) move.sub(right);
+
+      const running = keys.has("ShiftLeft") || keys.has("ShiftRight");
+      let speed01 = 0;
+      if (move.lengthSq() > 0) {
+        move.normalize();
+        const speed = running ? RUN_SPEED : WALK_SPEED;
+        speed01 = running ? 1 : 0.5;
+        const pos = character.object.position;
+        let nx = pos.x + move.x * speed * delta;
+        let nz = pos.z + move.z * speed * delta;
+        // Axis-separated sliding collision.
+        if (blocked(nx, pos.z)) nx = pos.x;
+        if (blocked(pos.x, nz)) nz = pos.z;
+        const radial = Math.hypot(nx, nz);
+        if (radial > WORLD_RADIUS) {
+          const k = WORLD_RADIUS / radial;
+          nx *= k;
+          nz *= k;
         }
-        player.rotation.y = Math.atan2(direction.x, direction.z);
+        nextPos.set(nx, 0, nz);
+        pos.copy(nextPos);
+        // Face travel direction, smoothly (accounting for the model's -Z front).
+        const targetYaw = Math.atan2(move.x, move.z) + MODEL_YAW_OFFSET;
+        const cur = character.object.rotation.y;
+        let diff = targetYaw - cur;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        character.object.rotation.y = cur + diff * Math.min(1, delta * 12);
       }
 
-      const isNear = player.position.distanceTo(TERMINAL) < 4.4;
-      if (isNear !== wasNear) {
-        wasNear = isNear;
-        proximityCallback.current(isNear);
+      character.setLocomotion(speed01);
+      character.update(delta);
+      world.update(delta, elapsed);
+
+      // Beacon shimmer + proximity.
+      core.rotation.y += delta * 1.1;
+      core.position.y = 2.1 + Math.sin(elapsed * 2.1) * 0.14;
+      beaconLight.intensity = 14 + Math.sin(elapsed * 3.2) * 3;
+      const near = character.object.position.distanceTo(TERMINAL) < 4.4;
+      if (near !== wasNear) {
+        wasNear = near;
+        proximityCallback.current(near);
       }
 
-      beaconCore.rotation.y += delta * 1.2;
-      beaconCore.position.y = 1.55 + Math.sin(timer.getElapsed() * 2.2) * 0.12;
+      // Guide arrows point toward the nearest amber archive; hidden once the player arrives.
+      let nearest = archives[0];
+      let best = Infinity;
+      for (const a of archives) {
+        const d = character.object.position.distanceToSquared(a);
+        if (d < best) {
+          best = d;
+          nearest = a;
+        }
+      }
+      guide.update(character.object.position, nearest, elapsed, near);
 
-      cameraTarget.set(player.position.x, player.position.y + 10.5, player.position.z + 15);
-      camera.position.lerp(cameraTarget, 1 - Math.pow(0.002, delta));
-      camera.lookAt(player.position.x, 0.8, player.position.z - 2.5);
+      // Keep the shadow frustum centred on the player.
+      sunTarget.position.copy(character.object.position);
+      sun.position.set(
+        character.object.position.x + 38,
+        44,
+        character.object.position.z + 26,
+      );
 
-      renderer.render(scene, camera);
-      animationFrame = requestAnimationFrame(animate);
+      // Third-person follow: translate camera & target by the player's move.
+      desiredTarget.set(
+        character.object.position.x,
+        character.object.position.y + 1.5,
+        character.object.position.z,
+      );
+      const shift = desiredTarget.clone().sub(prevTarget);
+      camera.position.add(shift);
+      controls.target.add(shift);
+      prevTarget.copy(controls.target);
+      controls.update();
+
+      composer.render();
+      frame = requestAnimationFrame(animate);
     };
     animate();
 
+    // ---- Cleanup ------------------------------------------------------------
     return () => {
-      cancelAnimationFrame(animationFrame);
+      cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
-      timer.dispose();
+      renderer.domElement.removeEventListener("pointerdown", onFirstPointer);
+      controls.dispose();
+      ambience.dispose();
+      guide.dispose();
+      character.dispose();
+      world.dispose();
+      composer.dispose();
       renderer.dispose();
       renderer.domElement.remove();
       scene.traverse((object) => {
@@ -209,5 +317,5 @@ export function RuinScene({ onProximityChange }: RuinSceneProps) {
     };
   }, []);
 
-  return <div ref={hostRef} className="ruin-scene" aria-label="Explorable Chandni Chowk ruin" />;
+  return <div ref={hostRef} className="ruin-scene" aria-label="Explorable overgrown Chandni Chowk ruin" />;
 }
