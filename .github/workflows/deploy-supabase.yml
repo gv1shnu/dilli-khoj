@@ -1,0 +1,60 @@
+name: Deploy Supabase (migrations + judge)
+
+# Manual only: pushes database migrations and deploys the judge Edge Function.
+# Kept out of automatic triggers so production schema changes are always deliberate.
+#
+# Requires these repository secrets:
+#   SUPABASE_ACCESS_TOKEN  - personal access token from the Supabase dashboard
+#   SUPABASE_DB_PASSWORD   - database password (used by `supabase db push`)
+# And this repository variable:
+#   SUPABASE_PROJECT_REF   - e.g. your-project-ref
+#
+# PRECONDITIONS handled manually (never in CI, they are sensitive):
+#   - The two judge role passwords are set via psql `\password`.
+#   - JUDGE_EXECUTOR_DATABASE_URL / JUDGE_PROGRESS_DATABASE_URL are set as
+#     Edge Function secrets (`supabase secrets set`).
+# See docs/setup-supabase-google.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      push_migrations:
+        description: "Run supabase db push (schema migrations)"
+        type: boolean
+        default: true
+      deploy_function:
+        description: "Deploy the judge-query Edge Function"
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy-supabase
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Apply migrations and deploy judge
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "$PROJECT_REF"
+
+      - name: Push migrations
+        if: ${{ inputs.push_migrations }}
+        run: supabase db push
+
+      - name: Deploy judge function
+        if: ${{ inputs.deploy_function }}
+        run: supabase functions deploy judge-query --project-ref "$PROJECT_REF"

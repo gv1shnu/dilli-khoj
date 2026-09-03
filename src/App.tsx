@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ResultTable } from "./components/ResultTable";
 import { preparePracticeDatabase, runPracticeQuery } from "./db/practice-db";
 import { RuinScene } from "./game/RuinScene";
+import { IntroOverlay } from "./game/IntroOverlay";
 import { WorldMap } from "./admin/WorldMap";
 import { submitToJudge } from "./lib/judge";
 import { signInWithGoogle, supabase } from "./lib/supabase";
@@ -9,6 +10,8 @@ import { ruinSix } from "./questions/ruin-six";
 import { matchesOrderedResult, type TabularResult } from "./sql/result-policy";
 
 type Status = { kind: "idle" | "loading" | "pass" | "fail" | "error"; message: string };
+
+const INTRO_SEEN_KEY = "dk_intro_seen_v1";
 
 /** Thin router: the `#admin` fragment opens the admin world map, else the game. */
 export function App() {
@@ -34,6 +37,22 @@ function GameShell() {
   });
   const [hintOpen, setHintOpen] = useState(false);
   const [signedInName, setSignedInName] = useState<string | null>(null);
+  const [showIntro, setShowIntro] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(INTRO_SEEN_KEY) !== "1";
+    } catch {
+      return true;
+    }
+  });
+
+  const dismissIntro = useCallback(() => {
+    setShowIntro(false);
+    try {
+      localStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {
+      // Private mode or blocked storage: just close for this session.
+    }
+  }, []);
 
   useEffect(() => {
     preparePracticeDatabase()
@@ -106,12 +125,22 @@ function GameShell() {
     <main className="app-shell">
       <RuinScene onProximityChange={setNearTerminal} />
 
+      {showIntro && <IntroOverlay onClose={dismissIntro} />}
+
       <header className="topbar">
         <div>
           <p className="eyebrow">DELHI // ARCHIVE 06</p>
           <h1>Dilli Khoj</h1>
         </div>
         <div className="player-strip">
+          <button
+            className="ghost-button help-button"
+            onClick={() => setShowIntro(true)}
+            aria-label="How to play"
+            title="How to play"
+          >
+            ?
+          </button>
           <span className="xp-chip">100 XP</span>
           {signedInName ? (
             <span className="identity">{signedInName}</span>

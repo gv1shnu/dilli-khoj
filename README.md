@@ -51,6 +51,30 @@ pnpm deploy
 
 Deploy only after `.env.local` contains the intended publishable key and the Supabase URL allowlist includes the production origin. Wrangler authentication remains in the developer's local account; no Cloudflare token belongs in Git.
 
+## Continuous integration and deployment
+
+GitHub Actions workflows live in `.github/workflows/`:
+
+- **`ci.yml`** — runs on every push and pull request. Typechecks the browser, node and edge-function projects, runs the vitest suite, builds the production bundle, and type-checks the judge under the Deno runtime it deploys on. No secrets required.
+- **`deploy-web.yml`** — deploys the static game shell to Cloudflare Workers Static Assets on pushes to `main` (or manual dispatch). The publishable key is inlined at build time, then the pinned Wrangler deploys `dist/`.
+- **`deploy-supabase.yml`** — **manual only** (`workflow_dispatch`). Pushes database migrations and deploys the `judge-query` Edge Function, with per-run toggles for each. Kept off automatic triggers so schema changes are always deliberate.
+
+### Required GitHub configuration
+
+Set these in **Settings → Secrets and variables → Actions** before deploying.
+
+| Kind | Name | Used by | Notes |
+| --- | --- | --- | --- |
+| Secret | `CLOUDFLARE_API_TOKEN` | deploy-web | Token with "Edit Cloudflare Workers" permissions |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | deploy-web | Cloudflare account id |
+| Secret | `VITE_SUPABASE_PUBLISHABLE_KEY` | deploy-web | Browser publishable key (`sb_publishable_...`) |
+| Variable | `VITE_SUPABASE_URL` | deploy-web | e.g. `https://your-project-ref.supabase.co` |
+| Secret | `SUPABASE_ACCESS_TOKEN` | deploy-supabase | Supabase personal access token |
+| Secret | `SUPABASE_DB_PASSWORD` | deploy-supabase | Database password for `db push` |
+| Variable | `SUPABASE_PROJECT_REF` | deploy-supabase | e.g. `your-project-ref` |
+
+The publishable key is safe in the browser bundle; still store it as a secret so it is not printed in logs. **Never** add a Supabase secret/service-role key, a database URL, or the two judge-role passwords to Actions — the judge-role passwords and the `JUDGE_*_DATABASE_URL` Edge Function secrets are configured manually per `docs/setup-supabase-google.md`, and `deploy-supabase.yml` assumes they already exist server-side.
+
 ## Documentation
 
 - [Product specification](docs/product-spec.md)
