@@ -88,12 +88,44 @@ The UI may provide a friendly error, but database and judge authorization must i
 Once the authenticated repository checkout exists:
 
 ```bash
-supabase init
+supabase start
+supabase test db
 supabase login
 supabase link --project-ref your-project-ref
+supabase db push
 ```
 
 Enter the database password only in the CLI prompt or secure credential store. Do not put it in shell history, chat or Git. Edge Function environment secrets can be added through the dashboard or `supabase secrets set`.
+
+### Judge role and function setup
+
+The migrations create two login roles without passwords:
+
+- `dilli_judge_executor` — read-only access to fixture tables;
+- `dilli_judge_progress` — execute access only to fixed private judge functions.
+
+After `supabase db push`, connect as the project database owner with `psql` and run the interactive commands below. `\password` prompts without echoing or placing the new password in shell history.
+
+```text
+\password dilli_judge_executor
+\password dilli_judge_progress
+```
+
+In the Supabase **Connect** panel, copy the transaction-pooler host and use port `6543`. Build one URL for each custom role; the pooler username normally has the form `ROLE.PROJECT_REF`. Put the URLs in a local ignored file such as `.env.judge`:
+
+```dotenv
+JUDGE_EXECUTOR_DATABASE_URL=postgresql://dilli_judge_executor.your-project-ref:URL_ENCODED_PASSWORD@POOLER_HOST:6543/postgres
+JUDGE_PROGRESS_DATABASE_URL=postgresql://dilli_judge_progress.your-project-ref:URL_ENCODED_PASSWORD@POOLER_HOST:6543/postgres
+```
+
+Then upload the secrets and deploy the function:
+
+```bash
+supabase secrets set --env-file .env.judge
+supabase functions deploy judge-query
+```
+
+Do not use the owner/postgres URL for either variable. Verify the actual custom-role username format in the Connect panel or with a test connection before deployment.
 
 Official references:
 

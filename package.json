@@ -20,15 +20,19 @@
     "three": "0.185.1"
   },
   "devDependencies": {
+    "@supabase/server": "1.5.2",
+    "@types/deno": "2.7.0",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "@types/three": "0.185.4",
     "@vitejs/plugin-react": "6.1.1",
+    "libpg-query": "17.7.4",
+    "postgres": "3.4.9",
     "typescript": "7.0.2",
     "vite": "8.2.2",
     "vitest": "5.0.0",
     "wrangler": "4.128.0"
   },
-  "packageManager": "pnpm@10.31.0"
+  "packageManager": "pnpm@11.19.0"
 }

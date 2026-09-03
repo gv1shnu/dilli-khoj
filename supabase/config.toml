@@ -25,3 +25,6 @@ uri = "pg-functions://postgres/public/hook_restrict_dilli_khoj_signup"
 [edge_runtime]
 enabled = true
 policy = "per_worker"
+
+[functions.judge-query]
+verify_jwt = true

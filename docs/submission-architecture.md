@@ -2,6 +2,8 @@
 
 ## Two execution paths
 
+Implementation status: the browser path and judge source are implemented. The judge is not deployed until the database roles, secrets and migrations are configured. See `implementation-status.md`.
+
 ### Run
 
 - Executes in PGlite inside a Web Worker.
@@ -42,6 +44,14 @@
 9. Call a fixed privileged progression function. Never pass student SQL to the privileged identity.
 10. Return the visible result preview, case count, XP and progression state.
 
+Current implementation details:
+
+- `@supabase/server` verifies user JWTs and exposes claims to the Edge Function.
+- `libpg-query` uses PostgreSQL 17's native parser compiled to WebAssembly; this avoids a partial SQL grammar.
+- The AST rejects non-`SelectStmt` nodes even when hidden inside a CTE, unknown relations, schema-qualified relations, row locks and functions outside the course allowlist.
+- The database role, read-only transaction and grants remain the hard security boundary; the AST is defence in depth and friendly validation.
+- A private manifest supplies fixture schemas and expected results. Hidden content is never returned to the browser.
+
 ## Identity separation
 
 Use two server identities:
@@ -80,6 +90,8 @@ The `HAVING` ruin may record whether `HAVING` appeared for instructor insight, b
 - First-time completion locks the player's progress row before updating XP and district state.
 - Revisit attempts use a different non-scoring endpoint or explicit `practice=true` mode.
 
+The implemented first-pass endpoint acquires a private five-second lease keyed by player UUID before execution. A 300 ms per-player cooldown absorbs accidental double clicks. The final recording function uses the unique `(player_id, submission_id)` constraint and locks progression rows, so a retry cannot award XP twice.
+
 ## Load shape
 
 With 3,000 students and approximately 25 first-pass submissions each, expect about 75,000 judge requests. Over 90–120 minutes this averages roughly 10–14 submissions per second, but checkpoint synchronization can create much larger bursts.
@@ -97,6 +109,8 @@ Free-tier strategy:
 
 Splitting students across multiple projects is a last resort because it fragments authentication, progress and the leaderboard.
 
+The Edge Function creates at most one executor and one progress connection per warm isolate and requires Supavisor transaction-pooler URLs on port 6543. Manifest lookup and lease acquisition share one progress transaction; verdict recording uses a second. Three cases run sequentially to reduce connection pressure. This shape is designed for the expected average but is not declared launch-ready until the 25/50/100/200 requests-per-second tests pass.
+
 ## Campus-network plan
 
 - Keep the initial compressed application payload below 5 MB if practical.
@@ -105,4 +119,3 @@ Splitting students across multiple projects is a last resort because it fragment
 - Install a service worker only after confirming update/rollback behavior.
 - Ask students to open the landing page 10–15 minutes before play begins, even if the game opens for everyone at the same time.
 - Provide a visible capability check for WebAssembly, IndexedDB and browser version before downloading world content.
-

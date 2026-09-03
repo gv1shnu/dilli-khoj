@@ -24,6 +24,12 @@ importers:
         specifier: 0.185.1
         version: 0.185.1
     devDependencies:
+      '@supabase/server':
+        specifier: 1.5.2
+        version: 1.5.2(@supabase/supabase-js@2.115.0)(typescript@7.0.2)
+      '@types/deno':
+        specifier: 2.7.0
+        version: 2.7.0
       '@types/node':
         specifier: 26.4.1
         version: 26.4.1
@@ -39,6 +45,12 @@ importers:
       '@vitejs/plugin-react':
         specifier: 6.1.1
         version: 6.1.1(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1))
+      libpg-query:
+        specifier: 17.7.4
+        version: 17.7.4
+      postgres:
+        specifier: 3.4.9
+        version: 3.4.9
       typescript:
         specifier: 7.0.2
         version: 7.0.2
@@ -444,6 +456,9 @@ packages:
   '@oxc-project/types@0.148.0':
     resolution: {integrity: sha512-Nm4s/jB+4FpFsPhWGEC4h7rzksesmtnMXomo6rCMcg/b8zLQuOziRgkCS1fxDCXOlJB/6Q8oABOZ/OP6RIPj9A==}
 
+  '@pgsql/types@17.6.2':
+    resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
+
   '@poppinss/colors@4.1.6':
     resolution: {integrity: sha512-H9xkIdFswbS8n1d6vmRd8+c10t2Qe+rZITbbDHHkQixH5+2x1FDGmi/0K+WgWiqQFKPSlIYB7jlH6Kpfn6Fleg==}
 
@@ -567,6 +582,15 @@ packages:
     resolution: {integrity: sha512-p97V6/YFcdp+zblFDVJaE8f9rGKTNz0PRzyJ2d1w/EYIU5lwidKuc3l/wM+u27ACmAC62albvoGiUGzLPSg7Aw==}
     engines: {node: '>=22.0.0'}
 
+  '@supabase/middleware@0.4.0':
+    resolution: {integrity: sha512-iGDAzSQVKRzaKkcbap4G9C20NWc6MYXNht2Mgg7dkY1E8H3Y4bsR7UlWiaL1sbMkgVO/qS0GnrEEXPnzzBXd0A==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      typescript: '>=5.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   '@supabase/phoenix@0.4.5':
     resolution: {integrity: sha512-aAn9H9ovVyeApKy11OWOrrOGq8DV68yWeH4ud2lN9fzn4aO8Zb5GLL9m1pUg9nLqIcT+ZDfAcsZe0E/nqdv2lw==}
 
@@ -577,6 +601,28 @@ packages:
   '@supabase/realtime-js@2.115.0':
     resolution: {integrity: sha512-5HyBkvlA/IUV2v8jX3uLTdy15jmTPRVXwXKoxvH2SKw5jZMNURxCxt+VpCEukscXQlY7pUpH8Cy4NH6io4iaRw==}
     engines: {node: '>=22.0.0'}
+
+  '@supabase/server@1.5.2':
+    resolution: {integrity: sha512-YwqkTGpxt4Bt5wwghHewZlsNdf9SiympEG9/+wSVjhxan8+af2M55PJqr2a+bHKMiz9r1qwsR21knuDmWt5YUg==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@supabase/supabase-js': ^2.0.0
+      elysia: ^1.4.0
+      h3: ^2.0.0
+      hono: ^4.0.0
+      pg: ^8.0.0
+    peerDependenciesMeta:
+      '@nestjs/common':
+        optional: true
+      elysia:
+        optional: true
+      h3:
+        optional: true
+      hono:
+        optional: true
+      pg:
+        optional: true
 
   '@supabase/storage-js@2.115.0':
     resolution: {integrity: sha512-dLyIxzbO+MCcKHhcce8rVUCQX1iyqXqQ8ytgkOVYJ7D+Zp0qKylPtQH3hamgxrGSxtDjaw47Urpzw2iK9PsKdA==}
@@ -599,6 +645,9 @@ packages:
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
+
+  '@types/deno@2.7.0':
+    resolution: {integrity: sha512-Y6fWcV8KpYeO3Lik/RiYnUxtr/LWqoeACciU0CA+dr1U/45tGgaX3HWQQAPCNN53raN4Rr4Fht4y6qsUH57fDA==}
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
@@ -834,9 +883,15 @@ packages:
     resolution: {integrity: sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==}
     engines: {node: '>=20.0.0'}
 
+  jose@6.2.10:
+    resolution: {integrity: sha512-iiW7J9qRFlGxvCOIBDBDxFePQSn7ZMAnrYGhrrOo6siO/MIqwfyilLR27pkfDgUk+raLuzADS8A3S/KLBisc0g==}
+
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
+
+  libpg-query@17.7.4:
+    resolution: {integrity: sha512-hTV3LvacQgJhc6GHpu5GYZMQBOAEpJ/LF1JjkixZ8YLh2TtbuN8y0JlNiPTe8PBTV9ChFkKcZMWSYKyhJfkYaQ==}
 
   lightningcss-android-arm64@1.33.0:
     resolution: {integrity: sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==}
@@ -947,6 +1002,10 @@ packages:
   postcss@8.5.26:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
     engines: {node: ^10 || ^12 || >=14}
+
+  postgres@3.4.9:
+    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
+    engines: {node: '>=12'}
 
   react-dom@19.2.8:
     resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
@@ -1384,6 +1443,8 @@ snapshots:
 
   '@oxc-project/types@0.148.0': {}
 
+  '@pgsql/types@17.6.2': {}
+
   '@poppinss/colors@4.1.6':
     dependencies:
       kleur: 4.1.5
@@ -1455,6 +1516,12 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@supabase/middleware@0.4.0(typescript@7.0.2)':
+    dependencies:
+      std-env: 4.2.0
+    optionalDependencies:
+      typescript: 7.0.2
+
   '@supabase/phoenix@0.4.5': {}
 
   '@supabase/postgrest-js@2.115.0':
@@ -1465,6 +1532,14 @@ snapshots:
     dependencies:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
+
+  '@supabase/server@1.5.2(@supabase/supabase-js@2.115.0)(typescript@7.0.2)':
+    dependencies:
+      '@supabase/middleware': 0.4.0(typescript@7.0.2)
+      '@supabase/supabase-js': 2.115.0
+      jose: 6.2.10
+    transitivePeerDependencies:
+      - typescript
 
   '@supabase/storage-js@2.115.0':
     dependencies:
@@ -1487,6 +1562,8 @@ snapshots:
       assertion-error: 2.0.1
 
   '@types/deep-eql@4.0.2': {}
+
+  '@types/deno@2.7.0': {}
 
   '@types/estree@1.0.9': {}
 
@@ -1653,7 +1730,13 @@ snapshots:
 
   iceberg-js@0.8.1: {}
 
+  jose@6.2.10: {}
+
   kleur@4.1.5: {}
+
+  libpg-query@17.7.4:
+    dependencies:
+      '@pgsql/types': 17.6.2
 
   lightningcss-android-arm64@1.33.0:
     optional: true
@@ -1739,6 +1822,8 @@ snapshots:
       nanoid: 3.3.18
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  postgres@3.4.9: {}
 
   react-dom@19.2.8(react@19.2.8):
     dependencies:

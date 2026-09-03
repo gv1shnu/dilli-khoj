@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@supabase/server": "npm:@supabase/server@1.5.2",
+    "libpg-query": "npm:libpg-query@17.7.4",
+    "postgres": "npm:postgres@3.4.9"
+  }
+}

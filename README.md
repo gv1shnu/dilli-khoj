@@ -11,12 +11,13 @@ Current milestone: **foundation vertical slice** — Ruin 06 at Chandni Chowk.
 - PostgreSQL-compatible local practice in a PGlite Web Worker with IndexedDB persistence.
 - Instant visible-case pass/fail feedback, result preview and query errors.
 - Google OAuth client wiring for Supabase.
-- Authoritative judge request contract; Submit does not pretend to award XP when the server judge is absent.
+- An authenticated Edge Function judge with PostgreSQL 17 parsing, three result fixtures and idempotent XP awards.
+- Separate executor/progression database roles, a per-player submission lease, cooldown and tight transaction timeouts.
 - Cloudflare Workers Static Assets configuration for the production origin.
 - Versioned Supabase auth, profile, progress, attempt and Ruin 06 fixture migrations.
 - Unit tests for query-policy edge cases and ordered result comparison.
 
-The restricted server executor and production judge are the next infrastructure milestone. Local practice is intentionally not a security boundary.
+The judge code is not deployed yet. It needs the two restricted transaction-pooler URLs, the client publishable key, migrations and Google Auth configuration. Until then, local practice is intentionally labelled development mode and is never a progression authority.
 
 ## Run locally
 
@@ -56,6 +57,7 @@ Deploy only after `.env.local` contains the intended publishable key and the Sup
 - [Curriculum and twenty-ruin map](docs/curriculum-map.md)
 - [Question authoring and tests](docs/question-authoring.md)
 - [Submission architecture](docs/submission-architecture.md)
+- [Implementation status](docs/implementation-status.md)
 - [Supabase and Google setup](docs/setup-supabase-google.md)
 - [Decisions and open items](docs/decisions-and-open-items.md)
 

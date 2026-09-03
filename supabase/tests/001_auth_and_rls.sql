@@ -1,9 +1,10 @@
 begin;
-select plan(7);
+select plan(8);
 
 select has_table('public', 'profiles', 'profiles exists');
 select has_table('public', 'ruin_progress', 'ruin_progress exists');
 select has_table('game_private', 'submission_attempts', 'private attempts exist');
+select has_table('game_private', 'questions', 'private question registry exists');
 select is(
   (select relrowsecurity from pg_class where oid = 'public.profiles'::regclass),
   true,
