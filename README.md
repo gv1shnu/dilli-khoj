@@ -82,6 +82,7 @@ The publishable key is safe in the browser bundle; still store it as a secret so
 - [Question authoring and tests](docs/question-authoring.md)
 - [Submission architecture](docs/submission-architecture.md)
 - [Implementation status](docs/implementation-status.md)
+- [Deployment runbook (zero to live URL)](docs/deployment-runbook.md)
 - [Supabase and Google setup](docs/setup-supabase-google.md)
 - [Decisions and open items](docs/decisions-and-open-items.md)
 
