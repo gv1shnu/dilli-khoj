@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ResultTable } from "./components/ResultTable";
 import { preparePracticeDatabase, runPracticeQuery } from "./db/practice-db";
 import { RuinScene } from "./game/RuinScene";
+import { WorldMap } from "./admin/WorldMap";
 import { submitToJudge } from "./lib/judge";
 import { signInWithGoogle, supabase } from "./lib/supabase";
 import { ruinSix } from "./questions/ruin-six";
@@ -9,7 +10,20 @@ import { matchesOrderedResult, type TabularResult } from "./sql/result-policy";
 
 type Status = { kind: "idle" | "loading" | "pass" | "fail" | "error"; message: string };
 
+/** Thin router: the `#admin` fragment opens the admin world map, else the game. */
 export function App() {
+  const [hash, setHash] = useState<string>(() => window.location.hash);
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  if (hash.startsWith("#admin")) return <WorldMap />;
+  return <GameShell />;
+}
+
+function GameShell() {
   const [nearTerminal, setNearTerminal] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(true);
   const [sql, setSql] = useState<string>(ruinSix.starterSql);
@@ -197,7 +211,9 @@ export function App() {
 
       <footer className="world-label">
         <span>SHAHJAHANABAD</span>
-        <span>Signal: stable</span>
+        <span>
+          <a className="admin-entry" href="#admin">Admin map</a> · Signal: stable
+        </span>
       </footer>
     </main>
   );

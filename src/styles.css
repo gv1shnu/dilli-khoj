@@ -510,6 +510,354 @@ button:disabled {
   }
 }
 
+/* ---- Admin world map ---------------------------------------------------- */
+
+.admin-entry {
+  color: var(--amber);
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.admin-entry:hover {
+  text-decoration: underline;
+}
+
+.admin-shell {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  padding: 24px clamp(16px, 4vw, 48px) 60px;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, rgba(244, 173, 69, 0.08), transparent),
+    #0b0e0d;
+  color: var(--ink);
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-header h1 {
+  font-family: Impact, "Arial Narrow", sans-serif;
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+
+.admin-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-chip {
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(18, 24, 21, 0.7);
+  font: 600 0.72rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--muted);
+}
+
+.admin-chip--live {
+  color: var(--mint);
+  border-color: rgba(101, 225, 189, 0.4);
+}
+
+.admin-chip--draft {
+  color: var(--amber);
+  border-color: rgba(244, 173, 69, 0.4);
+}
+
+.admin-link {
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.admin-link:hover {
+  border-color: rgba(244, 238, 223, 0.5);
+}
+
+.admin-note {
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  max-width: 90ch;
+}
+
+.admin-note code,
+.admin-topic code {
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.admin-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-bottom: 18px;
+}
+
+.admin-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.admin-legend-item i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.admin-map-wrap {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.admin-map {
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+  display: block;
+}
+
+.admin-route {
+  fill: none;
+  stroke: rgba(244, 173, 69, 0.35);
+  stroke-width: 3;
+  stroke-dasharray: 2 8;
+  stroke-linecap: round;
+}
+
+.admin-node {
+  cursor: pointer;
+}
+
+.admin-node:focus {
+  outline: none;
+}
+
+.admin-node:hover circle:first-of-type {
+  filter: brightness(1.15);
+}
+
+.admin-node-num {
+  fill: #10130f;
+  font: 700 20px ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: none;
+}
+
+.admin-node-label {
+  fill: var(--muted);
+  font: 500 12px -apple-system, sans-serif;
+  pointer-events: none;
+}
+
+.admin-detail {
+  margin-top: 22px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--amber);
+  border-radius: 4px;
+  background: var(--panel);
+  padding: 20px clamp(16px, 3vw, 28px);
+}
+
+.admin-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-detail h2 {
+  font-size: 1.4rem;
+}
+
+.admin-detail h3 {
+  margin: 20px 0 8px;
+  color: var(--muted);
+  font: 600 0.7rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-status {
+  padding: 6px 10px;
+  border-radius: 2px;
+  font: 700 0.68rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: nowrap;
+}
+
+.admin-status--live {
+  color: #08120d;
+  background: var(--mint);
+}
+
+.admin-status--drafted {
+  color: #1a1206;
+  background: var(--amber);
+}
+
+.admin-topic,
+.admin-desc {
+  margin: 12px 0 0;
+  line-height: 1.55;
+}
+
+.admin-topic {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.admin-desc {
+  color: #d8d3c7;
+  font-size: 0.95rem;
+  max-width: 80ch;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 32px;
+}
+
+@media (max-width: 820px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-sample {
+  border-collapse: collapse;
+  font: 0.75rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.admin-sample th,
+.admin-sample td {
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+.admin-sample th {
+  color: var(--mint);
+  background: #141815;
+}
+
+.admin-hints {
+  margin: 0;
+  padding-left: 18px;
+  color: #cfcabd;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.admin-schema {
+  margin-bottom: 10px;
+}
+
+.admin-schema-name {
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+}
+
+.admin-schema ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  list-style: none;
+}
+
+.admin-schema li {
+  color: #cfcabd;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.admin-schema code {
+  color: #f7d89f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.admin-type {
+  color: var(--mint);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.admin-colnote {
+  color: var(--muted);
+}
+
+.admin-sql {
+  margin: 0 0 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #090b0a;
+  color: #f7d89f;
+  font: 0.76rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.admin-sql--variant {
+  color: #b7c8bf;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.admin-vaulted {
+  margin-left: 8px;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 120, 105, 0.4);
+  border-radius: 2px;
+  color: var(--red);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+}
+
+.admin-check {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+.admin-check li::before {
+  margin-right: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.admin-check--done {
+  color: var(--mint);
+}
+
+.admin-check--done::before {
+  content: "✓";
+}
+
+.admin-check--todo {
+  color: var(--muted);
+}
+
+.admin-check--todo::before {
+  content: "○";
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
