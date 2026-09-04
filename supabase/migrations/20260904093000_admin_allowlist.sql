@@ -2,8 +2,9 @@
 --
 -- Specific admin emails may sign in (and therefore play) even if their domain is not
 -- one of the approved student domains. This lets the maintainer/team in WITHOUT opening
--- a whole extra domain to every one of its users. Kept in sync with the client
--- allowlist in src/game/admins.ts.
+-- a whole extra domain to every one of its users. This table is the single source of
+-- truth for admin identity; the client learns who is an admin only from the
+-- server-computed `isAdmin` flag returned by public.game_state().
 --
 -- NOTE: Google's OAuth audience still applies first. If the Google app is "Internal"
 -- to the university Workspace org, a different-org email (e.g. @partner.example) is
