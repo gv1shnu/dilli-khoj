@@ -31,14 +31,14 @@ All 20 ruins are **playable locally**. Authoritative server grading is live for 
 
 ### Tooling
 - CI (`ci.yml`): typecheck, vitest, build, Deno judge check. Deploy workflows for Cloudflare (`deploy-web.yml`) and Supabase (`deploy-supabase.yml`, manual).
-- Cloudflare config: worker `dilli-khoj`, account pinned; target origin `https://dilli-khoj.treasure-hunt.workers.dev`.
+- Cloudflare config: worker `dilli-khoj`, account pinned; target origin `https://dilli-khoj.example.workers.dev`.
 
 ## Verified
 - `pnpm typecheck`, `pnpm build`, and **38 unit tests** pass. Browser checks pass at a MacBook-class viewport.
 
 ## Not yet done
 1. **Authoritative grading for all 20**: generate the server judge migrations (hidden cases + computed expected into `game_private.question_cases`) from the content pipeline, add near-miss tests, and get a blind human review per `question-authoring.md`.
-2. **Deploy**: change the Cloudflare account subdomain to `treasure-hunt`, then deploy (`deploy-runbook.md`). Complete Google OAuth + Supabase auth/migrations and deploy the judge.
+2. **Deploy**: the Cloudflare account subdomain is `example` (live origin `https://dilli-khoj.example.workers.dev`); complete Google OAuth + Supabase auth/migrations and deploy the judge (see the deployment runbook).
 3. **Multi-ruin gameplay**: place multiple archives and drive unlock gating from `ruins.ts`/districts; wire XP and progression to the server once grading covers all ruins.
 4. **Admin auth**: the studio is dev-only today; a secured, deployed admin surface (approved emails + RLS) is a later step.
 5. **Load test** the free database at 25/50/100/200 submissions per second before a class-wide launch.

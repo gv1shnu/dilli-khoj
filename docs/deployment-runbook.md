@@ -2,7 +2,7 @@
 
 This is the hand-holding guide. Follow it top to bottom the first time. It takes you
 from nothing to a working, signed-in, judge-graded game at
-`https://dilli-khoj.treasure-hunt.workers.dev`.
+`https://dilli-khoj.example.workers.dev`.
 
 If you only want to *see* the game deployed (roaming + local **Run** working, with
 sign-in and **Submit** showing "development mode" messages), you can stop after
@@ -44,7 +44,7 @@ Project facts you will reuse (all public, safe to see):
 
 - Supabase project ref: `your-project-ref`
 - Supabase URL: `https://your-project-ref.supabase.co`
-- Production origin: `https://dilli-khoj.treasure-hunt.workers.dev`
+- Production origin: `https://dilli-khoj.example.workers.dev`
 - Approved email domains: `example.edu`, `students.example.edu`
 
 ---
@@ -107,7 +107,7 @@ You will end this part holding a **Client ID** and a **Client Secret**.
    - Application type: **Web application**
    - Name: `Dilli Khoj Web`
    - **Authorized JavaScript origins** — add both:
-     - `https://dilli-khoj.treasure-hunt.workers.dev`
+     - `https://dilli-khoj.example.workers.dev`
      - `http://localhost:5173`
    - **Authorized redirect URIs** — add exactly this one (this is Supabase's callback):
      - `https://your-project-ref.supabase.co/auth/v1/callback`
@@ -139,9 +139,9 @@ Open https://supabase.com/dashboard and select project `your-project-ref`.
 ### C2. URL configuration
 
 1. Left sidebar → **Authentication** → **URL Configuration**.
-2. **Site URL:** `https://dilli-khoj.treasure-hunt.workers.dev`
+2. **Site URL:** `https://dilli-khoj.example.workers.dev`
 3. **Redirect URLs** — add:
-   - `https://dilli-khoj.treasure-hunt.workers.dev/**`
+   - `https://dilli-khoj.example.workers.dev/**`
    - `http://localhost:5173/**`
    (The `/**` lets any path under that origin complete a login.)
 
@@ -271,18 +271,18 @@ verdict instead of the development-mode message.
 
 You can deploy from your laptop first (simplest), then automate it in Part G.
 
-The target URL is `https://dilli-khoj.treasure-hunt.workers.dev`, which decodes as
+The target URL is `https://dilli-khoj.example.workers.dev`, which decodes as
 `<worker-name>.<account-subdomain>.workers.dev` — worker **`dilli-khoj`** (already set
-in `wrangler.jsonc`) on the account whose `workers.dev` **subdomain is `treasure-hunt`**.
+in `wrangler.jsonc`) on the account whose `workers.dev` **subdomain is `example`**.
 
-### F0. Set the account subdomain to `treasure-hunt` (once)
+### F0. Set the account subdomain to `example` (once)
 
-The `workers.dev` subdomain is account-wide. To get the `…treasure-hunt.workers.dev`
+The `workers.dev` subdomain is account-wide. To get the `…example.workers.dev`
 part of the URL:
 
 1. Cloudflare dashboard → **Workers & Pages**.
 2. On the right, find **Your subdomain** and click **Change** (or set it, if unset).
-3. Enter `treasure-hunt` and save. It must be globally available; if it is taken you
+3. Enter `example` and save. It must be globally available; if it is taken you
    will need a different subdomain (then update the origin in `wrangler.jsonc` docs,
    Supabase Site URL, and Google origins to match).
 
@@ -296,7 +296,7 @@ pinned in `wrangler.jsonc`. Before deploying, run `pnpm exec wrangler whoami`
 and confirm the authenticated user has access to this account. If not, log out
 and log in to the intended account; do not change the pinned ID to bypass an
 authentication error. Any `CLOUDFLARE_ACCOUNT_ID` environment variable must match
-this ID too. The intended URL remains `https://dilli-khoj.treasure-hunt.workers.dev`.
+this ID too. The intended URL remains `https://dilli-khoj.example.workers.dev`.
 
 ```bash
 cd /Users/YOUR_NAME/Dev/treasure-hunt
@@ -309,7 +309,7 @@ your own Cloudflare account — no token needed for a local deploy.
 Workers Static Assets project defined in `wrangler.jsonc`.
 
 **Checkpoint F:** the command prints a live URL. Open
-`https://dilli-khoj.treasure-hunt.workers.dev` — the game loads, the intro overlay
+`https://dilli-khoj.example.workers.dev` — the game loads, the intro overlay
 appears, and local **Run** works.
 
 ---
@@ -367,7 +367,7 @@ URL reflects your latest commit.
 
 ## Part H — Verify end to end
 
-On `https://dilli-khoj.treasure-hunt.workers.dev`:
+On `https://dilli-khoj.example.workers.dev`:
 
 1. Intro overlay appears; roaming works (WASD, mouse-drag, arrows lead to the amber).
 2. **Sign in with Google** with an approved-domain account → succeeds, your name shows.

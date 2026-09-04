@@ -48,7 +48,7 @@ The build emits PGlite's PostgreSQL WebAssembly and data files. They are the dom
 
 ## Deploy the static shell
 
-Production origin: `https://dilli-khoj.treasure-hunt.workers.dev`
+Production origin: `https://dilli-khoj.example.workers.dev`
 
 ```bash
 pnpm deploy

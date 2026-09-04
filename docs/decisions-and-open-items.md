@@ -9,7 +9,7 @@
 | Identity fields | Fetch Google display name and email; use Supabase UUID as primary identity |
 | Supabase | Project `your-project-ref` |
 | Repository | Private GitHub repository `gv1shnu/treasure-hunt` |
-| Static hosting | Cloudflare Workers Static Assets at `dilli-khoj.treasure-hunt.workers.dev` |
+| Static hosting | Cloudflare Workers Static Assets at `dilli-khoj.example.workers.dev` |
 | Cloudflare account | Owner-confirmed `a34c3ecff69a697ae99c602e883ddb53`; pinned in `wrangler.jsonc` |
 | Google Workspace | Both approved domains belong to the same Workspace organization |
 | Development access | Local repository write access granted; use the owner's Git identity |
@@ -17,7 +17,7 @@
 | Content size | Twenty ruins |
 | Districts | Seven, contiguous ruin ranges, named in `ruins.ts` (Yamuna Gates → Deep Foundations) |
 | XP economy | Implemented in `scoring.ts`: start 100, survey +5, solve +20, hint −10, reveal −30; max 600, floor −300 |
-| Worker/project name | Cloudflare Worker `dilli-khoj`; URL `dilli-khoj.treasure-hunt.workers.dev` |
+| Worker/project name | Cloudflare Worker `dilli-khoj`; URL `dilli-khoj.example.workers.dev` |
 | Question authoring | Dev-only Question Studio at `#admin`; canonical solutions excluded from production builds |
 | Grading | Any safe query passing all result fixtures is accepted; intended syntax is not a hard gate |
 | Scoring | Wrong submissions cost nothing; hints and reveals cost XP |
@@ -51,7 +51,7 @@
 ## Owner actions still open
 
 1. ~~Copy the Supabase publishable key into `.env.local`~~ — done.
-2. Change the Cloudflare account's `workers.dev` subdomain to `treasure-hunt` so the URL resolves (see the deployment runbook, Part F).
+2. Change the Cloudflare account's `workers.dev` subdomain to `example` so the URL resolves (see the deployment runbook, Part F).
 3. Complete the Google OAuth client using the setup guide.
 4. Configure the Supabase Google provider, URL allowlist and Before User Created hook.
 5. Link the Supabase CLI and apply the reviewed migrations; deploy the judge.
