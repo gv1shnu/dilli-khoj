@@ -2,7 +2,7 @@
 
 ## Two execution paths
 
-Implementation status: the browser path and judge source are implemented. The judge is not deployed until the database roles, secrets and migrations are configured. See `implementation-status.md`.
+Implementation status: all 20 local practice paths exist; only Ruin 06 has server grading. The latest maintainer handoff reports that judge deployed with roles, secrets and migrations configured. Local code inspection found a signup/judge domain-policy mismatch and browser-local preview unlocks; these are not a completed production authorization/progression system. See [implementation status](implementation-status.md) and [next steps](next-steps.md).
 
 ### Run
 
@@ -10,7 +10,7 @@ Implementation status: the browser path and judge source are implemented. The ju
 - Uses the visible fixture cached in IndexedDB.
 - Returns immediate PostgreSQL-compatible rows or errors.
 - Is unlimited, free and untrusted.
-- Never changes XP, progression or the leaderboard.
+- Never changes official XP, server progression or the leaderboard. In the current preview it does update local `passed` state, which the UI uses to unlock the next archive; that state is untrusted.
 
 ### Submit
 

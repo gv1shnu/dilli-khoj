@@ -8,8 +8,13 @@ Approved domains:
 
 - `example.edu`
 - `students.example.edu`
+- `partner.example`
 
-## Information still needed
+## Current setup snapshot
+
+The 4 September maintainer handoff reports the publishable key, Google provider/redirects, migrations and judge deployment configured, and Google sign-in tested successfully. Google is reported External / Testing; hook enablement and disabling unused Email signup still need confirmation. The guide below is a reference for checking or recreating setup, not a requirement to redo it on another laptop. The judge's separate domain check has not yet been updated for `partner.example`; see [next steps](next-steps.md).
+
+## Values needed on a new laptop
 
 - A Supabase publishable key for browser configuration. Retrieve it from **Connect** or **Settings → API Keys**. Prefer `sb_publishable_...`; legacy `anon` keys are being deprecated.
 - Google OAuth configured in the dashboard. Keep its client secret out of chat and Git.
@@ -33,7 +38,7 @@ The university domains share one Google Workspace organization, but `partner.exa
 8. Go to **Authentication → Providers → Google**. Leave this page open; it displays the Supabase callback URL needed by Google.
 9. After Google setup, paste the Google Client ID and Client Secret here and enable the provider.
 10. Disable authentication methods the game does not use, especially anonymous and password sign-up.
-11. Configure a **Before User Created** hook that allows only the two approved domains and only Google-created accounts.
+11. Verify the **Before User Created** hook allows the three approved domains or server-allowlisted admin emails, and only Google-created accounts.
 12. Create the profile trigger that copies Google display name and email into the game profile while using the Supabase user UUID as the permanent identifier.
 13. Run the database migrations, RLS tests and judge-role attack tests before adding production content.
 
@@ -65,7 +70,7 @@ Official references:
 
 9. Create the client.
 10. Copy its Client ID and Client Secret directly into **Supabase → Authentication → Providers → Google**.
-11. Test both approved domains and a non-approved Gmail account.
+11. Test all three approved domains and a non-approved Gmail account.
 12. Confirm that Google returns display name and email and that the non-approved account is rejected by the server-side hook.
 
 Google states that email alone should not be treated as the permanent account identifier. Use the Supabase UUID/Google subject for identity and verify the hosted-domain claim when restricting Workspace membership:
@@ -78,7 +83,7 @@ Do not rely on a client-side email suffix check. The server-side creation hook s
 
 - OAuth provider is Google;
 - email is verified;
-- normalized domain is exactly `example.edu` or `students.example.edu`, **or** the email is in `game_private.admin_emails` (the admin allowlist);
+- normalized domain is exactly `example.edu`, `students.example.edu` or `partner.example`, **or** the email is in `game_private.admin_emails` (the admin allowlist);
 - where available, Google's hosted-domain claim agrees with the approved organization.
 
 The UI may provide a friendly error, but database and judge authorization must independently reject other accounts.

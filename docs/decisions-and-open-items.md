@@ -11,7 +11,7 @@
 | Repository | Private GitHub repository `gv1shnu/treasure-hunt` |
 | Static hosting | Cloudflare Workers Static Assets at `dilli-khoj.example.workers.dev` |
 | Cloudflare account | Owner-confirmed `a34c3ecff69a697ae99c602e883ddb53`; pinned in `wrangler.jsonc` |
-| Google Workspace | Both approved domains belong to the same Workspace organization |
+| Google Workspace | The two university domains share an organization; `partner.example` requires External Google OAuth |
 | Development access | Local repository write access granted; use the owner's Git identity |
 | Deadline | No date; release by readiness gate |
 | Content size | Twenty ruins |
@@ -44,8 +44,8 @@
 
 | Area | Default |
 | --- | --- |
-| XP | Start 100; solve +20; survey +5; hint -10; reveal -30; wrong 0 |
-| Leaderboard order | Solved count, then XP, then active solve time |
+| XP | Start 100; solve +20; survey +5; hint -10; reveal -20; wrong 0; help affordability-gated |
+| Leaderboard order | Completers only, then XP descending and completion time ascending; exact timing exclusions need reconciliation |
 | Data collection | Minimum identity, progress, submissions, verdicts, latency and hint usage |
 | Retention | Delete raw SQL and detailed attempts after 90 days; retain anonymous aggregates |
 | Hidden grading | One visible plus two hidden fixtures; one hidden runtime fixture fallback if free-tier load fails |
@@ -55,13 +55,14 @@
 ## Owner actions still open
 
 1. ~~Copy the Supabase publishable key into `.env.local`~~ — done.
-2. Change the Cloudflare account's `workers.dev` subdomain to `example` so the URL resolves (see the deployment runbook, Part F).
-3. Complete the Google OAuth client using the setup guide.
-4. Configure the Supabase Google provider, URL allowlist and Before User Created hook.
-5. Link the Supabase CLI and apply the reviewed migrations; deploy the judge.
-6. ~~Provide the admin allowlist emails~~ — done (`game_private.admin_emails`). Apply the `admin_allowlist` migration with `supabase db push`.
+3. Handoff reports Cloudflare live, Google OAuth/provider/redirects working, migrations applied and judge deployed. Do not recreate these resources; confirm current state before release.
+4. Confirm Before User Created hook enablement, disable unused Email/Anonymous providers, and complete the Google External production rollout when ready. The handoff reports External / Testing today.
+5. Authorize deployment of a reviewed current build when ready; the hosted site reportedly predates recent gameplay changes.
+6. ~~Provide the admin allowlist emails and apply the migration~~ — reported done. Production admin authorization still needs implementation.
 7. Obtain written permission for institutional logo files if they will appear in the shipped game.
 8. Decide whether the 90-day raw-attempt retention default should be shorter.
+9. Resolve completion timing: sign-up-to-completion wall time versus excluding loading/revisit time. Code currently stores first-play local timestamps as a preview proxy.
+10. Decide whether to retain the default Supabase domain on Google consent. Custom branding must not introduce spending without explicit budget approval.
 
 ## Feasibility watchlist
 

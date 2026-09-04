@@ -111,7 +111,7 @@ The absence of a deadline is not a technical problem. It does create scope-drift
 
 - all twenty questions meet the authoring standard;
 - all fixtures and near-miss tests pass;
-- authentication works for both approved domains;
+- authentication and Submit work for all three approved domains and the server admin allowlist;
 - a synthetic load test passes the agreed latency target;
 - the game completes on a baseline MacBook Air in current Chrome;
 - the production build and visible dataset are preloaded before the class-wide start.
@@ -129,4 +129,3 @@ Collect only:
 - coarse gameplay telemetry required to diagnose stuck students.
 
 Do not collect location, contacts or unrelated Google account data. Keep raw SQL and detailed attempts for 90 days after the event, then delete them or retain only anonymous aggregates. This is a safe default and can be shortened later.
-

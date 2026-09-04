@@ -1,5 +1,6 @@
 # Deployment runbook (zero to live URL)
 
+
 This is the hand-holding guide. Follow it top to bottom the first time. It takes you
 from nothing to a working, signed-in, judge-graded game at
 `https://dilli-khoj.example.workers.dev`.
@@ -14,7 +15,7 @@ sign-in and **Submit** showing "development mode" messages), you can stop after
 | --- | --- | --- |
 | **Cloudflare** | Serves the game (HTML/JS/WASM) to students | Cloudflare Workers Static Assets |
 | **Google OAuth** | "Sign in with Google" identity | Google Cloud |
-| **Supabase Auth** | Verifies the Google login, restricts to your two domains | Supabase |
+| **Supabase Auth** | Verifies Google login; signup hook checks three domains and admin allowlist | Supabase |
 | **Supabase Postgres** | Stores profiles, progress, XP; holds the hidden fixtures | Supabase |
 | **Judge (Edge Function)** | Grades **Submit** against hidden cases, awards XP | Supabase |
 | **GitHub Actions** | Builds and deploys automatically | GitHub |
@@ -45,7 +46,7 @@ Project facts you will reuse (all public, safe to see):
 - Supabase project ref: `your-project-ref`
 - Supabase URL: `https://your-project-ref.supabase.co`
 - Production origin: `https://dilli-khoj.example.workers.dev`
-- Approved email domains: `example.edu`, `students.example.edu`
+- Approved email domains: `example.edu`, `students.example.edu`, `partner.example`
 
 ---
 
