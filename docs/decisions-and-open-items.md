@@ -33,7 +33,7 @@
 | Setting | Fictional post-collapse Delhi approved |
 | Tone | Playful, classroom-friendly, limited humour |
 | Content boundaries | Stay on educational game development; no unrelated issues |
-| Question structure | Title → description → sample output → hints |
+| Question structure | Title → description → sample output → schema with sample rows → hints |
 | Academic approval | Team discussion; no single external approver named |
 | Admin allowlist | `former.admin@example.edu`, `staff.admin@partner.example` (`game_private.admin_emails` + `src/game/admins.ts`). Admins are also players |
 | Player domains | `example.edu`, `students.example.edu`, and `partner.example` (added 2026-09-04, owner decision). Allowing `partner.example` **requires the Google OAuth app to be External + published** (Internal blocks its different-org accounts) |

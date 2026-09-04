@@ -27,7 +27,7 @@ export function ResultTable({ result }: { result: TabularResult }) {
   );
 }
 
-function formatCell(value: unknown): string {
+export function formatCell(value: unknown): string {
   if (value === null) return "NULL";
   if (value instanceof Date) return value.toISOString();
   if (typeof value === "object") return JSON.stringify(value);

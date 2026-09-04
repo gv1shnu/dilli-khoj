@@ -52,7 +52,9 @@ function blankQuestion(id: number): RuinQuestion {
     sampleRows: [["sample"]],
     ordered: true,
     hints: ["First hint."],
-    schema: [{ name: "table_name", columns: [{ name: "col", type: "text" }] }],
+    schema: [
+      { name: "table_name", columns: [{ name: "col", type: "text" }], sampleRows: [["sample"]] },
+    ],
     starterSql: "SELECT col\nFROM table_name;",
     canonicalSolution: "SELECT col\nFROM table_name\nORDER BY col;",
     acceptedVariants: [],

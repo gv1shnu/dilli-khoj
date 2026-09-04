@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ResultTable } from "./components/ResultTable";
+import { ResultTable, formatCell } from "./components/ResultTable";
 import { FullscreenButton } from "./components/FullscreenButton";
 import { preparePracticeDatabase, runPracticeQuery } from "./db/practice-db";
 import { RuinScene } from "./game/RuinScene";
@@ -650,6 +650,27 @@ function GameShell({
                     {column.note ? ` · ${column.note}` : ""}
                   </code>
                 ))}
+                <span className="schema-sample-label">Sample rows · illustrative</span>
+                <div className="schema-sample-scroll">
+                  <table className="schema-sample">
+                    <thead>
+                      <tr>
+                        {table.columns.map((column) => (
+                          <th key={column.name}>{column.name}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {table.sampleRows.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {table.columns.map((column, colIndex) => (
+                            <td key={column.name}>{formatCell(row[colIndex])}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             ))}
           </details>

@@ -240,6 +240,40 @@ h2 {
 .archive-schema code {
   overflow-wrap: anywhere;
 }
+.schema-sample-label {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.schema-sample-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+}
+.schema-sample {
+  width: 100%;
+  border-collapse: collapse;
+  font:
+    0.68rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+.schema-sample th,
+.schema-sample td {
+  padding: 5px 9px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+.schema-sample th {
+  color: var(--mint);
+  background: #141815;
+}
+.schema-sample tr:last-child td {
+  border-bottom: 0;
+}
 .draft-note {
   display: block;
   margin-top: 5px;

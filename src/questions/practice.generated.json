@@ -40,6 +40,26 @@
             "name": "is_key",
             "type": "boolean"
           }
+        ],
+        "sampleRows": [
+          [
+            "resident",
+            "resident_id",
+            "integer",
+            true
+          ],
+          [
+            "resident",
+            "full_name",
+            "text",
+            false
+          ],
+          [
+            "shelter",
+            "capacity",
+            "integer",
+            false
+          ]
         ]
       }
     ],
@@ -105,6 +125,26 @@
             "name": "nullable",
             "type": "boolean"
           }
+        ],
+        "sampleRows": [
+          [
+            "bus",
+            "bus_id",
+            "primary",
+            false
+          ],
+          [
+            "bus",
+            "plate_no",
+            "candidate",
+            false
+          ],
+          [
+            "bus",
+            "colour",
+            "none",
+            true
+          ]
         ]
       }
     ],
@@ -165,6 +205,26 @@
             "name": "parent_attribute",
             "type": "text"
           }
+        ],
+        "sampleRows": [
+          [
+            "ration_cards",
+            "family_id",
+            "family",
+            "id"
+          ],
+          [
+            "residents",
+            "family_id",
+            "family",
+            "id"
+          ],
+          [
+            "families",
+            "ward",
+            "ward",
+            "id"
+          ]
         ]
       }
     ],
@@ -230,6 +290,26 @@
             "name": "changed_at",
             "type": "timestamp"
           }
+        ],
+        "sampleRows": [
+          [
+            "CREATE TABLE",
+            "shelters",
+            "DDL",
+            "2042-01-02 10:00:00"
+          ],
+          [
+            "ALTER TABLE",
+            "pumps",
+            "DDL",
+            "2042-01-03 10:00:00"
+          ],
+          [
+            "INSERT",
+            "residents",
+            "DML",
+            "2042-01-04 10:00:00"
+          ]
         ]
       }
     ],
@@ -295,6 +375,26 @@
             "name": "granted",
             "type": "boolean"
           }
+        ],
+        "sampleRows": [
+          [
+            "scout",
+            "shelters",
+            "SELECT",
+            true
+          ],
+          [
+            "porter",
+            "crates",
+            "SELECT",
+            false
+          ],
+          [
+            "builder",
+            "repairs",
+            "INSERT",
+            true
+          ]
         ]
       }
     ],
@@ -365,6 +465,29 @@
             "name": "daily_rations",
             "type": "integer"
           }
+        ],
+        "sampleRows": [
+          [
+            102,
+            "Moonlight Grain",
+            "K-7",
+            "open",
+            28
+          ],
+          [
+            101,
+            "Copper Kettle",
+            "K-7",
+            "closed",
+            0
+          ],
+          [
+            104,
+            "Old Clock Spices",
+            "K-7",
+            null,
+            7
+          ]
         ]
       }
     ],
@@ -418,6 +541,23 @@
             "name": "arrival_day",
             "type": "integer"
           }
+        ],
+        "sampleRows": [
+          [
+            "Asha",
+            "W-2",
+            1
+          ],
+          [
+            "Dev",
+            "W-1",
+            2
+          ],
+          [
+            "Noor",
+            null,
+            4
+          ]
         ]
       }
     ],
@@ -471,6 +611,20 @@
             "type": "text",
             "note": "free text description"
           }
+        ],
+        "sampleRows": [
+          [
+            "Scroll House",
+            "handmade PAPER"
+          ],
+          [
+            "Paper Lantern",
+            "lamps"
+          ],
+          [
+            "Ink Corner",
+            "paper and ink"
+          ]
         ]
       }
     ],
@@ -528,6 +682,23 @@
             "name": "sealed",
             "type": "boolean"
           }
+        ],
+        "sampleRows": [
+          [
+            11,
+            "D-1",
+            false
+          ],
+          [
+            15,
+            "D-1",
+            true
+          ],
+          [
+            17,
+            null,
+            false
+          ]
         ]
       }
     ],
@@ -583,6 +754,20 @@
             "name": "value_coins",
             "type": "integer"
           }
+        ],
+        "sampleRows": [
+          [
+            "Amber lens",
+            90
+          ],
+          [
+            "Copper dial",
+            64
+          ],
+          [
+            "Worn buckle",
+            10
+          ]
         ]
       }
     ],
@@ -642,6 +827,20 @@
             "name": "notes",
             "type": "text"
           }
+        ],
+        "sampleRows": [
+          [
+            "dal",
+            "Stir gently"
+          ],
+          [
+            "chai",
+            null
+          ],
+          [
+            "rice",
+            "नींबू"
+          ]
         ]
       }
     ],
@@ -711,6 +910,23 @@
             "type": "numeric",
             "note": "may be NULL"
           }
+        ],
+        "sampleRows": [
+          [
+            1,
+            12.4,
+            null
+          ],
+          [
+            2,
+            10.25,
+            0.25
+          ],
+          [
+            3,
+            0,
+            0
+          ]
         ]
       }
     ],
@@ -778,6 +994,20 @@
             "name": "depart_at",
             "type": "timestamp"
           }
+        ],
+        "sampleRows": [
+          [
+            "A",
+            "2042-02-01 23:59:00"
+          ],
+          [
+            "B",
+            "2042-02-02 00:00:00"
+          ],
+          [
+            "C",
+            null
+          ]
         ]
       }
     ],
@@ -837,6 +1067,20 @@
             "name": "crates",
             "type": "integer"
           }
+        ],
+        "sampleRows": [
+          [
+            "rice",
+            7
+          ],
+          [
+            "rice",
+            7
+          ],
+          [
+            "millet",
+            3
+          ]
         ]
       }
     ],
@@ -893,6 +1137,20 @@
             "name": "metal_kg",
             "type": "numeric"
           }
+        ],
+        "sampleRows": [
+          [
+            "H-A",
+            500
+          ],
+          [
+            "H-B",
+            800
+          ],
+          [
+            "H-E",
+            1000
+          ]
         ]
       }
     ],
@@ -945,6 +1203,20 @@
             "name": "weight_kg",
             "type": "numeric"
           }
+        ],
+        "sampleRows": [
+          [
+            "B-A",
+            20
+          ],
+          [
+            "B-A",
+            19.9
+          ],
+          [
+            "B-C",
+            40
+          ]
         ]
       }
     ],
@@ -1014,6 +1286,23 @@
             "name": "taps",
             "type": "integer"
           }
+        ],
+        "sampleRows": [
+          [
+            "Blue",
+            "Mira",
+            40
+          ],
+          [
+            "Blue",
+            "Adi",
+            40
+          ],
+          [
+            "Gold",
+            "Noor",
+            25
+          ]
         ]
       }
     ],
@@ -1096,6 +1385,20 @@
             "name": "signal",
             "type": "integer"
           }
+        ],
+        "sampleRows": [
+          [
+            0,
+            10
+          ],
+          [
+            1,
+            20
+          ],
+          [
+            3,
+            null
+          ]
         ]
       }
     ],
@@ -1170,6 +1473,20 @@
             "name": "depth_m",
             "type": "numeric"
           }
+        ],
+        "sampleRows": [
+          [
+            1,
+            10
+          ],
+          [
+            3,
+            40
+          ],
+          [
+            5,
+            null
+          ]
         ]
       }
     ],
@@ -1227,6 +1544,20 @@
             "type": "integer",
             "note": "-> towers.tower_id"
           }
+        ],
+        "sampleRows": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            null
+          ]
         ]
       },
       {
@@ -1241,6 +1572,20 @@
             "name": "tower_name",
             "type": "text"
           }
+        ],
+        "sampleRows": [
+          [
+            1,
+            "North"
+          ],
+          [
+            2,
+            "East"
+          ],
+          [
+            3,
+            "West"
+          ]
         ]
       }
     ],

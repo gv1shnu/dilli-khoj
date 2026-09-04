@@ -25,12 +25,15 @@ export interface QuestionColumn {
   note?: string;
 }
 
+export type SampleValue = string | number | boolean | null;
+
 export interface QuestionTable {
   name: string;
   columns: QuestionColumn[];
+  /** A few illustrative source rows shown in the schema browser. Fictional
+   *  examples of the table's shape — never the graded fixture or the answer. */
+  sampleRows: SampleValue[][];
 }
-
-export type SampleValue = string | number | boolean | null;
 
 export interface RuinQuestion {
   id: number;
@@ -83,6 +86,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "data_type", type: txt },
           { name: "is_key", type: bool },
         ],
+        sampleRows: [
+          ["resident", "resident_id", "integer", true],
+          ["resident", "full_name", "text", false],
+          ["shelter", "capacity", "integer", false],
+        ],
       },
     ],
     starterSql: "SELECT attribute, data_type\nFROM catalog_columns\nORDER BY attribute;",
@@ -111,6 +119,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "attribute", type: txt },
           { name: "key_kind", type: txt, note: "primary | candidate | unique | none" },
           { name: "nullable", type: bool },
+        ],
+        sampleRows: [
+          ["bus", "bus_id", "primary", false],
+          ["bus", "plate_no", "candidate", false],
+          ["bus", "colour", "none", true],
         ],
       },
     ],
@@ -144,6 +157,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "parent_entity", type: txt },
           { name: "parent_attribute", type: txt },
         ],
+        sampleRows: [
+          ["ration_cards", "family_id", "family", "id"],
+          ["residents", "family_id", "family", "id"],
+          ["families", "ward", "ward", "id"],
+        ],
       },
     ],
     starterSql: "SELECT child_entity, child_attribute\nFROM foreign_keys\nORDER BY child_entity, child_attribute;",
@@ -175,6 +193,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "object_name", type: txt },
           { name: "op_kind", type: txt, note: "DDL | DML" },
           { name: "changed_at", type: "timestamp" },
+        ],
+        sampleRows: [
+          ["CREATE TABLE", "shelters", "DDL", "2042-01-02 10:00:00"],
+          ["ALTER TABLE", "pumps", "DDL", "2042-01-03 10:00:00"],
+          ["INSERT", "residents", "DML", "2042-01-04 10:00:00"],
         ],
       },
     ],
@@ -208,6 +231,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "privilege", type: txt, note: "SELECT | INSERT | ..." },
           { name: "granted", type: bool },
         ],
+        sampleRows: [
+          ["scout", "shelters", "SELECT", true],
+          ["porter", "crates", "SELECT", false],
+          ["builder", "repairs", "INSERT", true],
+        ],
       },
     ],
     starterSql: "SELECT grantee, object_name\nFROM access_grants\nORDER BY grantee;",
@@ -238,6 +266,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "status", type: txt, note: "open | closed | NULL" },
           { name: "daily_rations", type: int },
         ],
+        sampleRows: [
+          [102, "Moonlight Grain", "K-7", "open", 28],
+          [101, "Copper Kettle", "K-7", "closed", 0],
+          [104, "Old Clock Spices", "K-7", null, 7],
+        ],
       },
     ],
     starterSql: ruinSix.starterSql,
@@ -266,6 +299,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "home_ward", type: txt },
           { name: "arrival_day", type: int },
         ],
+        sampleRows: [
+          ["Asha", "W-2", 1],
+          ["Dev", "W-1", 2],
+          ["Noor", null, 4],
+        ],
       },
     ],
     starterSql: "SELECT home_ward\nFROM pilgrims\nORDER BY home_ward;",
@@ -291,6 +329,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "shop_name", type: txt },
           { name: "trade", type: txt, note: "free text description" },
+        ],
+        sampleRows: [
+          ["Scroll House", "handmade PAPER"],
+          ["Paper Lantern", "lamps"],
+          ["Ink Corner", "paper and ink"],
         ],
       },
     ],
@@ -318,6 +361,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "vault_id", type: int, note: "primary key" },
           { name: "ward_code", type: txt },
           { name: "sealed", type: bool },
+        ],
+        sampleRows: [
+          [11, "D-1", false],
+          [15, "D-1", true],
+          [17, null, false],
         ],
       },
     ],
@@ -348,6 +396,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "item", type: txt },
           { name: "value_coins", type: int },
+        ],
+        sampleRows: [
+          ["Amber lens", 90],
+          ["Copper dial", 64],
+          ["Worn buckle", 10],
         ],
       },
     ],
@@ -381,6 +434,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "dish", type: txt },
           { name: "notes", type: txt },
+        ],
+        sampleRows: [
+          ["dal", "Stir gently"],
+          ["chai", null],
+          ["rice", "नींबू"],
         ],
       },
     ],
@@ -416,6 +474,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "litres_per_min", type: "numeric" },
           { name: "backup_lpm", type: "numeric", note: "may be NULL" },
         ],
+        sampleRows: [
+          [1, 12.4, null],
+          [2, 10.25, 0.25],
+          [3, 0, 0],
+        ],
       },
     ],
     starterSql: "SELECT pump_id, litres_per_min, backup_lpm\nFROM pumps\nORDER BY pump_id;",
@@ -448,6 +511,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "train", type: txt },
           { name: "depart_at", type: "timestamp" },
+        ],
+        sampleRows: [
+          ["A", "2042-02-01 23:59:00"],
+          ["B", "2042-02-02 00:00:00"],
+          ["C", null],
         ],
       },
     ],
@@ -482,6 +550,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "crop", type: txt },
           { name: "crates", type: int },
         ],
+        sampleRows: [
+          ["rice", 7],
+          ["rice", 7],
+          ["millet", 3],
+        ],
       },
     ],
     starterSql: "SELECT crop, crates\nFROM lots\nORDER BY crop;",
@@ -511,6 +584,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "heap_no", type: txt },
           { name: "metal_kg", type: "numeric" },
+        ],
+        sampleRows: [
+          ["H-A", 500],
+          ["H-B", 800],
+          ["H-E", 1000],
         ],
       },
     ],
@@ -544,6 +622,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "bin", type: txt },
           { name: "weight_kg", type: "numeric" },
+        ],
+        sampleRows: [
+          ["B-A", 20],
+          ["B-A", 19.9],
+          ["B-C", 40],
         ],
       },
     ],
@@ -579,6 +662,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "rider", type: txt },
           { name: "taps", type: int },
         ],
+        sampleRows: [
+          ["Blue", "Mira", 40],
+          ["Blue", "Adi", 40],
+          ["Gold", "Noor", 25],
+        ],
       },
     ],
     starterSql: "SELECT line, rider, taps\nFROM riders\nORDER BY line, taps DESC;",
@@ -611,6 +699,11 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "hour", type: int },
           { name: "signal", type: int },
+        ],
+        sampleRows: [
+          [0, 10],
+          [1, 20],
+          [3, null],
         ],
       },
     ],
@@ -645,6 +738,11 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "well_id", type: int, note: "primary key" },
           { name: "depth_m", type: "numeric" },
         ],
+        sampleRows: [
+          [1, 10],
+          [3, 40],
+          [5, null],
+        ],
       },
     ],
     starterSql: "SELECT well_id, depth_m\nFROM wells\nORDER BY depth_m DESC, well_id;",
@@ -678,12 +776,22 @@ const QUESTIONS: RuinQuestion[] = [
           { name: "span_id", type: int, note: "primary key" },
           { name: "tower_id", type: int, note: "-> towers.tower_id" },
         ],
+        sampleRows: [
+          [1, 1],
+          [2, 1],
+          [4, null],
+        ],
       },
       {
         name: "towers",
         columns: [
           { name: "tower_id", type: int, note: "primary key" },
           { name: "tower_name", type: txt },
+        ],
+        sampleRows: [
+          [1, "North"],
+          [2, "East"],
+          [3, "West"],
         ],
       },
     ],
