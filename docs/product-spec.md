@@ -21,15 +21,18 @@ Use a distinct Dilli Khoj visual identity. The official Example School of Techno
 
 ## Player loop
 
-1. Sign in with Google.
-2. Roam the currently unlocked district.
-3. Survey a ruin and open its SQL terminal.
-4. Use **Run** for unlimited local practice.
-5. Use **Submit** for authoritative server evaluation against visible and hidden cases.
-6. Receive an immediate verdict without losing XP for a wrong answer.
-7. Solve every ruin in the district to open the next checkpoint.
+1. Read the how-to-play explanation.
+2. **Sign in with Google — required before any play.** Sign-in is mandatory (not optional) immediately after the explanation. This reduces anonymous traffic, ensures only legitimate approved-domain users play, and lets admins access each player's progress.
+3. Roam the currently unlocked area.
+4. Survey the current ruin and open its SQL terminal.
+5. Use **Run** for unlimited local practice.
+6. Use **Submit** for authoritative server evaluation against visible and hidden cases.
+7. Receive an immediate verdict without losing XP for a wrong answer.
+8. Solve the ruin to unlock the next one.
 
-Movement is never gated by SQL inside an open district. SQL clears ruins and opens district checkpoints.
+### Sequential passage and rising difficulty
+
+Ruins are played **strictly in order** (1 → 20). A ruin is playable only once the previous one is solved; players cannot jump ahead to a later topic. Because the sequence follows the DBMS Topic Tree (Modules 1 → 8), difficulty **rises** as the player advances. Movement is never gated by SQL — only the *next* ruin's availability is. Cleared ruins remain open for revisiting (see Revisit mode).
 
 ## Scope
 
@@ -55,7 +58,7 @@ Questions describe the required data outcome and may recommend a technique such 
 
 ## Scoring and help
 
-Recommended rules:
+Implemented in `src/game/scoring.ts`:
 
 | Event | XP |
 | --- | ---: |
@@ -63,34 +66,44 @@ Recommended rules:
 | First completion of a ruin | +20 |
 | First survey of a ruin | +5 |
 | Hint | -10 |
-| Full solution reveal | -30 |
+| Full solution reveal | -20 |
 | Wrong submission | 0 |
 | Revisit practice | 0 |
 
 - Ruins 1–10 have one hint; ruins 11–20 have two.
 - The full solution becomes available only after all hints for that question have been opened.
-- XP may go negative; debt never blocks learning.
-- XP, solved state, survey state and unlocks are server-authoritative.
-- A reveal solves nothing automatically. The learner must still submit a passing query.
+- **Help is a purchase, gated by balance (anti-bypass rule).** You cannot open a hint or reveal you cannot afford. **Solving is always free and always available**, so debt never blocks *learning* — only *shortcuts* are rationed.
+- **No reveal-bypass:** a player who takes maximum help (all hints + reveal) on every level runs out of affordable help at about **level 13 of 20 (~two-thirds)** and must solve the rest unaided. A no-help run tops out at **600 XP** (`MAX_XP`); the exhaustion level is computed as `EXHAUSTS_AROUND`.
+- A reveal solves nothing automatically. The learner must still submit a passing query — there is no way to reach the end without solving.
+- XP, solved state, survey state and unlocks are server-authoritative in production.
 
-## Revisit mode
+## Revisit mode and the player world map
 
-Solved ruins remain physically accessible. Revisiting a ruin starts a non-scoring practice attempt with a different question variant for the same topic.
+Each signed-in player has a **personal world map** showing their own progress: which ruins are locked, which is current, and which they have cleared. Cleared ruins are marked and clickable.
 
-- The variant is deterministic from player, ruin and visit count.
-- It awards no additional progression XP and cannot change district state.
-- It may use the same visible tables with a different target or threshold.
-- Revisit results may be recorded for learning analytics but never affect the leaderboard.
+- Clicking a cleared ruin on the player's map opens a **revisit** — a non-scoring practice attempt on that topic.
+- The variant is deterministic from player, ruin and visit count; it may reuse the visible tables with a different target or threshold.
+- Revisits award no progression XP and cannot change unlock state or the leaderboard; results may be recorded for analytics only.
+- Per-player cleared/surveyed state, XP, hint/reveal usage, sign-up time and completion time are tracked so the map and the leaderboard can be rendered. Client-local while offline; server-authoritative once the backend is live.
 
 ## Leaderboard
 
-The final leaderboard is visible to students. Rank by:
+The leaderboard lists **only players who have completed the game** (all 20 ruins solved). Rank by:
 
-1. number of first-time ruins solved;
-2. XP remaining;
-3. total active solving time, ascending, as a tie-break only.
+1. XP remaining, descending;
+2. total time from sign-up to completion, ascending, as the tie-break.
 
-Display name, solved count and XP. Never display email addresses. Show the top twenty plus the current player's own position. Pauses, loading time and revisit practice do not count toward active solving time.
+Display name and XP (and optionally completion time). Never display email addresses. Show the top twenty plus the current player's own position if they have completed. Loading time and revisit practice do not count as solving.
+
+Implemented as `compareCompletion` / `hasCompleted` in `src/game/scoring.ts`; cross-player data requires the server backend.
+
+## Access control (admin and question pages)
+
+The **admin surfaces** — the Question Studio and any player-progress views — are **restricted to specific admin emails** supplied by the project owner. These pages are not reachable by ordinary players.
+
+- Access is granted only to signed-in users whose email is on the admin allowlist (owner-provided).
+- Canonical solutions must never reach ordinary students: they are excluded from student builds, and any deployed admin view must read admin data from the server under RLS keyed to admin emails, not bundle it into the client.
+- Until the allowlist and server RLS are in place, the authoring studio stays a local dev-only tool.
 
 ## Release policy without a deadline
 

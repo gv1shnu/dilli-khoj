@@ -16,13 +16,16 @@
 | Deadline | No date; release by readiness gate |
 | Content size | Twenty ruins |
 | Districts | Seven, contiguous ruin ranges, named in `ruins.ts` (Yamuna Gates → Deep Foundations) |
-| XP economy | Implemented in `scoring.ts`: start 100, survey +5, solve +20, hint −10, reveal −30; max 600, floor −300 |
+| Sign-in | Google sign-in is **required** before play, right after the how-to-play explanation (reduce traffic, legitimate users only, admin progress access) |
+| Sequential passage | Ruins play strictly in order (1→20); no jumping ahead. Difficulty rises with the module sequence |
+| XP economy | `scoring.ts`: start 100, survey +5, solve +20, hint −10, reveal −20. Help is affordability-gated (anti-bypass); solving is always free. Full-help exhausts ~level 13/20; max 600 |
+| Access control | Admin + question pages restricted to owner-supplied admin emails; solutions never ship to students |
 | Worker/project name | Cloudflare Worker `dilli-khoj`; URL `dilli-khoj.example.workers.dev` |
 | Question authoring | Dev-only Question Studio at `#admin`; canonical solutions excluded from production builds |
 | Grading | Any safe query passing all result fixtures is accepted; intended syntax is not a hard gate |
 | Scoring | Wrong submissions cost nothing; hints and reveals cost XP |
-| Revisits | Allowed with a different, non-scoring question variant |
-| Leaderboard | Enabled; no email displayed |
+| Revisits | Allowed via each player's personal world map (click a cleared ruin); non-scoring variant |
+| Leaderboard | Completers only (all 20 solved), ranked by XP then time from sign-up to completion; no email displayed |
 | Browser | Modern browsers supported; Chrome recommended and used as support baseline |
 | Budget | ₹0 operating target; degrade hidden runtime cases before adding paid infrastructure |
 | Institutional identity | Example School of Technology at Example University |
@@ -55,7 +58,7 @@
 3. Complete the Google OAuth client using the setup guide.
 4. Configure the Supabase Google provider, URL allowlist and Before User Created hook.
 5. Link the Supabase CLI and apply the reviewed migrations; deploy the judge.
-6. Add admin emails when the dashboard is ready.
+6. Provide the **admin allowlist emails** (you + your team) that may open the Question Studio and the player-progress/leaderboard admin views.
 7. Obtain written permission for institutional logo files if they will appear in the shipped game.
 8. Decide whether the 90-day raw-attempt retention default should be shorter.
 
