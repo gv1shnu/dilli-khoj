@@ -9,10 +9,10 @@ This is a single-page application without a route library. There are no separate
 | Entry | What it opens | Access |
 | --- | --- | --- |
 | `/` or `/#` | Intro, sign-in and game shell | Approved signed-in players; DEV offline bypass available |
-| `/#admin` | Question Studio with a visual progression route, fixtures, answers and local JSON editing/export | DEV build only; excluded from student production assets |
-| World map button | Personal district/ruin selector modal | In-game; server clearance controls signed-in access |
+| `/#admin` | Question Studio with the complete geographic atlas, fixtures, answers and local JSON editing/export | DEV build only; excluded from student production assets |
+| World map button | Animated geographic atlas modal | Players: cleared regions only. Server-recognized admins: all 20 regions |
 | Leaderboard button | Top 20 completers plus personal rank modal | Signed-in approved players |
-| Admin button | Player table and question-review modal | Server-allowlisted admins; each protected read is audited |
+| Admin button | Complete atlas, player table and question-review modal | Server-allowlisted admins; each protected read is audited |
 | Archive arrows/dropdown | First-pass/current archive or a cleared ruin's alternate practice question | Sequential unlock rules; selection is component state, not a URL |
 | Fullscreen button | Browser fullscreen for the complete game or DEV studio | Available where the browser supports the Fullscreen API |
 
@@ -38,15 +38,21 @@ Cloudflare is configured with SPA fallback: an unknown web path may load the app
 | `public/` | Static assets, including the Soldier model |
 | `docs/`, `.github/workflows/` | Team documentation and CI/release workflows |
 
-## Map review
+## Geographic atlas and access
 
-- **Player map:** visually styled cards, grouped into seven districts. Green/check-mark cards are restored, amber is current, and dimmed/locked cards are future ruins. It is useful as a progress selector, but has no illustrated terrain, geographic positioning, connected route or player-position marker.
-- **DEV admin map:** a genuine SVG diagram with colored ruin nodes and a dotted, winding progression route. It is a curriculum diagram, not Delhi geography. Clicking a node opens detailed authoring content.
-- **Production admin:** a protected table and question-review panel. It has no dedicated visual cohort/world map. Admins who play also have the normal personal player map.
-- **World relationship:** the infinite tiled 3D world repeats the same environment/amber. Choosing another curriculum archive changes the question, not a distinct geographic destination in the scene.
-- **Review findings:** below 820px, the mission card and its only World map button are hidden; player map access needs a compact-layout entry. The DEV studio's legacy `live`/`draft` badges and fixture checklist are catalog flags, not current generated-fixture or deployment evidence. They can misleadingly show “needs fixtures” for questions that now have fixtures. Neither map provides a trapped modal keyboard focus experience yet.
+The shared atlas is an original SVG illustration of an imagined Delhi: the Yamuna river, ridge woodland, walled-city streets, connecting roads, ruins, domes, a stepwell and a bridge. River currents, mist, birds and a selected-region beacon animate with CSS. It is compressed fictional geography, not a surveyed map or turn-by-turn navigation.
 
-Fullscreen entry and the explicit exit control were checked interactively in both the game and DEV studio. Browser-native fullscreen changes update the button; unsupported browsers show a disabled control and failures show a short explanation.
+- **Players:** only cleared ruin regions are revealed. Each of the 20 ruins owns one adjoining geographic parcel; clearing a ruin reveals that parcel, not the entire curriculum district. Unrestored terrain stays under mist and has no marker, name or map link. Even the current unsolved ruin stays fogged on the map; its existing archive controls remain available in the game. A cleared marker opens a non-scoring revisit.
+- **Admins:** the World map button shows all 20 parcels based on the server's `isAdmin` result. Selecting any region opens protected question inspection. The production Admin panel and DEV Question Studio also use the complete atlas. Full map inspection does not award XP or bypass first-pass prerequisites.
+- **Authority:** signed-in clearance comes from `game_state`, never browser Run results. DEV preview uses its own separate local clears. Geography is public presentation data; fog is a gameplay presentation rule, not encryption or a security boundary. Answers and admin content remain behind the server-authorized RPCs. The production admin atlas appears after successful protected reads and disappears if a subsequent read is denied.
+- **Controls:** markers are keyboard-focusable HTML buttons over the SVG. Hover/focus shows the place and curriculum topic; click opens revisit/inspection. Player map dialogs trap Tab focus, close with Escape and restore focus to the opener. A compact-screen toolbar button keeps map access available below 820px.
+- **Motion:** Pause map animation stops all atlas effects. The atlas also honors the system's reduced-motion setting. It introduces no new WebGL canvas, JavaScript animation loop, map-tile downloads or paid map API.
+- **World relationship:** the infinite tiled 3D world is preserved. The atlas changes archive selection; its landmarks do not teleport the Soldier into twenty new 3D environments. The curriculum still follows its original 1→20 order, independent of map coordinates.
+- **Authoring status:** the studio reports generated fixtures/local drafts instead of treating old catalog `live` flags as deployment evidence. Edited questions still need regeneration, tests and human review.
+
+Implementation paths: `src/game/GeographicMap.tsx` draws the shared atlas; `src/game/geography.ts` defines landmark positions and adjoining parcels; `src/game/PlayerMap.tsx` handles player/admin atlas modal access; `src/game/CommunityPanel.tsx` handles protected admin content; `src/admin/WorldMap.tsx` is the DEV editor. These are source paths, not new web routes.
+
+Fullscreen entry and explicit exit work in the game and DEV studio. Unsupported browsers show a disabled control; fullscreen failures show a short explanation.
 
 ## How a student's SQL is evaluated
 
@@ -95,6 +101,23 @@ A separate [duration profile](local-profile-results.json) sent 200 first-ruin re
 Run `pnpm test:profile` to reproduce the duration diagnostic. It enables statement-duration logging only in the disposable local cluster and writes aggregate measurements; it never profiles the hosted database or copies raw SQL logs into the repository.
 
 Both workloads exercise first-ruin load, not a realistic mix of expensive later queries, and exclude hosted HTTP, Edge isolates and Supavisor. No cloud capacity conclusion follows from these local numbers.
+
+### Performance pros and cons
+
+Compared with the preceding fullscreen build, the geographic atlas update adds about 8.1KB of main JavaScript (3.1KB gzip) and 1.4KB CSS (0.45KB gzip), measured from Vite production output. No new image, map-tile or font asset is fetched. These bundle figures do not measure animation frame cost.
+
+| Choice | Pros | Cons / limits |
+| --- | --- | --- |
+| Local PostgreSQL Run | Unlimited practice stays off the server; worker separates SQL execution from the UI thread | Large WASM/data download, startup and browser memory cost; expensive results can still tax the device |
+| Server Submit with three fixtures | Hidden cases reject visible-answer shortcuts; one consistent authority owns grades | Three executions and serial protocol exchanges per submission; heavier later queries still need sustained load testing |
+| One executor/progress connection per isolate | Constrains connection pressure on the zero-cost database target | Requests share queues; network delay compounds across awaited commands; connection limits must be tuned against hosted evidence |
+| Fixed server RPCs and profile locks | Prevent double awards/purchases and concurrent-account inconsistencies | Repeated identity/manifest reads and locking add work; high per-account contention can queue |
+| Thirty-second progress polling | Simple cross-tab/device refresh and recovery from missed updates | About 100 background RPCs/s at 3,000 tabs, even before grading; needs visibility-aware backoff/jitter |
+| Shared SVG atlas | Small code-defined artwork; no tile service, external image fetch, extra WebGL context or animation loop | CSS animation still uses rendering resources; all public geographic metadata ships to the browser; fog is presentation only |
+| Cleared-only map rendering | Only visible region controls/parcels are rendered; up to 20 regions, with precomputed parcel geometry | The static terrain drawing is still present under the SVG clip; this is not lazy loading geographic data |
+| CSS motion controls | Users can pause effects; reduced-motion preferences disable them | The existing 3D background still renders while the atlas is open; atlas pause does not pause that scene |
+| Infinite instanced world | Reuses geometry and avoids downloading twenty separate environments | Grass, shadows, bloom and high pixel ratio create GPU load; fullscreen can increase pixel work |
+| Static hosting and immutable assets | Cacheable delivery fits the zero-cost goal; no web server per player | First cohort download can saturate campus Wi-Fi; actual transfer/caching behavior remains unmeasured |
 
 ### Structural bottlenecks and next actions
 

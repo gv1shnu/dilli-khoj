@@ -96,6 +96,7 @@ function GameShell({
   const signedInName = player?.name ?? null;
   const [server, setServer] = useState<GameState | null>(null);
   const [serverError, setServerError] = useState("");
+  const [adminRuin, setAdminRuin] = useState(1);
   const [community, setCommunity] = useState<"leaderboard" | "admin" | null>(
     null,
   );
@@ -452,13 +453,20 @@ function GameShell({
       {community && (
         <CommunityPanel
           admin={community === "admin"}
+          initialRuin={adminRuin}
           onClose={() => setCommunity(null)}
         />
       )}
       {showMap && (
         <PlayerMap
           cleared={cleared}
-          onSelect={selectArchive}
+          fullAccess={Boolean(server?.isAdmin)}
+          onSelect={(id) => {
+            if (server?.isAdmin) {
+              setAdminRuin(id);
+              setCommunity("admin");
+            } else void selectArchive(id);
+          }}
           onClose={() => setShowMap(false)}
         />
       )}
@@ -471,6 +479,12 @@ function GameShell({
         </div>
         <div className="player-strip">
           <FullscreenButton />
+          <button
+            className="ghost-button compact-map-button"
+            onClick={() => setShowMap(true)}
+          >
+            World map
+          </button>
           <button
             className="ghost-button help-button"
             onClick={() => setShowIntro(true)}

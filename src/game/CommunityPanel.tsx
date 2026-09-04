@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { GeographicMap } from "./GeographicMap";
 import { gameRpc, type Leaderboard } from "../lib/game";
 interface Player {
   id: string;
@@ -18,15 +19,18 @@ interface Question {
 export function CommunityPanel({
   admin,
   onClose,
+  initialRuin = 1,
 }: {
   admin: boolean;
+  initialRuin?: number;
   onClose: () => void;
 }) {
+  const [adminVerified, setAdminVerified] = useState(false);
   const [board, setBoard] = useState<Leaderboard | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [question, setQuestion] = useState<Question | null>(null);
   const [page, setPage] = useState(0);
-  const [ruin, setRuin] = useState(1);
+  const [ruin, setRuin] = useState(initialRuin);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -41,6 +45,7 @@ export function CommunityPanel({
           gameRpc<Question>("admin_question", { ruin }),
         ]).then(([p, q]) => {
           if (active) {
+            setAdminVerified(true);
             setPlayers(p);
             setQuestion(q);
           }
@@ -119,12 +124,20 @@ export function CommunityPanel({
             )}
           </>
         )}
-        {admin && (
+        {admin && !error && (
           <>
             <p>
               Read-only player and content review. Access is checked by the
               server and recorded in the audit log.
             </p>
+            {adminVerified && (
+              <GeographicMap
+                cleared={[]}
+                fullAccess
+                selectedId={ruin}
+                onSelect={setRuin}
+              />
+            )}
             <h3>Players</h3>
             <table>
               <thead>

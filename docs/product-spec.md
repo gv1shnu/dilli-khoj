@@ -79,8 +79,9 @@ Implemented in `src/game/scoring.ts`:
 
 ## Revisit mode and the player world map
 
-Each signed-in player has a **personal world map** showing their own progress: which ruins are locked, which is current, and which they have cleared. Cleared ruins are marked and clickable.
+Each signed-in player has an **animated geographic atlas** of an imagined Delhi. Only cleared ruin regions are revealed and clickable; all uncleared regions, including the current frontier, remain under mist without map labels or links. The current question remains accessible through the game archive controls. Admins can inspect all twenty regions through the full atlas; inspection does not bypass scoring or progression rules.
 
+- The illustrated atlas uses the Yamuna, ridge woodland, streets and landmarks. Geography is compressed for presentation and does not change curriculum order or the infinite 3D world. Motion can be paused and honors reduced-motion preferences.
 - Clicking a cleared ruin on the player's map opens a **revisit** — a non-scoring practice attempt on that topic.
 - The variant is deterministic from player, ruin and visit count; it may reuse the visible tables with a different target or threshold.
 - Revisits award no progression XP and cannot change unlock state or the leaderboard; results may be recorded for analytics only.

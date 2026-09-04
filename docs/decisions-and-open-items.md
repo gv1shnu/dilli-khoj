@@ -24,6 +24,7 @@
 | Question authoring | Dev-only Question Studio at `#admin`; canonical solutions excluded from production builds |
 | Grading | Any safe query passing all result fixtures is accepted; intended syntax is not a hard gate |
 | Scoring | Wrong submissions cost nothing; hints and reveals cost XP |
+| Geographic atlas | Animated fictional Delhi; players see only cleared ruin parcels, admins inspect all 20; no paid map API or new grade bypass |
 | Revisits | Allowed via each player's personal world map (click a cleared ruin); non-scoring variant |
 | Leaderboard | Completers only (all 20 solved), ranked by XP then time from sign-up to completion; no email displayed |
 | Browser | Modern browsers supported; Chrome recommended and used as support baseline |

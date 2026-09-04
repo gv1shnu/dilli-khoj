@@ -915,107 +915,6 @@ button:disabled {
   line-height: 1.55;
 }
 
-.pmap-districts {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.pmap-district-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--line);
-}
-
-.pmap-district-name {
-  color: var(--amber);
-  font:
-    600 0.74rem/1 ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-  letter-spacing: 0.06em;
-}
-
-.pmap-colnote {
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.pmap-ruins {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-}
-
-.pmap-ruin {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.02);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 140ms ease,
-    background 140ms ease,
-    transform 140ms ease;
-}
-
-.pmap-ruin:not(:disabled):hover {
-  border-color: rgba(244, 238, 223, 0.5);
-  transform: translateY(-1px);
-}
-
-.pmap-ruin:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.pmap-ruin-id {
-  font:
-    700 0.9rem/1 ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-}
-
-.pmap-ruin-place {
-  color: var(--ink);
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.pmap-ruin-state {
-  color: var(--muted);
-  font-size: 0.66rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.pmap-ruin--cleared {
-  border-left: 3px solid var(--mint);
-}
-
-.pmap-ruin--cleared .pmap-ruin-id {
-  color: var(--mint);
-}
-
-.pmap-ruin--current {
-  border-left: 3px solid var(--amber);
-  background: rgba(244, 173, 69, 0.06);
-}
-
-.pmap-ruin--current .pmap-ruin-id {
-  color: var(--amber);
-}
-
 /* ---- Admin world map ---------------------------------------------------- */
 
 .admin-entry {
@@ -1130,59 +1029,6 @@ button:disabled {
   height: 12px;
   border-radius: 3px;
   display: inline-block;
-}
-
-.admin-map-wrap {
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 8px;
-  overflow-x: auto;
-}
-
-.admin-map {
-  width: 100%;
-  min-width: 720px;
-  height: auto;
-  display: block;
-}
-
-.admin-route {
-  fill: none;
-  stroke: rgba(244, 173, 69, 0.35);
-  stroke-width: 3;
-  stroke-dasharray: 2 8;
-  stroke-linecap: round;
-}
-
-.admin-node {
-  cursor: pointer;
-}
-
-.admin-node:focus {
-  outline: none;
-}
-
-.admin-node:hover circle:first-of-type {
-  filter: brightness(1.15);
-}
-
-.admin-node-num {
-  fill: #10130f;
-  font:
-    700 20px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-  pointer-events: none;
-}
-
-.admin-node-label {
-  fill: var(--muted);
-  font:
-    500 12px -apple-system,
-    sans-serif;
-  pointer-events: none;
 }
 
 .admin-detail {
@@ -1529,4 +1375,260 @@ button.admin-link {
   border: 1px solid var(--line);
   color: var(--ink);
   font-size: 0.75rem;
+}
+
+/* Shared geographic atlas: SVG terrain, HTML targets; no extra render loop. */
+.geo-modal {
+  width: min(1100px, 100%);
+}
+.geo-atlas {
+  margin: 18px 0;
+  border: 1px solid #61705a;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #172321;
+}
+.geo-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  color: #c7bb91;
+  background: #1b2825;
+  font:
+    600 0.68rem/1.4 ui-monospace,
+    monospace;
+  letter-spacing: 0.08em;
+}
+.geo-toolbar button {
+  font-size: 0.68rem;
+}
+.geo-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b9c995;
+  margin-right: 8px;
+}
+.geo-paper {
+  position: relative;
+  isolation: isolate;
+}
+.geo-drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.geo-terrain-label {
+  fill: #cbd3b0;
+  opacity: 0.7;
+  font:
+    italic 16px Georgia,
+    serif;
+  letter-spacing: 6px;
+}
+.geo-city-label {
+  fill: #d6c79b;
+  opacity: 0.65;
+  font:
+    12px Georgia,
+    serif;
+  letter-spacing: 3px;
+}
+.geo-signature {
+  fill: #b5b798;
+  opacity: 0.6;
+  font:
+    10px ui-monospace,
+    monospace;
+  letter-spacing: 3px;
+}
+.geo-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #dac18a;
+  border-radius: 50%;
+  background: #263d33;
+  color: #f4ddad;
+  cursor: pointer;
+  font:
+    700 11px ui-monospace,
+    monospace;
+  box-shadow: 0 3px 9px #101b19;
+}
+.geo-marker::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 1px solid #d2bd84;
+  border-radius: 50%;
+  opacity: 0;
+}
+.geo-marker--selected {
+  background: #dfbd78;
+  color: #26382d;
+  z-index: 2;
+}
+.geo-marker--selected::before {
+  animation: atlas-beacon 3s ease-out infinite;
+}
+.geo-marker:hover,
+.geo-marker:focus-visible {
+  outline: 3px solid #f3dfac;
+  outline-offset: 3px;
+}
+.geo-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 115px;
+  padding: 18px 22px;
+  border-top: 1px solid #4b5f4e;
+  background: #1b2825;
+}
+.geo-caption h3 {
+  margin: 7px 0;
+  color: #ead9b1;
+  font:
+    1.1rem Georgia,
+    serif;
+}
+.geo-caption p {
+  margin: 6px 0 0;
+  color: #b8c0ab;
+  font-size: 0.78rem;
+}
+.geo-caption button {
+  flex-shrink: 0;
+}
+.geo-footnote {
+  margin: 0;
+  padding: 10px 22px;
+  color: #97a290;
+  font:
+    italic 0.7rem/1.5 Georgia,
+    serif;
+}
+.geo-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: min(80%, 350px);
+  color: #c5cdb7;
+}
+.geo-empty span {
+  color: #aab39b;
+  font:
+    0.65rem ui-monospace,
+    monospace;
+  letter-spacing: 0.18em;
+}
+.geo-empty h3 {
+  font:
+    1.6rem/1.2 Georgia,
+    serif;
+  margin: 16px 0 10px;
+}
+.geo-empty p {
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+.geo-water {
+  animation: atlas-river 12s linear infinite;
+}
+.geo-mist {
+  animation: atlas-mist 16s ease-in-out infinite alternate;
+}
+.geo-birds {
+  animation: atlas-birds 14s ease-in-out infinite alternate;
+}
+@keyframes atlas-river {
+  to {
+    stroke-dashoffset: -192;
+  }
+}
+@keyframes atlas-mist {
+  to {
+    transform: translateX(25px);
+    opacity: 0.09;
+  }
+}
+@keyframes atlas-birds {
+  to {
+    transform: translate(60px, -15px);
+  }
+}
+@keyframes atlas-beacon {
+  from {
+    opacity: 0.65;
+    scale: 0.85;
+  }
+  to {
+    opacity: 0;
+    scale: 1.5;
+  }
+}
+.geo-still *,
+.geo-still *::before {
+  animation: none !important;
+}
+.compact-map-button {
+  display: none;
+}
+@media (max-width: 820px) {
+  .compact-map-button {
+    display: inline-block;
+  }
+  .topbar {
+    position: relative;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .player-strip {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .terminal-panel {
+    top: auto;
+    bottom: 48px;
+    max-height: calc(100dvh - 180px);
+  }
+  .pmap-backdrop {
+    padding: 10px;
+    position: fixed;
+  }
+  .geo-modal {
+    padding: 20px 12px 12px;
+    max-height: calc(100dvh - 20px);
+  }
+  .geo-caption {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px;
+  }
+  .geo-marker {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+  .geo-toolbar {
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .geo-atlas *,
+  .geo-atlas *::before {
+    animation: none !important;
+  }
 }

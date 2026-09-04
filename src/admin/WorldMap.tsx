@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { RUIN_QUESTIONS, type RuinQuestion } from "../questions/catalog";
 import { PRACTICE_QUESTIONS } from "../questions/practice";
-import { DISTRICTS, MODULE_TITLES, RUIN_SEQUENCE, TOTAL_RUINS, districtById, ruinById } from "../game/ruins";
+import { DISTRICTS, MODULE_TITLES, TOTAL_RUINS, districtById, ruinById } from "../game/ruins";
 import { MAX_XP, TOTAL_HINTS, XP } from "../game/scoring";
+import { GeographicMap } from "../game/GeographicMap";
 import { FullscreenButton } from "../components/FullscreenButton";
 
 // Admin-only authoring workspace (DEV builds only — this module and every canonical
@@ -59,7 +60,6 @@ function blankQuestion(id: number): RuinQuestion {
   };
 }
 
-const COLS = 5, CELL_W = 190, CELL_H = 150, PAD_X = 70, PAD_Y = 70;
 
 export function WorldMap() {
   const [overlay, setOverlay] = useState<Overlay>(loadOverlay);
@@ -88,19 +88,7 @@ export function WorldMap() {
   const practice = PRACTICE_QUESTIONS.find((p) => p.id === selected.id);
   const hasLocalEdits = Object.keys(overlay.edits).length > 0 || overlay.added.length > 0;
 
-  const nodes = useMemo(() => {
-    return RUIN_SEQUENCE.map((t, index) => {
-      const row = Math.floor(index / COLS);
-      const posInRow = index % COLS;
-      const col = row % 2 === 0 ? posInRow : COLS - 1 - posInRow;
-      return { id: t.id, x: PAD_X + col * CELL_W, y: PAD_Y + row * CELL_H };
-    });
-  }, []);
-  const pathD = nodes.map((n, i) => `${i === 0 ? "M" : "L"} ${n.x} ${n.y}`).join(" ");
-  const width = PAD_X * 2 + (COLS - 1) * CELL_W;
-  const height = PAD_Y * 2 + (Math.ceil(TOTAL_RUINS / COLS) - 1) * CELL_H;
-
-  const liveCount = questions.filter((q) => q.status === "live").length;
+  const fixtureCurrent = Boolean(practice) && !overlay.edits[selected.id];
 
   const beginEdit = () => {
     setDraft(JSON.stringify(selected, null, 2));
@@ -170,7 +158,7 @@ export function WorldMap() {
         <div className="admin-stats">
           <FullscreenButton className="admin-chip admin-link" />
           <span className="admin-chip">{TOTAL_RUINS} ruins · {DISTRICTS.length} districts</span>
-          <span className="admin-chip admin-chip--live">{liveCount} live</span>
+          <span className="admin-chip admin-chip--live">{PRACTICE_QUESTIONS.length} generated</span>
           {hasLocalEdits && <span className="admin-chip admin-chip--draft">local edits</span>}
           <button className="admin-chip admin-link" onClick={exportJson}>⭳ Export JSON</button>
           <a className="admin-chip admin-link" href="#">← Game</a>
@@ -194,30 +182,7 @@ export function WorldMap() {
         ))}
       </div>
 
-      <div className="admin-map-wrap">
-        <svg className="admin-map" viewBox={`0 0 ${width} ${height}`} role="group" aria-label="Ruin progression map">
-          <path d={pathD} className="admin-route" />
-          {nodes.map((n) => {
-            const t = ruinById(n.id)!;
-            const color = DISTRICT_COLORS[t.district];
-            const isSelected = n.id === selectedId;
-            const q = questionById(n.id);
-            const isLive = q?.status === "live";
-            return (
-              <g key={n.id} transform={`translate(${n.x} ${n.y})`} className="admin-node"
-                 onClick={() => { setSelectedId(n.id); setEditing(false); }} role="button" tabIndex={0}
-                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSelectedId(n.id); }}>
-                <circle r={26} fill={color} stroke={isSelected ? "#fff" : "#0a0d0c"} strokeWidth={isSelected ? 3 : 2} />
-                {isLive && <circle r={31} fill="none" stroke="#65e1bd" strokeWidth={2} strokeDasharray="3 3" />}
-                <text className="admin-node-num" textAnchor="middle" dy="0.35em">{n.id}</text>
-                <text className="admin-node-label" textAnchor="middle" y={46}>
-                  {t.place.length > 20 ? `${t.place.slice(0, 19)}…` : t.place}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
+      <GeographicMap cleared={[]} fullAccess selectedId={selectedId} onSelect={id => {setSelectedId(id); setEditing(false);}} />
 
       {overlay.added.length > 0 && (
         <div className="admin-added">
@@ -251,7 +216,7 @@ export function WorldMap() {
             <h2>{selected.title}</h2>
           </div>
           <span className={`admin-status admin-status--${selected.status}`}>
-            {selected.status === "live" ? "LIVE · fixtures graded" : "DRAFT · needs fixtures"}
+            {fixtureCurrent ? "GENERATED · review pending" : "LOCAL DRAFT · regenerate"}
           </span>
         </div>
 
@@ -327,8 +292,8 @@ export function WorldMap() {
               <ul className="admin-check">
                 <li className="admin-check--done">Content authored (title, description, hints)</li>
                 <li className="admin-check--done">Canonical + {selected.acceptedVariants.length} accepted variants</li>
-                <li className={selected.status === "live" ? "admin-check--done" : "admin-check--todo"}>Visible + two hidden fixtures with computed expected rows</li>
-                <li className={selected.status === "live" ? "admin-check--done" : "admin-check--todo"}>Near-miss tests (missing/extra rows, wrong column/order, NULL/tie/duplicate)</li>
+                <li className={fixtureCurrent ? "admin-check--done" : "admin-check--todo"}>Visible fixture generated from the catalog</li>
+                <li className="admin-check--todo">Run fixture and near-miss regression tests: pnpm test</li>
                 <li className="admin-check--todo">Blind human review (solve from description)</li>
               </ul>
             </div>

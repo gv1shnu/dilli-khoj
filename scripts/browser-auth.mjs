@@ -68,6 +68,25 @@ try {
     const state = states.get(id);
     if (!state) throw new Error("Unexpected test account");
     if (name === "game_state") return route.fulfill({ json: state });
+    if (name === "admin_players" || name === "admin_question") {
+      if (!state.isAdmin)
+        return route.fulfill({
+          status: 403,
+          json: { message: "Administrator access required." },
+        });
+      return route.fulfill({
+        json:
+          name === "admin_players"
+            ? []
+            : {
+                title: `Reviewed ruin ${payload.ruin}`,
+                description: "Protected content",
+                hints: [],
+                solution: "Protected solution",
+                dataset_version: "2026-09-04.1",
+              },
+      });
+    }
     if (name === "game_action") {
       let p = state.progress.find((p) => p.ruin === payload.ruin);
       if (!p) {
@@ -198,6 +217,19 @@ try {
       .isEnabled(),
     true,
   );
+  await page.setViewportSize({ width: 700, height: 900 });
+  await page.getByRole("button", { name: "World map", exact: true }).click();
+  const atlas = page.getByRole("dialog", {
+    name: "Your world map",
+    exact: true,
+  });
+  assert.equal(await atlas.locator(".geo-marker").count(), 1);
+  assert.equal(
+    await atlas.getByRole("button", { name: /Kashmere Gate/ }).count(),
+    0,
+  );
+  await page.getByRole("button", { name: "Close map", exact: true }).click();
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole("button", { name: "Leaderboard", exact: true }).click();
   await page
     .getByText("No explorer has completed all twenty ruins yet.")
@@ -229,9 +261,42 @@ try {
     await page.getByRole("button", { name: "Admin", exact: true }).count(),
     0,
   );
+  states.get(bob).isAdmin = true;
+  await page.reload();
+  await page.getByRole("button", { name: "Admin", exact: true }).waitFor();
+  await page.getByRole("button", { name: "World map", exact: true }).click();
+  const fullAtlas = page.getByRole("dialog", {
+    name: "Complete world map",
+    exact: true,
+  });
+  assert.equal(await fullAtlas.locator(".geo-marker").count(), 20);
+  await fullAtlas
+    .getByRole("button", { name: "Signature Bridge · Inspect", exact: true })
+    .click();
+  await page
+    .getByRole("heading", { name: "Reviewed ruin 20", exact: true })
+    .waitFor();
+  const adminPanel = page.getByRole("dialog", {
+    name: "Administration",
+    exact: true,
+  });
+  assert.equal(await adminPanel.locator(".geo-marker").count(), 20);
+  states.get(bob).isAdmin = false;
+  await adminPanel
+    .getByRole("button", { name: "Agrasen ki Baoli · Inspect", exact: true })
+    .click();
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "Administrator access required." })
+    .waitFor();
+  assert.equal(await adminPanel.locator(".geo-marker").count(), 0);
+  assert.equal(
+    await page.getByText("Protected solution", { exact: true }).count(),
+    0,
+  );
   assert.deepEqual(errors, []);
   console.log(
-    "Authenticated UI contracts passed: server-only unlocks, paid help, leaderboard and account-switch isolation. Supabase network fully mocked.",
+    "Authenticated UI contracts passed: server-only unlocks, paid help, leaderboard, account-switch isolation, cleared-only player maps, compact map access, full admin maps and revocation. Supabase network fully mocked.",
   );
 } finally {
   await browser.close();

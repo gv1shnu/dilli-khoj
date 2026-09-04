@@ -27,7 +27,7 @@ cp -n .env.example .env.local
 pnpm dev
 ```
 
-Open **http://localhost:5173**. Keep this exact origin for the configured OAuth redirect. Use **Fullscreen** in the game or Question Studio header to expand the app, and **Exit fullscreen** to return. See [navigation and maps](navigation-and-performance-review.md) for the available screens.
+Open **http://localhost:5173**. Keep this exact origin for the configured OAuth redirect. Use **Fullscreen** in the game or Question Studio header to expand the app, and **Exit fullscreen** to return. See [navigation, map access and performance pros/cons](navigation-and-performance-review.md) for the available screens. The player atlas reveals cleared regions only; the admin atlas provides full inspection.
 
 Offline development does not need hosted credentials. If a sign-in gate appears, choose **Continue for local development**. The bypass is excluded from production.
 
