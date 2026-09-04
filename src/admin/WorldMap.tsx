@@ -3,6 +3,7 @@ import { RUIN_QUESTIONS, type RuinQuestion } from "../questions/catalog";
 import { PRACTICE_QUESTIONS } from "../questions/practice";
 import { DISTRICTS, MODULE_TITLES, RUIN_SEQUENCE, TOTAL_RUINS, districtById, ruinById } from "../game/ruins";
 import { MAX_XP, TOTAL_HINTS, XP } from "../game/scoring";
+import { FullscreenButton } from "../components/FullscreenButton";
 
 // Admin-only authoring workspace (DEV builds only — this module and every canonical
 // solution are tree-shaken out of production, so students never receive answers).
@@ -167,6 +168,7 @@ export function WorldMap() {
           <h1>Question Studio</h1>
         </div>
         <div className="admin-stats">
+          <FullscreenButton className="admin-chip admin-link" />
           <span className="admin-chip">{TOTAL_RUINS} ruins · {DISTRICTS.length} districts</span>
           <span className="admin-chip admin-chip--live">{liveCount} live</span>
           {hasLocalEdits && <span className="admin-chip admin-chip--draft">local edits</span>}

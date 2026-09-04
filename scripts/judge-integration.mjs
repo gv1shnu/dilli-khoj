@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { createHmac, randomBytes, randomUUID } from "node:crypto";
 import { createServer } from "vite";
 import { postgresHarness } from "./postgres-harness.mjs";
@@ -123,6 +123,78 @@ try {
   console.log(
     "PostgreSQL 17 integration passed: 20 authenticated three-case submissions, 600 XP completion, concurrent retries and purchases.",
   );
+  if (process.argv.includes("--profile")) {
+    // Only the disposable cluster: log server durations, then retain aggregates.
+    await pg.sql.unsafe("alter system set log_min_duration_statement = 0");
+    await pg.sql`select pg_reload_conf()`;
+    const cohort = Array.from({ length: 200 }, () => randomUUID());
+    for (const id of cohort)
+      await addPlayer(pg.db, id, `${id}@partner.example`);
+    const logPath = `${pg.dir}/server.log`;
+    const offset = (await readFile(logPath)).length;
+    const latencies = [];
+    const started = performance.now();
+    const results = await Promise.all(
+      cohort.map(async (id) => {
+        const start = performance.now();
+        const result = await submit(
+          questions[0],
+          questions[0].canonicalSolution,
+          randomUUID(),
+          id,
+        );
+        latencies.push(performance.now() - start);
+        return result;
+      }),
+    );
+    const elapsedMs = Math.round(performance.now() - started);
+    assert.ok(
+      results.every((result) => result.status === 200 && result.body.correct),
+    );
+    const log = (await readFile(logPath)).subarray(offset).toString();
+    const stages = {};
+    for (const match of log.matchAll(
+      /duration: ([\d.]+) ms\s+(?:(?:parse|bind|execute) [^:]*:|statement:)\s*([^\n]*)/g,
+    )) {
+      const sql = match[2].trim().toLowerCase();
+      const stage = sql.includes("is_approved_player")
+        ? "authorization"
+        : sql.includes("prepare_judge_submission")
+          ? "preparation"
+          : sql.includes("record_judged_submission")
+            ? "recording"
+            : /^(set |begin|commit)/.test(sql)
+              ? "transaction_setup_and_commit"
+              : "student_query_protocol";
+      const item = (stages[stage] ??= { events: 0, totalMs: 0, maxMs: 0 });
+      const ms = Number(match[1]);
+      item.events++;
+      item.totalMs += ms;
+      item.maxMs = Math.max(item.maxMs, ms);
+    }
+    for (const item of Object.values(stages)) {
+      item.totalMs = Math.round(item.totalMs * 100) / 100;
+      item.meanMs = Math.round((item.totalMs / item.events) * 1000) / 1000;
+    }
+    latencies.sort((a, b) => a - b);
+    const report = {
+      environment:
+        "Disposable local PostgreSQL 17; single Node judge; 200 simultaneous first-ruin submissions; server duration logging enabled. No HTTP or hosted pooler.",
+      requests: cohort.length,
+      correct: results.length,
+      elapsedMs,
+      p50Ms: Math.round(latencies[99]),
+      p95Ms: Math.round(latencies[189]),
+      stages,
+      caveat:
+        "Protocol events include parse/bind/execute. Server durations exclude time waiting in the Node connection queue. This profile is not comparable to the earlier rate-shaped load test or a cloud capacity claim.",
+    };
+    await writeFile(
+      new URL("../docs/local-profile-results.json", import.meta.url),
+      JSON.stringify(report, null, 2) + "\n",
+    );
+    console.log(JSON.stringify(report));
+  }
   const measurements = [];
   if (process.argv.includes("--load")) {
     for (const rate of [25, 50, 100, 200]) {

@@ -1513,3 +1513,20 @@ button.admin-link {
 .community-card select {
   margin: 0.3rem;
 }
+
+.fullscreen-control {
+  position: relative;
+  display: inline-flex;
+}
+.fullscreen-error {
+  position: absolute;
+  z-index: 30;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 240px;
+  padding: 10px;
+  background: #141815;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.75rem;
+}

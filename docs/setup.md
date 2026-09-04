@@ -27,7 +27,7 @@ cp -n .env.example .env.local
 pnpm dev
 ```
 
-Open **http://localhost:5173**. Keep this exact origin for the configured OAuth redirect.
+Open **http://localhost:5173**. Keep this exact origin for the configured OAuth redirect. Use **Fullscreen** in the game or Question Studio header to expand the app, and **Exit fullscreen** to return. See [navigation and maps](navigation-and-performance-review.md) for the available screens.
 
 Offline development does not need hosted credentials. If a sign-in gate appears, choose **Continue for local development**. The bypass is excluded from production.
 
@@ -71,9 +71,10 @@ Browser work needs no Docker or local PostgreSQL. The standalone judge integrati
 ```bash
 pnpm test:integration
 pnpm test:load
+pnpm test:profile
 ```
 
-The load command writes aggregate timing evidence to `docs/local-load-results.json`. Run it separately from browser/unit tests to avoid laptop resource contention. This is a local handler/driver benchmark, not an HTTP or Supavisor capacity test.
+The load command writes aggregate timing evidence to `docs/local-load-results.json`; the optional profile command records PostgreSQL duration aggregates in `docs/local-profile-results.json`. Run it separately from browser/unit tests to avoid laptop resource contention. This is a local handler/driver benchmark, not an HTTP or Supavisor capacity test.
 
 For Chromium tests, install Google Chrome and keep `pnpm dev` running in another terminal:
 

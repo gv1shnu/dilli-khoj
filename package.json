@@ -18,7 +18,8 @@
     "test:integration": "node scripts/judge-integration.mjs",
     "test:load": "node scripts/judge-integration.mjs --load",
     "test:browser:auth": "node scripts/browser-auth.mjs",
-    "test:assets": "node scripts/check-production-assets.mjs"
+    "test:assets": "node scripts/check-production-assets.mjs",
+    "test:profile": "node scripts/judge-integration.mjs --profile"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.8",

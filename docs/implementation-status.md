@@ -6,7 +6,7 @@ Reviewed 4 September 2026. Branch: `build/foundation`. **Development preview; cl
 
 | Area | Behavior |
 | --- | --- |
-| World | Infinite 150-unit tiled world, wrapped player/camera, animated Soldier, map, ambience and intro; model yaw offset preserved |
+| World | Infinite 150-unit tiled world, wrapped player/camera, animated Soldier, map, ambience, intro and browser fullscreen; model yaw offset preserved |
 | Content | 20 curriculum-ordered first-pass questions; 60 generated server datasets; visible-only browser fixtures |
 | Identity | Shared three-domain/admin policy; confirmed, non-anonymous Google accounts required; current server records checked |
 | Grading | All 20 ruins supported; JWT validation, AST policy, read-only restricted role, bounded row fetch, timeouts and three-case comparison |
@@ -26,13 +26,15 @@ Reviewed 4 September 2026. Branch: `build/foundation`. **Development preview; cl
 - Real local PostgreSQL 17: actual JWT judge and PostgreSQL driver accepted all 20 canonical submissions with 3/3 cases, ended at 600 XP, and passed concurrent retry and purchase checks.
 - Chromium offline smoke: all 20 sequential questions with wrong/correct SQL, draft restore, alternate revisit and write rejection passed.
 - Chromium authenticated UI contracts: mocked server-only unlocks, paid help, leaderboard and account switching passed without live requests.
-- Load test: 1,125 first-solve requests across four three-second stages, all returned correct verdicts. See [local load evidence](local-load-results.json). At 25/50/100/200 requests/second, p95 was approximately 196/1,940/3,001/16,911 ms. This single local Node process uses real PostgreSQL and the judge handler, but bypasses HTTP transport, hosted Edge runtime and Supavisor. It **does not prove** capacity for 3,000 students.
+- Load test repeated without competing browser/unit tests: 1,125 first-solve requests passed. At 25/50/100/200 requests/second, p95 was 34/8/9/8ms. The earlier 16,911ms p95 at 200/s did not reproduce; laptop contention is a likely factor, not a proven attribution. See [current load evidence](local-load-results.json) and [review](navigation-and-performance-review.md).
+- A separate 200-simultaneous-request profile completed in 356ms, p95 345ms. It records aggregate PostgreSQL protocol timings. Both tests use one local Node handler and PostgreSQL 17, first-ruin SQL only, and exclude HTTP/Edge/Supavisor. They do not prove sustained or hosted capacity for 3,000 students.
+- Fullscreen entry and explicit exit passed interactively in both the game and DEV studio; typecheck/build/asset checks passed afterward.
 
 ## Limitations and release blockers
 
 - No new live migrations, judge deployment or web deployment have been performed. Handoff reports an older hosted build and Ruin 06 judge; current remote state was not independently rechecked.
 - Full Supabase Auth/PostgREST/hook/pooler integration and real multi-device sessions remain unverified. Minimal Auth tables in local tests do not replace that gate.
-- High-load latency is unacceptable for launch. Free-tier compute and campus download capacity remain unproven.
+- Sustained mixed-query load, hosted free-tier compute and campus download capacity remain unproven. Clean local results do not remove those release gates.
 - Blind human question review, additional adversarial SQL tests, Safari/Firefox and baseline hardware coverage remain required.
 - No planner-cost ceiling or result-byte ceiling is implemented. Statement/lock timeouts, AST policy, read-only grants and row limits provide partial resource controls.
 - Revisit drafts are session-only; first-pass drafts persist on the current browser, scoped by account, without cross-device synchronization.

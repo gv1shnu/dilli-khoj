@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { ResultTable } from "./components/ResultTable";
+import { FullscreenButton } from "./components/FullscreenButton";
 import { preparePracticeDatabase, runPracticeQuery } from "./db/practice-db";
 import { RuinScene } from "./game/RuinScene";
 import { IntroOverlay } from "./game/IntroOverlay";
@@ -469,6 +470,7 @@ function GameShell({
           <h1>Dilli Khoj</h1>
         </div>
         <div className="player-strip">
+          <FullscreenButton />
           <button
             className="ghost-button help-button"
             onClick={() => setShowIntro(true)}

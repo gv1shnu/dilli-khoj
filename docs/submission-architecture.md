@@ -133,4 +133,4 @@ Numeric comparison uses PostgreSQL type OIDs to normalize bigint/numeric wire va
 
 ## Measured local performance
 
-[Local load results](local-load-results.json) record 25/50/100/200 requests per second against one Node handler process and disposable PostgreSQL 17. All verdicts were correct, but 200 requests/second produced about 17-second p95 latency. This is a queueing blocker, not a successful capacity claim. Hosted HTTP, Edge isolates, Supavisor and the free-tier project require separate authorized measurement.
+[Local load results](local-load-results.json) record 25/50/100/200 requests per second against one Node handler process and disposable PostgreSQL 17. All verdicts were correct. A clean repeat recorded 8ms p95 at 200 requests/second; the earlier roughly 17-second result did not reproduce without competing laptop work. See the [detailed review](navigation-and-performance-review.md) and [burst profile](local-profile-results.json). These short first-ruin benchmarks are not a hosted or sustained capacity claim. HTTP, Edge isolates, Supavisor and the free-tier project require separate authorized measurement.

@@ -1,0 +1,41 @@
+{
+  "environment": "Disposable local PostgreSQL 17; single Node judge; 200 simultaneous first-ruin submissions; server duration logging enabled. No HTTP or hosted pooler.",
+  "requests": 200,
+  "correct": 200,
+  "elapsedMs": 356,
+  "p50Ms": 298,
+  "p95Ms": 345,
+  "stages": {
+    "authorization": {
+      "events": 600,
+      "totalMs": 14.13,
+      "maxMs": 0.311,
+      "meanMs": 0.024
+    },
+    "preparation": {
+      "events": 600,
+      "totalMs": 47.88,
+      "maxMs": 0.744,
+      "meanMs": 0.08
+    },
+    "transaction_setup_and_commit": {
+      "events": 4200,
+      "totalMs": 10.69,
+      "maxMs": 0.057,
+      "meanMs": 0.003
+    },
+    "student_query_protocol": {
+      "events": 2400,
+      "totalMs": 17.95,
+      "maxMs": 0.053,
+      "meanMs": 0.007
+    },
+    "recording": {
+      "events": 600,
+      "totalMs": 70.46,
+      "maxMs": 0.723,
+      "meanMs": 0.117
+    }
+  },
+  "caveat": "Protocol events include parse/bind/execute. Server durations exclude time waiting in the Node connection queue. This profile is not comparable to the earlier rate-shaped load test or a cloud capacity claim."
+}
