@@ -6,7 +6,7 @@ export const ruinSix = {
   place: "Chandni Chowk",
   title: "The Last Open Stalls",
   description:
-    "Return `stall_id` for K-7 stalls whose status is `open`. Sort by `stall_id`.",
+    "Find the stalls still open in ward K-7. List their identification numbers from smallest to largest.",
   sampleColumns: ["stall_id"],
   sampleRows: [[21], [46]],
   hints: ["Filter both `ward_code` and `status`, then use `ORDER BY`."],

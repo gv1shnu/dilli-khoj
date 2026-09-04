@@ -67,9 +67,9 @@ const txt = "text";
 const QUESTIONS: RuinQuestion[] = [
   {
     id: 1,
-    title: "Reading the Resident Schema",
+    title: "Reading the Resident Records",
     description:
-      "The gate catalog lists every attribute of each entity. Return `attribute` and `data_type` for the `resident` entity, sorted by `attribute`.",
+      "Find the fields belonging to resident records. List each field’s name and the kind of value it stores, alphabetically by field name.",
     sampleColumns: ["attribute", "data_type"],
     sampleRows: [
       ["sample_col_a", "text"],
@@ -81,7 +81,7 @@ const QUESTIONS: RuinQuestion[] = [
       {
         name: "catalog_columns",
         columns: [
-          { name: "entity", type: txt, note: "entity/table name" },
+          { name: "entity", type: txt, note: "name of the table described by this record" },
           { name: "attribute", type: txt, note: "column name" },
           { name: "data_type", type: txt },
           { name: "is_key", type: bool },
@@ -106,7 +106,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 2,
     title: "Keys to the Bus Bay",
     description:
-      "Some attributes can identify a `bus` on their own. Return each `attribute` whose `key_kind` is `primary` or `candidate`. Sort by `attribute`.",
+      "For buses, list the chosen identifier and the alternative identifiers. Put their field names in alphabetical order.",
     sampleColumns: ["attribute"],
     sampleRows: [["sample_key_1"], ["sample_key_2"]],
     ordered: true,
@@ -140,7 +140,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 3,
     title: "Tracing the Family Links",
     description:
-      "The register records foreign keys. List every reference that points at the `family` entity: return `child_entity` and `child_attribute`, ordered by both.",
+      "Find links pointing to family records. Show the originating table and field for each link, alphabetically by table name, then field name.",
     sampleColumns: ["child_entity", "child_attribute"],
     sampleRows: [
       ["sample_child", "sample_ref_col"],
@@ -177,7 +177,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 4,
     title: "Evidence of the Rebuild",
     description:
-      "The records room keeps a change log. Return `object_name` and `op` for every entry whose `op_kind` is `DDL`, newest first by `changed_at`.",
+      "Find changes to the structure of stored records. Show the affected object’s name and recorded action, with the newest changes first.",
     sampleColumns: ["object_name", "op"],
     sampleRows: [
       ["sample_table", "CREATE TABLE"],
@@ -191,7 +191,7 @@ const QUESTIONS: RuinQuestion[] = [
         columns: [
           { name: "op", type: txt, note: "e.g. CREATE TABLE, INSERT" },
           { name: "object_name", type: txt },
-          { name: "op_kind", type: txt, note: "DDL | DML" },
+          { name: "op_kind", type: txt, note: "DDL: changes to record structure; DML: changes to record contents" },
           { name: "changed_at", type: "timestamp" },
         ],
         sampleRows: [
@@ -214,7 +214,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 5,
     title: "Who Holds the Keys",
     description:
-      "List `grantee` and `object_name` where a `SELECT` privilege was granted (`granted` is true). Sort by `grantee`, then `object_name`.",
+      "Find who has permission to read each set of records. Show the permission holder and record-set name, alphabetically by holder, then name.",
     sampleColumns: ["grantee", "object_name"],
     sampleRows: [
       ["sample_role", "sample_object"],
@@ -286,7 +286,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 7,
     title: "Every Ward Represented",
     description:
-      "Pilgrims gather on the steps. Return each distinct `home_ward` that appears in `pilgrims` — one row per ward — sorted by `home_ward`.",
+      "List every home ward represented by visiting pilgrims once, in alphabetical order.",
     sampleColumns: ["home_ward"],
     sampleRows: [["W-00"], ["W-99"]],
     ordered: true,
@@ -318,7 +318,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 8,
     title: "The Paper Traders",
     description:
-      "Return `shop_name` for every shop whose `trade` mentions paper in any capitalisation. Sort by `shop_name`.",
+      "Find shops whose trade description mentions paper, regardless of capital letters. List the shop names alphabetically.",
     sampleColumns: ["shop_name"],
     sampleRows: [["Sample Stationers"], ["Zeta Scrolls"]],
     ordered: true,
@@ -349,7 +349,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 9,
     title: "Unsealed in the Silver Lane",
     description:
-      "Return `vault_id` for vaults in ward `D-1`, `D-3`, or `D-9` that are not sealed (`sealed` is false). Sort by `vault_id`.",
+      "Find unsealed vaults in wards D-1, D-3, or D-9. List their identification numbers in increasing order.",
     sampleColumns: ["vault_id"],
     sampleRows: [[900], [901]],
     ordered: true,
@@ -382,7 +382,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 10,
     title: "The Three Richest Finds",
     description:
-      "Return `item` and `value_coins` for the three most valuable finds, highest value first. Break ties by `item` ascending.",
+      "Show the three most valuable finds with their coin values, most valuable first. When values match, arrange the item names alphabetically.",
     sampleColumns: ["item", "value_coins"],
     sampleRows: [
       ["Sample Relic", 999],
@@ -417,7 +417,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 11,
     title: "Karim's Recipe Cards",
     description:
-      "For each dish return its name upper-cased as `dish_caps` and the length of `notes` as `note_len`. Sort by `dish`.",
+      "Write each dish’s name in capital letters and give the number of characters in its notes. Arrange dishes alphabetically by their original names.",
     sampleColumns: ["dish_caps", "note_len"],
     sampleRows: [
       ["SAMPLE DISH", 42],
@@ -455,7 +455,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 12,
     title: "Total Flow at Wazirabad",
     description:
-      "Return `pump_id` and the rounded combined flow `litres_per_min + backup_lpm` as `total_flow`, treating a missing `backup_lpm` as zero. Sort by `pump_id`.",
+      "For each pump, combine its main and backup flows and round to the nearest whole number. Treat missing backup flow as zero; list pumps by identification number.",
     sampleColumns: ["pump_id", "total_flow"],
     sampleRows: [
       [500, 120],
@@ -494,7 +494,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 13,
     title: "Departures by Day",
     description:
-      "From `departures`, return each calendar `date` of `depart_at` and the count of trains that day as `trains`. Sort by `date`.",
+      "Count the departures on each calendar day. Show each date and its departure total, earliest day first.",
     sampleColumns: ["date", "trains"],
     sampleRows: [
       ["1999-01-01", 9],
@@ -532,7 +532,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 14,
     title: "Crates at Azadpur Mandi",
     description:
-      "Return each `crop` and its total `crates` as `total_crates` across all lots. Sort by `crop`.",
+      "For each crop, add the crates from every lot. Show the crop and its total, alphabetically by crop.",
     sampleColumns: ["crop", "total_crates"],
     sampleRows: [
       ["sample-crop", 1200],
@@ -570,7 +570,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 15,
     title: "Heaps Above the Line",
     description:
-      "Return `heap_no` for disposal heaps whose total recovered `metal_kg` exceeds 800. Sort by `heap_no`. `HAVING` is the intended lesson.",
+      "Find disposal heaps containing more than 800 kilograms of recovered metal in total. List their heap numbers in increasing order.",
     sampleColumns: ["heap_no"],
     sampleRows: [["H-00"], ["H-99"]],
     ordered: true,
@@ -605,7 +605,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 16,
     title: "Heavy Parcels per Bin",
     description:
-      "For each `bin`, return the count of parcels weighing at least 20 kg as `heavy_count`. Sort by `bin`. Try `CASE`; equivalent queries work too.",
+      "For every bin, count parcels weighing at least 20 kilograms. Include bins with none; show bin names and their counts, alphabetically by bin.",
     sampleColumns: ["bin", "heavy_count"],
     sampleRows: [
       ["BIN-0", 5],
@@ -643,7 +643,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 17,
     title: "Ranking the Rush",
     description:
-      "Return `line`, `rider`, `taps` and `line_rank`: rank descending taps within each line, sharing ranks for ties and leaving gaps. Sort by `line`, `line_rank`, then `rider`.",
+      "Show each line, rider, tap total, and placing. Within each line, highest totals come first; ties share a placing and skip subsequent places. Arrange by line, placing, then rider.",
     sampleColumns: ["line", "rider", "taps", "line_rank"],
     sampleRows: [
       ["Sample", "rider-a", 999, 1],
@@ -682,7 +682,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 18,
     title: "The Previous Signal",
     description:
-      "Return `hour`, `signal`, and the previous reading's `signal` as `prev_signal` (null for the first), ordered by `hour`.",
+      "Show each reading’s hour, signal, and preceding signal in time order. The first reading has no preceding value.",
     sampleColumns: ["hour", "signal", "prev_signal"],
     sampleRows: [
       [0, 55, null],
@@ -720,7 +720,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 19,
     title: "Deeper than Average",
     description:
-      "Return `well_id` and `depth_m` for every well deeper than the average well depth. Sort by `depth_m` descending, then `well_id`.",
+      "Find wells deeper than the average well depth. Show their identification numbers and depths, deepest first; break ties by identification number.",
     sampleColumns: ["well_id", "depth_m"],
     sampleRows: [
       [700, 99.9],
@@ -758,7 +758,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 20,
     title: "Spans and Their Towers",
     description:
-      "Return `tower_name` and `span_id` for each anchored span, plus unoccupied towers with null `span_id`. Sort by `tower_name`, then `span_id`. Try joins and `UNION`; equivalent queries work too.",
+      "List each tower with its attached span numbers, including towers without spans. For those towers, leave the span missing; arrange alphabetically by tower name, then by span number.",
     sampleColumns: ["tower_name", "span_id"],
     sampleRows: [
       ["Sample North Tower", 10],

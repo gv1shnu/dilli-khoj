@@ -3,7 +3,7 @@
     "ruin": 1,
     "variant": 0,
     "title": "Archive 1 · Revisit 1",
-    "description": "Return attribute and data_type for shelter attributes, sorted by attribute.",
+    "description": "Find the fields belonging to shelter records. Show their names and value types, alphabetically by field name.",
     "expected": {
       "columns": [
         "attribute",
@@ -21,7 +21,7 @@
     "ruin": 1,
     "variant": 1,
     "title": "Archive 1 · Revisit 2",
-    "description": "Return entity and attribute for key attributes, sorted by entity and attribute.",
+    "description": "Find fields marked as identifiers. Show each table and field name, alphabetically by table, then field.",
     "expected": {
       "columns": [
         "entity",
@@ -39,7 +39,7 @@
     "ruin": 2,
     "variant": 0,
     "title": "Archive 2 · Revisit 1",
-    "description": "Return attribute for nullable bus attributes, sorted by attribute.",
+    "description": "Find bus fields that allow missing values. List their names alphabetically.",
     "expected": {
       "columns": [
         "attribute"
@@ -58,7 +58,7 @@
     "ruin": 2,
     "variant": 1,
     "title": "Archive 2 · Revisit 2",
-    "description": "Return attribute for non-nullable bus attributes with no key, sorted by attribute.",
+    "description": "Find bus fields that require a value but are not identifiers. List their names alphabetically.",
     "expected": {
       "columns": [
         "attribute"
@@ -74,7 +74,7 @@
     "ruin": 3,
     "variant": 0,
     "title": "Archive 3 · Revisit 1",
-    "description": "Return child_entity and child_attribute for references to shelter, sorted by both columns.",
+    "description": "Find links pointing to shelter records. Show their originating table and field, alphabetically by table, then field.",
     "expected": {
       "columns": [
         "child_entity",
@@ -92,7 +92,7 @@
     "ruin": 3,
     "variant": 1,
     "title": "Archive 3 · Revisit 2",
-    "description": "Return child_entity and child_attribute for references to ward, sorted by both columns.",
+    "description": "Find links pointing to ward records. Show their originating table and field, alphabetically by table, then field.",
     "expected": {
       "columns": [
         "child_entity",
@@ -110,7 +110,7 @@
     "ruin": 4,
     "variant": 0,
     "title": "Archive 4 · Revisit 1",
-    "description": "Return object_name and op for DML entries, newest first with missing timestamps last.",
+    "description": "Find changes to record contents. Show the affected object’s name and action, newest first; undated changes come last.",
     "expected": {
       "columns": [
         "object_name",
@@ -132,7 +132,7 @@
     "ruin": 4,
     "variant": 1,
     "title": "Archive 4 · Revisit 2",
-    "description": "Return object_name and op for CREATE TABLE entries, sorted by object_name.",
+    "description": "Find entries recording the creation of a table. Show the table name and recorded action, alphabetically by name.",
     "expected": {
       "columns": [
         "object_name",
@@ -150,7 +150,7 @@
     "ruin": 5,
     "variant": 0,
     "title": "Archive 5 · Revisit 1",
-    "description": "Return grantee and object_name for explicitly revoked SELECT privileges, sorted by both columns.",
+    "description": "Find explicitly withdrawn permission to read records. Show the holder and record-set name, alphabetically by holder, then name.",
     "expected": {
       "columns": [
         "grantee",
@@ -168,7 +168,7 @@
     "ruin": 5,
     "variant": 1,
     "title": "Archive 5 · Revisit 2",
-    "description": "Return grantee and object_name for granted INSERT privileges, sorted by both columns.",
+    "description": "Find granted permission to add records. Show the holder and record-set name, alphabetically by holder, then name.",
     "expected": {
       "columns": [
         "grantee",
@@ -186,7 +186,7 @@
     "ruin": 6,
     "variant": 0,
     "title": "Archive 6 · Revisit 1",
-    "description": "Return stall_id for closed K-7 stalls, sorted by stall_id.",
+    "description": "Find closed stalls in ward K-7. List their identification numbers in increasing order.",
     "expected": {
       "columns": [
         "stall_id"
@@ -202,7 +202,7 @@
     "ruin": 6,
     "variant": 1,
     "title": "Archive 6 · Revisit 2",
-    "description": "Return stall_id for open stalls outside K-7, sorted by stall_id.",
+    "description": "Find open stalls with a known ward outside K-7. List their identification numbers in increasing order.",
     "expected": {
       "columns": [
         "stall_id"
@@ -221,7 +221,7 @@
     "ruin": 7,
     "variant": 0,
     "title": "Archive 7 · Revisit 1",
-    "description": "Return distinct non-null home_ward values among pilgrims arriving after day 2, sorted by home_ward.",
+    "description": "List each known home ward once for pilgrims arriving after day two. Arrange ward names alphabetically.",
     "expected": {
       "columns": [
         "home_ward"
@@ -237,7 +237,7 @@
     "ruin": 7,
     "variant": 1,
     "title": "Archive 7 · Revisit 2",
-    "description": "Return distinct non-null home_ward values among pilgrims arriving before day 3, sorted by home_ward descending.",
+    "description": "List each known home ward once for pilgrims arriving before day three. Arrange ward names in reverse alphabetical order.",
     "expected": {
       "columns": [
         "home_ward"
@@ -256,7 +256,7 @@
     "ruin": 8,
     "variant": 0,
     "title": "Archive 8 · Revisit 1",
-    "description": "Return shop_name for shops whose name begins with Paper, case-insensitively, sorted by shop_name.",
+    "description": "Find shops whose names begin with Paper, regardless of capital letters. List their names alphabetically.",
     "expected": {
       "columns": [
         "shop_name"
@@ -272,7 +272,7 @@
     "ruin": 8,
     "variant": 1,
     "title": "Archive 8 · Revisit 2",
-    "description": "Return shop_name for shops whose trade ends with ink, case-insensitively, sorted by shop_name.",
+    "description": "Find shops whose trade descriptions end with ink, regardless of capital letters. List their names alphabetically.",
     "expected": {
       "columns": [
         "shop_name"
@@ -288,7 +288,7 @@
     "ruin": 9,
     "variant": 0,
     "title": "Archive 9 · Revisit 1",
-    "description": "Return vault_id for sealed vaults in D-1 or D-3, sorted by vault_id.",
+    "description": "Find sealed vaults in wards D-1 or D-3. List their identification numbers in increasing order.",
     "expected": {
       "columns": [
         "vault_id"
@@ -304,7 +304,7 @@
     "ruin": 9,
     "variant": 1,
     "title": "Archive 9 · Revisit 2",
-    "description": "Return vault_id for unsealed vaults outside D-1, D-3 and D-9, sorted by vault_id.",
+    "description": "Find unsealed vaults with known wards outside D-1, D-3, and D-9. List their identification numbers in increasing order.",
     "expected": {
       "columns": [
         "vault_id"
@@ -320,7 +320,7 @@
     "ruin": 10,
     "variant": 0,
     "title": "Archive 10 · Revisit 1",
-    "description": "Return item and value_coins for the second and third most valuable finds; break value ties by item ascending.",
+    "description": "Show the second and third most valuable finds with their coin values, most valuable first. Break value ties alphabetically by item name.",
     "expected": {
       "columns": [
         "item",
@@ -342,7 +342,7 @@
     "ruin": 10,
     "variant": 1,
     "title": "Archive 10 · Revisit 2",
-    "description": "Return item and value_coins for the two least valuable finds; break value ties by item ascending.",
+    "description": "Show the two least valuable finds with their coin values, least valuable first. Break value ties alphabetically by item name.",
     "expected": {
       "columns": [
         "item",
@@ -364,7 +364,7 @@
     "ruin": 11,
     "variant": 0,
     "title": "Archive 11 · Revisit 1",
-    "description": "Return dish and lower-cased notes as notes_lower, sorted by dish.",
+    "description": "Show each dish with its notes written in small letters. Arrange dishes alphabetically.",
     "expected": {
       "columns": [
         "dish",
@@ -394,7 +394,7 @@
     "ruin": 11,
     "variant": 1,
     "title": "Archive 11 · Revisit 2",
-    "description": "Return dish and the first three note characters as note_start, sorted by dish.",
+    "description": "Show each dish with the first three characters of its notes. Arrange dishes alphabetically.",
     "expected": {
       "columns": [
         "dish",
@@ -424,7 +424,7 @@
     "ruin": 12,
     "variant": 0,
     "title": "Archive 12 · Revisit 1",
-    "description": "Return pump_id and absolute backup flow as backup_flow, treating missing backup as zero, sorted by pump_id.",
+    "description": "Show each pump with the magnitude of its backup flow, ignoring the sign. Treat missing backup flow as zero; arrange pumps by identification number.",
     "expected": {
       "columns": [
         "pump_id",
@@ -458,7 +458,7 @@
     "ruin": 12,
     "variant": 1,
     "title": "Archive 12 · Revisit 2",
-    "description": "Return pump_id and rounded primary flow as main_flow, treating missing primary flow as zero, sorted by pump_id.",
+    "description": "Show each pump with its main flow rounded to the nearest whole number. Treat missing main flow as zero; arrange pumps by identification number.",
     "expected": {
       "columns": [
         "pump_id",
@@ -492,7 +492,7 @@
     "ruin": 13,
     "variant": 0,
     "title": "Archive 13 · Revisit 1",
-    "description": "Return departure date as date and count of named trains as named_trains per date, sorted by date.",
+    "description": "For each departure day, count trains whose names are recorded. Show the date and count, earliest day first.",
     "expected": {
       "columns": [
         "date",
@@ -518,7 +518,7 @@
     "ruin": 13,
     "variant": 1,
     "title": "Archive 13 · Revisit 2",
-    "description": "Return departure date as date and earliest timestamp as first_departure per non-null date, sorted by date.",
+    "description": "For each known departure day, find its earliest departure time. Show the date and that time, earliest day first.",
     "expected": {
       "columns": [
         "date",
@@ -540,7 +540,7 @@
     "ruin": 14,
     "variant": 0,
     "title": "Archive 14 · Revisit 1",
-    "description": "Return crop and number of lots as lot_count, sorted by crop.",
+    "description": "Count the lots belonging to each crop. Show the crop and lot count, alphabetically by crop.",
     "expected": {
       "columns": [
         "crop",
@@ -566,7 +566,7 @@
     "ruin": 14,
     "variant": 1,
     "title": "Archive 14 · Revisit 2",
-    "description": "Return crop and maximum crates in one lot as max_crates, sorted by crop.",
+    "description": "Find the largest number of crates in a single lot for each crop. Show the crop and amount, alphabetically by crop.",
     "expected": {
       "columns": [
         "crop",
@@ -592,7 +592,7 @@
     "ruin": 15,
     "variant": 0,
     "title": "Archive 15 · Revisit 1",
-    "description": "Return heap_no for heaps with total metal at most 800 kg, sorted by heap_no.",
+    "description": "Find heaps containing at most 800 kilograms of recovered metal in total. List heap numbers in increasing order.",
     "expected": {
       "columns": [
         "heap_no"
@@ -611,7 +611,7 @@
     "ruin": 15,
     "variant": 1,
     "title": "Archive 15 · Revisit 2",
-    "description": "Return heap_no for heaps with more than one metal record, sorted by heap_no.",
+    "description": "Find heaps with more than one metal record. List heap numbers in increasing order.",
     "expected": {
       "columns": [
         "heap_no"
@@ -630,7 +630,7 @@
     "ruin": 16,
     "variant": 0,
     "title": "Archive 16 · Revisit 1",
-    "description": "Return bin and number of parcels lighter than 20 kg as light_count, sorted by bin.",
+    "description": "For every bin, count parcels lighter than 20 kilograms, including bins with none. Show bin names and counts, alphabetically by bin.",
     "expected": {
       "columns": [
         "bin",
@@ -656,7 +656,7 @@
     "ruin": 16,
     "variant": 1,
     "title": "Archive 16 · Revisit 2",
-    "description": "Return bin and number of parcels with unknown weight as unknown_count, sorted by bin.",
+    "description": "For every bin, count parcels whose weight is unknown, including bins with none. Show bin names and counts, alphabetically by bin.",
     "expected": {
       "columns": [
         "bin",
@@ -682,7 +682,7 @@
     "ruin": 17,
     "variant": 0,
     "title": "Archive 17 · Revisit 1",
-    "description": "Return line, rider, taps and line_rank using descending taps with shared ranks and no gaps, sorted by line, line_rank, rider.",
+    "description": "Show each line, rider, tap total, and placing. Highest totals lead each line; ties share places without gaps. Arrange by line, placing, then rider.",
     "expected": {
       "columns": [
         "line",
@@ -728,7 +728,7 @@
     "ruin": 17,
     "variant": 1,
     "title": "Archive 17 · Revisit 2",
-    "description": "Return line, rider, taps and position numbering each line by descending taps then rider, sorted by line and position.",
+    "description": "Show each line, rider, tap total, and position. Number riders within each line by highest totals, breaking ties alphabetically. Arrange by line, then position.",
     "expected": {
       "columns": [
         "line",
@@ -774,7 +774,7 @@
     "ruin": 18,
     "variant": 0,
     "title": "Archive 18 · Revisit 1",
-    "description": "Return hour, signal and the next signal as next_signal, null after the final reading, sorted by hour.",
+    "description": "Show each reading’s hour, signal, and following signal in time order. The last reading has no following value.",
     "expected": {
       "columns": [
         "hour",
@@ -814,7 +814,7 @@
     "ruin": 18,
     "variant": 1,
     "title": "Archive 18 · Revisit 2",
-    "description": "Return hour, signal and the sum of signals so far as running_signal, sorted by hour.",
+    "description": "Show each reading’s hour, signal, and accumulated signal total up to that hour, earliest first.",
     "expected": {
       "columns": [
         "hour",
@@ -854,7 +854,7 @@
     "ruin": 19,
     "variant": 0,
     "title": "Archive 19 · Revisit 1",
-    "description": "Return well_id and depth_m for wells shallower than the average depth, sorted by depth_m then well_id.",
+    "description": "Find wells shallower than the average depth. Show their identification numbers and depths, shallowest first; break ties by identification number.",
     "expected": {
       "columns": [
         "well_id",
@@ -876,7 +876,7 @@
     "ruin": 19,
     "variant": 1,
     "title": "Archive 19 · Revisit 2",
-    "description": "Return well_id and depth_m for wells at the smallest known depth, sorted by well_id.",
+    "description": "Find all wells at the smallest known depth. Show their identification numbers and depths, arranged by identification number.",
     "expected": {
       "columns": [
         "well_id",
@@ -894,7 +894,7 @@
     "ruin": 20,
     "variant": 0,
     "title": "Archive 20 · Revisit 1",
-    "description": "Return tower_name and count of anchored spans as span_count for every tower, including zero counts, sorted by tower_name.",
+    "description": "Show every tower with its number of attached spans, including towers with none. Arrange tower names alphabetically.",
     "expected": {
       "columns": [
         "tower_name",
@@ -920,7 +920,7 @@
     "ruin": 20,
     "variant": 1,
     "title": "Archive 20 · Revisit 2",
-    "description": "Return tower_name and span_id only for anchored spans, sorted by tower_name then span_id.",
+    "description": "Show tower names and span numbers for attached spans only. Arrange alphabetically by tower name, then by span number.",
     "expected": {
       "columns": [
         "tower_name",
