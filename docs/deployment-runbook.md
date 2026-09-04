@@ -99,8 +99,10 @@ You will end this part holding a **Client ID** and a **Client Secret**.
    - App name: `Dilli Khoj`
    - User support email: an address you monitor
    - Developer contact email: your email
-5. **Audience:** choose **Internal**. (Both approved domains are in the same
-   Workspace org, so Internal is correct and avoids Google's verification review.)
+5. **Audience:** choose **External** and **publish** the app. (`partner.example` is a
+   separate Workspace org, which Internal would block. The `openid`/`email`/`profile`
+   scopes are non-sensitive, so publishing needs no Google security review. The
+   signup hook still restricts sign-ups to the approved domains + admin emails.)
 6. **Scopes:** add only `openid`, `email`, and `profile`. Do **not** add Drive,
    Calendar, or contacts scopes.
 7. Left menu → **Clients** → **Create client**:

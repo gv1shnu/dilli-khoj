@@ -5,7 +5,7 @@
 | Area | Decision |
 | --- | --- |
 | Curriculum source | Supplied `NST DBMS 2026.xlsx`, Modules 1–8 |
-| Email domains | `example.edu` and `students.example.edu` |
+| Email domains | `example.edu`, `students.example.edu`, `partner.example` |
 | Identity fields | Fetch Google display name and email; use Supabase UUID as primary identity |
 | Supabase | Project `your-project-ref` |
 | Repository | Private GitHub repository `gv1shnu/treasure-hunt` |
@@ -35,7 +35,7 @@
 | Question structure | Title → description → sample output → hints |
 | Academic approval | Team discussion; no single external approver named |
 | Admin allowlist | `former.admin@example.edu`, `staff.admin@partner.example` (`game_private.admin_emails` + `src/game/admins.ts`). Admins are also players |
-| Player domains | Only `example.edu` and `students.example.edu`. `partner.example` is **not** added as a general domain (broadens audience; Google Internal-audience would block it anyway) — specific admin emails are allowed through the hook instead |
+| Player domains | `example.edu`, `students.example.edu`, and `partner.example` (added 2026-09-04, owner decision). Allowing `partner.example` **requires the Google OAuth app to be External + published** (Internal blocks its different-org accounts) |
 | Release cohort | All students at once |
 | Network | Campus Wi-Fi, approximately 2–5 MB/s observed |
 | Launch owner | Project owner/user |

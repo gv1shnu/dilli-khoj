@@ -16,7 +16,7 @@ Approved domains:
 
 Confirmed production origin: `https://dilli-khoj.example.workers.dev`
 
-Both approved domains belong to the same Google Workspace organization, so the Google app may use an **Internal** audience.
+The university domains share one Google Workspace organization, but `partner.example` is a separate organization. Because that domain is allowed, the Google app must use an **External** audience (Internal would block `partner.example` accounts), and it must be **published** to production so it is not capped at 100 test users. The requested scopes (`openid`, `email`, `profile`) are non-sensitive, so publishing an External app does not trigger Google's security review.
 
 ## Supabase project preparation
 
@@ -53,7 +53,7 @@ Official references:
    - App name: `Dilli Khoj`.
    - User support email: an account you monitor.
    - Developer contact: your email.
-4. Choose the **Internal** audience; both approved domains are confirmed in the same Google Workspace organization.
+4. Choose the **External** audience (a `partner.example` account is a different Workspace org, which Internal would reject), then **publish** the app to production.
 5. Request only `openid`, `email` and `profile` scopes. The game does not need Google Drive, Calendar or contacts.
 6. Create a client with application type **Web application**.
 7. Add authorized JavaScript origins:
@@ -83,7 +83,7 @@ Do not rely on a client-side email suffix check. The server-side creation hook s
 
 The UI may provide a friendly error, but database and judge authorization must independently reject other accounts.
 
-**Admin emails vs. domains:** to let a specific admin in without opening a whole domain, add the email to `game_private.admin_emails` (migration `…_admin_allowlist.sql`) rather than adding its domain here. Note Google's audience still applies first: if the OAuth app is **Internal**, an email from a different Workspace org (e.g. `@partner.example`) is rejected by Google before the hook runs — that admin should sign in with an approved-domain account, or the app must be switched to **External**.
+Approved domains are `example.edu`, `students.example.edu`, and `partner.example` (in `hook_restrict_dilli_khoj_signup`). The `game_private.admin_emails` table additionally lets specific admin emails in regardless of domain. Google's audience applies first: because `partner.example` is a different Workspace org, the OAuth app **must be External and published**, or those accounts are blocked before the hook runs.
 
 ## Local and deployment linkage
 
