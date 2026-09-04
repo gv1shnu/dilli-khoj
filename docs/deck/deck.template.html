@@ -1,0 +1,621 @@
+<title>Dilli Khoj Field Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    color-scheme: dark;
+    --ground: #0b0e0c;
+    --ground-2: #10140f;
+    --panel: #161b17;
+    --panel-2: #1c231d;
+    --line: rgba(238, 223, 192, 0.14);
+    --line-strong: rgba(238, 223, 192, 0.28);
+    --ink: #f4eede;
+    --muted: #9aa79c;
+    --faint: #6d7870;
+    --amber: #f4ad45;
+    --mint: #65e1bd;
+    --red: #ff7869;
+    --d1: #e8724c;
+    --d2: #e8b53f;
+    --d3: #57c98a;
+    --d4: #35c7b0;
+    --d5: #4aa3e8;
+    --d6: #8f86e0;
+    --d7: #d86fce;
+    --display: "Fraunces", Georgia, serif;
+    --body: "Instrument Sans", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  .deck {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .deck { scroll-behavior: auto; }
+  }
+
+  .slide {
+    scroll-snap-align: start;
+    min-height: 100vh;
+    padding: clamp(40px, 6vh, 84px) clamp(28px, 7vw, 120px) clamp(64px, 8vh, 100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* ---- shared chrome ---- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .eyebrow .num { color: var(--faint); }
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--amber);
+    opacity: 0.7;
+  }
+  h1, h2, h3 { font-family: var(--display); font-weight: 900; margin: 0; text-wrap: balance; line-height: 1.02; }
+  h1 { font-size: clamp(2.7rem, 6.4vw, 5.6rem); letter-spacing: -0.015em; }
+  h2 { font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: -0.01em; }
+  h3 { font-size: 1.18rem; font-weight: 600; }
+  p { line-height: 1.6; margin: 0; }
+  .lead { font-size: clamp(1.05rem, 1.5vw, 1.4rem); color: var(--ink); max-width: 40ch; }
+  .body { color: var(--muted); max-width: 62ch; }
+  strong { color: var(--ink); font-weight: 600; }
+  code { font-family: var(--mono); font-size: 0.86em; color: var(--mint); background: rgba(101, 225, 189, 0.09); padding: 1px 6px; border-radius: 4px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: center;
+  }
+  .grid.narrow-media { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+  .stack { display: flex; flex-direction: column; gap: 20px; }
+
+  figure { margin: 0; }
+  .shot {
+    width: 100%;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    display: block;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+    background: var(--panel);
+  }
+  figcaption {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+  }
+  figcaption b { color: var(--amber); font-weight: 500; }
+
+  .figrow { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+  /* ---- lists ---- */
+  ul.ticks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  ul.ticks li { position: relative; padding-left: 26px; color: var(--muted); max-width: 54ch; line-height: 1.5; }
+  ul.ticks li::before { content: "▸"; position: absolute; left: 0; top: 0; color: var(--mint); }
+  ul.ticks li strong { color: var(--ink); }
+
+  /* ---- tiles ---- */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+  .tile {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 18px 16px;
+    background: linear-gradient(160deg, var(--panel-2), var(--panel));
+  }
+  .tile .k { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
+  .tile .v { font-family: var(--display); font-weight: 900; font-size: 2rem; margin-top: 6px; }
+  .tile .v.pos { color: var(--mint); }
+  .tile .v.neg { color: var(--red); }
+  .tile .v.amber { color: var(--amber); }
+  .tile small { display: block; color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+
+  /* ---- district legend ---- */
+  .districts { display: flex; flex-direction: column; gap: 10px; }
+  .drow { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .dot { width: 12px; height: 12px; border-radius: 3px; }
+  .drow .dcode { font-family: var(--mono); font-size: 0.78rem; color: var(--ink); }
+  .drow .dname { font-weight: 600; }
+  .drow .dmod { font-family: var(--mono); font-size: 0.72rem; color: var(--faint); text-align: right; }
+
+  /* ---- module chips ---- */
+  .modules { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .mod { border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; background: var(--panel); }
+  .mod .mn { font-family: var(--mono); font-size: 0.66rem; color: var(--amber); letter-spacing: 0.12em; }
+  .mod .mt { font-size: 0.92rem; margin-top: 4px; color: var(--ink); line-height: 1.35; }
+
+  /* ---- hero ---- */
+  .hero {
+    justify-content: flex-end;
+    padding-bottom: clamp(48px, 9vh, 110px);
+    background:
+      linear-gradient(180deg, rgba(11, 14, 12, 0.5) 0%, rgba(11, 14, 12, 0.15) 32%, rgba(11, 14, 12, 0.72) 78%, var(--ground) 100%),
+      var(--hero-img) center/cover no-repeat;
+  }
+  .hero .brandline { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
+  .hero .brandline img { width: 58px; height: 58px; filter: drop-shadow(0 3px 10px rgba(0,0,0,0.6)); }
+  .hero .brandline span { font-family: var(--mono); letter-spacing: 0.34em; text-transform: uppercase; font-size: 0.8rem; color: var(--amber); }
+  .hero h1 { max-width: 16ch; }
+  .hero .lead { max-width: 52ch; font-size: clamp(1.1rem, 1.7vw, 1.5rem); margin-top: 18px; color: var(--ink); }
+  .hero .meta { margin-top: 30px; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.12em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .hero .meta b { color: var(--mint); font-weight: 500; }
+
+  /* ---- architecture diagram ---- */
+  .arch { width: 100%; height: auto; }
+  .arch text { font-family: var(--mono); fill: var(--ink); }
+
+  /* closing */
+  .closing { align-items: center; text-align: center; justify-content: center; }
+  .closing .brandbig { width: 92px; height: 92px; margin-bottom: 8px; }
+  .closing h2 { max-width: 20ch; }
+  .credit { font-family: var(--mono); letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.8rem; color: var(--amber); }
+
+  /* ---- fixed navigation ---- */
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--amber); width: 0; z-index: 50; transition: width 0.2s ease; }
+  .rail { position: fixed; right: clamp(14px, 2vw, 30px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 11px; z-index: 40; }
+  .rail button { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; padding: 0; cursor: pointer; transition: all 0.2s ease; }
+  .rail button[aria-current="true"] { background: var(--amber); border-color: var(--amber); transform: scale(1.35); }
+  .rail button:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+  .pager { position: fixed; left: clamp(18px, 2vw, 32px); bottom: 20px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--faint); z-index: 40; }
+  .pager b { color: var(--ink); }
+  .hint { position: fixed; right: clamp(40px, 5vw, 70px); bottom: 20px; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--faint); z-index: 40; }
+  @media (max-width: 1000px) { .hint { display: none; } }
+
+  @media (max-width: 860px) {
+    .grid, .grid.narrow-media, .figrow { grid-template-columns: 1fr; }
+    .slide { justify-content: flex-start; }
+    .rail { display: none; }
+  }
+</style>
+
+<div class="progress" id="progress"></div>
+<nav class="rail" id="rail" aria-label="Slides"></nav>
+<div class="pager" id="pager"></div>
+<div class="hint">↑ ↓ / space to navigate</div>
+
+<main class="deck" id="deck">
+
+  <!-- 01 HERO -->
+  <section class="slide hero" style="--hero-img: url('{{IMG:03-scene.jpg}}')">
+    <div class="brandline"><img src="{{IMG:favicon}}" alt="Dilli Khoj helm mark" /><span>Dilli Khoj</span></div>
+    <h1>Learn PostgreSQL by excavating a lost Delhi.</h1>
+    <p class="lead">A 3D exploration game where students walk the ruins of a fictional, post-collapse Shahjahanabad and wake twenty sealed archives — one real SQL query at a time.</p>
+    <div class="meta">
+      <span>FIELD REPORT · END-TO-END</span>
+      <span>20 RUINS · 8 DBMS MODULES · 7 DISTRICTS</span>
+      <span>DEVELOPED BY <b>VISHNU GANDARAPU</b></span>
+    </div>
+  </section>
+
+  <!-- 02 WHAT IT IS -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">01</span> The premise</p>
+    <div class="grid narrow-media">
+      <div class="stack">
+        <h2>A course, disguised as an expedition.</h2>
+        <p class="body">Dilli Khoj teaches the NST DBMS 2026 topic tree as a game. Each ruin guards a sealed archive; reading it means writing the SQL the archive asks for. Get it right and the ruin wakes, unlocking the next. The curriculum is the map.</p>
+        <ul class="ticks">
+          <li><strong>Twenty authored questions</strong>, one per ruin, in a fixed teaching order from schema-reading to multi-table joins.</li>
+          <li><strong>Sign-in required.</strong> Only approved institutional Google accounts may play, so the world stays to real students.</li>
+          <li><strong>Every query is real PostgreSQL</strong> — read-only, run against a live database, graded on the server.</li>
+        </ul>
+      </div>
+      <figure>
+        <img class="shot" src="{{IMG:01-intro.jpg}}" alt="In-game how-to-play briefing overlay" />
+        <figcaption><b>FIG 01</b><span>Onboarding — the how-to-play briefing</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 03 PLAYER PATH -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">02</span> The player path</p>
+    <h2>From gate to graded solve.</h2>
+    <div class="figrow">
+      <figure>
+        <img class="shot" src="{{IMG:02-signin.jpg}}" alt="Mandatory Google sign-in gate" />
+        <figcaption><b>1 · GATE</b><span>Mandatory Google sign-in</span></figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="{{IMG:03-scene.jpg}}" alt="The explorable 3D ruin with the archive terminal open" />
+        <figcaption><b>2 · EXPLORE &amp; SOLVE</b><span>Walk to an amber archive, open the terminal</span></figcaption>
+      </figure>
+    </div>
+    <p class="body">The flow is linear and gated: <strong>intro briefing → sign in → walk the ruin → open the archive → Run freely, then Submit</strong>. A passing Submit restores the ruin and unlocks the next. Cleared ruins stay open forever for revisiting.</p>
+  </section>
+
+  <!-- 04 INTERFACE -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">03</span> The interface</p>
+    <div class="grid">
+      <div class="stack">
+        <h2>A walkable world beside a working SQL console.</h2>
+        <ul class="ticks">
+          <li><strong>Left:</strong> a third-person, explorable ruin built in Three.js — dusk lighting, guide arrows to the nearest archive, ambient audio.</li>
+          <li><strong>Right:</strong> the archive terminal — the question, a sample output, the schema, and an editor with <code>Run</code> (free practice) and <code>Submit</code> (server-graded).</li>
+          <li><strong>Always visible:</strong> XP balance, ruins-restored count, world map, and the mission card.</li>
+        </ul>
+      </div>
+      <figure>
+        <img class="shot" src="{{IMG:03-scene.jpg}}" alt="Full game interface: 3D ruin on the left, archive terminal on the right" />
+        <figcaption><b>FIG 03</b><span>Ruin 01 — the full playing surface</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 05 QUESTION ANATOMY -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">04</span> Anatomy of a question</p>
+    <div class="grid narrow-media">
+      <div class="stack">
+        <h2>Story, shape, and a live schema.</h2>
+        <p class="body">Every archive follows one structure so students always know where to look:</p>
+        <ul class="ticks">
+          <li><strong>Task with a short story</strong> — the in-world objective and the exact rows and columns to return.</li>
+          <li><strong>Sample output</strong> — fictional rows showing the answer's shape, flagged order-matters or any-order.</li>
+          <li><strong>Schema with sample rows</strong> — each table's columns <em>and</em> a few illustrative rows, so the source data is never a mystery.</li>
+          <li><strong>Hints for XP</strong>, then a full <strong>solution reveal</strong> — both paid for, the reveal gated behind opening every hint.</li>
+        </ul>
+      </div>
+      <figure>
+        <img class="shot" src="{{IMG:04-question-schema.png}}" alt="Archive terminal showing task, sample output and schema with sample rows" />
+        <figcaption><b>FIG 04</b><span>Schema browser, now with illustrative sample rows</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 06 CURRICULUM MAP -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">05</span> The curriculum, as a city</p>
+    <div class="grid">
+      <figure>
+        <img class="shot" src="{{IMG:08-admin.jpg}}" alt="The complete animated atlas of all 20 ruins across the fictional city" />
+        <figcaption><b>FIG 05</b><span>Question Studio — the complete atlas of all 20 ruins</span></figcaption>
+      </figure>
+      <div class="stack">
+        <h2>20 ruins → 8 modules → 7 districts.</h2>
+        <p class="body">Ruins unlock in one fixed order. Contiguous runs of ruins form seven districts, each holding one band of the DBMS syllabus. The order is the single source of truth — progression, unlocks and the leaderboard all read it.</p>
+        <div class="districts">
+          <div class="drow"><span class="dot" style="background:var(--d1)"></span><span class="dcode">D1</span><span class="dname">Yamuna Gates</span><span class="dmod">ruins 1–3 · M1</span></div>
+          <div class="drow"><span class="dot" style="background:var(--d2)"></span><span class="dcode">D2</span><span class="dname">The Records Quarter</span><span class="dmod">ruins 4–5 · M2</span></div>
+          <div class="drow"><span class="dot" style="background:var(--d3)"></span><span class="dcode">D3</span><span class="dname">Chandni Chowk Bazaars</span><span class="dmod">ruins 6–10 · M3</span></div>
+          <div class="drow"><span class="dot" style="background:var(--d4)"></span><span class="dcode">D4</span><span class="dname">Kitchens &amp; Conduits</span><span class="dmod">ruins 11–13 · M4</span></div>
+          <div class="drow"><span class="dot" style="background:var(--d5)"></span><span class="dcode">D5</span><span class="dname">The Outer Yards</span><span class="dmod">ruins 14–16 · M5</span></div>
+          <div class="drow"><span class="dot" style="background:var(--d6)"></span><span class="dcode">D6</span><span class="dname">The Ridge Lines</span><span class="dmod">ruins 17–18 · M6</span></div>
+          <div class="drow"><span class="dot" style="background:var(--d7)"></span><span class="dcode">D7</span><span class="dname">Deep Foundations</span><span class="dmod">ruins 19–20 · M7–8</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 DIFFICULTY / VARIETY -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">06</span> The difficulty ramp</p>
+    <h2>Every ruin raises the bar.</h2>
+    <p class="body">Difficulty is encoded by module and district — and by the hint budget: ruins 1–10 get one hint, 11–20 get two. A single walk climbs from filtering catalog rows to windowed analytics and joins with set operations.</p>
+    <div class="figrow">
+      <figure>
+        <img class="shot" src="{{IMG:q-ruin17.png}}" alt="Ruin 17 — window function ranking question" />
+        <figcaption><b>RUIN 17 · M6</b><span>Window functions — RANK over partitions</span></figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="{{IMG:q-ruin20.png}}" alt="Ruin 20 — multi-table join and UNION question with two tables" />
+        <figcaption><b>RUIN 20 · M8</b><span>Joins &amp; set operations — two tables</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 08 XP ECONOMY -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">07</span> The XP economy</p>
+    <div class="grid narrow-media">
+      <div class="stack">
+        <h2>Help costs; solving never does.</h2>
+        <p class="body">A wrong Submit is free, so students submit fearlessly. Solving is always available. But <strong>help must be paid for</strong> — and you can't reveal your way to the end.</p>
+        <ul class="ticks">
+          <li>A maximum-help player runs out of affordable help around <strong>ruin 13–14 of 20</strong> and must solve the rest unaided.</li>
+          <li>A no-help player tops out at <strong>600 XP</strong>. Only players who clear all twenty appear on the leaderboard.</li>
+        </ul>
+      </div>
+      <div class="tiles">
+        <div class="tile"><div class="k">Start</div><div class="v">100</div></div>
+        <div class="tile"><div class="k">Survey</div><div class="v pos">+5</div><small>first open</small></div>
+        <div class="tile"><div class="k">Solve</div><div class="v pos">+20</div><small>first pass</small></div>
+        <div class="tile"><div class="k">Hint</div><div class="v neg">−10</div><small>must afford</small></div>
+        <div class="tile"><div class="k">Reveal</div><div class="v neg">−20</div><small>after all hints</small></div>
+        <div class="tile"><div class="k">Wrong Submit</div><div class="v">0</div><small>always free</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 GRADING / FAIR PLAY -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">08</span> Grading &amp; fair play</p>
+    <div class="grid">
+      <div class="stack">
+        <h2>The server is the referee.</h2>
+        <ul class="ticks">
+          <li><strong>Server-authoritative judge.</strong> Submit calls a Supabase Edge Function that runs the query on real PostgreSQL under a restricted identity — never the browser.</li>
+          <li><strong>Hidden fixtures.</strong> Each ruin is graded against a visible case plus hidden datasets, compared order-sensitive or order-free per question.</li>
+          <li><strong>Read-only by construction.</strong> Only <code>SELECT</code> / <code>WITH … SELECT</code>, one statement, a 10&nbsp;KB cap, a statement timeout and a max-rows ceiling.</li>
+          <li><strong>Pinned datasets.</strong> Every submission carries a <code>dataset_version</code> so grading is reproducible.</li>
+        </ul>
+      </div>
+      <figure>
+        <img class="shot" src="{{IMG:05-run-pass.png}}" alt="Archive terminal showing a passing visible case with a result table" />
+        <figcaption><b>FIG 08</b><span>A passing Run — the visible case</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 10 ARCHITECTURE -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">09</span> Architecture</p>
+    <h2>One SPA, two databases, one referee.</h2>
+    <svg class="arch" viewBox="0 0 1180 470" role="img" aria-label="System architecture diagram">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#9aa79c" />
+        </marker>
+      </defs>
+      <style>
+        .box { fill: #161b17; stroke: rgba(238,223,192,0.28); rx: 12; }
+        .box.accent { stroke: #f4ad45; }
+        .box.mint { stroke: #65e1bd; }
+        .lbl { font-size: 20px; font-weight: 700; fill: #f4eede; }
+        .sub { font-size: 13px; fill: #9aa79c; }
+        .tag { font-size: 12px; fill: #f4ad45; letter-spacing: 0.12em; }
+        .flow { stroke: #6d7870; stroke-width: 1.6; fill: none; marker-end: url(#ar); }
+        .flow.warm { stroke: #f4ad45; }
+      </style>
+
+      <!-- Client -->
+      <rect class="box accent" x="24" y="150" width="300" height="170" rx="12" />
+      <text class="tag" x="44" y="180">CLIENT · BROWSER</text>
+      <text class="lbl" x="44" y="212">React 19 + Vite SPA</text>
+      <text class="sub" x="44" y="238">Three.js explorable world</text>
+      <text class="sub" x="44" y="260">Archive terminal &amp; SQL editor</text>
+      <text class="sub" x="44" y="290">PGlite (Postgres-in-WASM)</text>
+      <text class="sub" x="44" y="308">— free offline practice</text>
+
+      <!-- Cloudflare -->
+      <rect class="box" x="24" y="30" width="300" height="86" rx="12" />
+      <text class="tag" x="44" y="60">EDGE HOST</text>
+      <text class="lbl" x="44" y="90">Cloudflare Workers</text>
+      <text class="sub" x="44" y="108">static assets · SPA fallback</text>
+
+      <!-- Supabase auth -->
+      <rect class="box mint" x="440" y="24" width="320" height="120" rx="12" />
+      <text class="tag" x="460" y="54" style="fill:#65e1bd">AUTH</text>
+      <text class="lbl" x="460" y="86">Google OAuth (PKCE)</text>
+      <text class="sub" x="460" y="110">approved-domain sign-up hook</text>
+      <text class="sub" x="460" y="130">admin allowlist · RLS identities</text>
+
+      <!-- Supabase RPC -->
+      <rect class="box" x="440" y="170" width="320" height="130" rx="12" />
+      <text class="tag" x="460" y="200">PROGRESS · RPC</text>
+      <text class="lbl" x="460" y="232">Supabase Postgres</text>
+      <text class="sub" x="460" y="256">game_state() · begin_revisit()</text>
+      <text class="sub" x="460" y="276">leaderboard · admin (audited)</text>
+      <text class="sub" x="460" y="294">row-level security throughout</text>
+
+      <!-- Judge -->
+      <rect class="box accent" x="440" y="330" width="320" height="116" rx="12" />
+      <text class="tag" x="460" y="360">REFEREE · EDGE FUNCTION</text>
+      <text class="lbl" x="460" y="392">judge-query</text>
+      <text class="sub" x="460" y="416">executor role — runs the SQL</text>
+      <text class="sub" x="460" y="434">progress role — records verdict</text>
+
+      <!-- Executor DB -->
+      <rect class="box" x="880" y="330" width="276" height="116" rx="12" />
+      <text class="tag" x="900" y="360">GRADING DATA</text>
+      <text class="lbl" x="900" y="392">Fixture Postgres</text>
+      <text class="sub" x="900" y="416">visible + hidden datasets</text>
+      <text class="sub" x="900" y="434">restricted, read-only identity</text>
+
+      <!-- flows -->
+      <path class="flow" d="M174 150 L174 116" />
+      <path class="flow warm" d="M324 100 L436 84" />
+      <path class="flow" d="M324 210 L436 220" />
+      <path class="flow warm" d="M324 250 L436 372" />
+      <path class="flow" d="M760 388 L876 388" />
+      <path class="flow" d="M600 300 L600 330" opacity="0.6" />
+    </svg>
+    <p class="body">The browser talks to Cloudflare for the app, to Supabase Auth to sign in, and to Supabase RPCs for progress. A <strong>Submit</strong> goes to the <code>judge-query</code> Edge Function, which runs the query under an executor role against fixture data and writes the verdict under a separate progress role.</p>
+  </section>
+
+  <!-- 11 SECURITY -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">10</span> Auth &amp; security</p>
+    <h2>One source of truth for who's in.</h2>
+    <div class="grid">
+      <ul class="ticks">
+        <li><strong>Google OAuth with PKCE</strong> — the app never sees a password; sign-in happens on Google.</li>
+        <li><strong>Approved domains + admin allowlist</strong> enforced by a before-user-created hook. The allowlist lives in <code>game_private.admin_emails</code> — the single server-side source of truth.</li>
+        <li><strong>Admin status is server-computed</strong> and returned by <code>game_state()</code>; the client never asserts it.</li>
+        <li><strong>Admin reads are gated and audited</strong> — <code>require_admin()</code> guards every privileged RPC and logs it.</li>
+        <li><strong>Solutions never ship to students</strong> — the authoring studio is a dev-only bundle, absent from production.</li>
+      </ul>
+      <div class="stack">
+        <div class="tiles">
+          <div class="tile"><div class="k">Password seen by app</div><div class="v pos">Never</div></div>
+          <div class="tile"><div class="k">Admin source</div><div class="v amber">1 table</div><small>server-side</small></div>
+          <div class="tile"><div class="k">Privileged RPCs</div><div class="v amber">Audited</div></div>
+          <div class="tile"><div class="k">RLS</div><div class="v pos">On</div><small>own rows only</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 WORLD MAP + REVISITS -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">11</span> Maps, admin &amp; practice</p>
+    <div class="grid">
+      <div class="stack">
+        <h2>See the city; revisit any ruin.</h2>
+        <ul class="ticks">
+          <li><strong>World map.</strong> Players reveal only the ruin parcels they've cleared; admins inspect all twenty in the Question Studio.</li>
+          <li><strong>Revisits.</strong> Every ruin has two alternate variants — 40 in total — for non-scoring practice that changes no XP, time or unlocks.</li>
+          <li><strong>Leaderboard.</strong> Completers ranked by XP, then fastest completion.</li>
+        </ul>
+      </div>
+      <figure>
+        <img class="shot" src="{{IMG:06-worldmap.jpg}}" alt="The animated world-map atlas modal" />
+        <figcaption><b>FIG 11</b><span>The cartography office — a player's world map</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 13 LEGAL -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">12</span> Compliance &amp; consent</p>
+    <div class="grid">
+      <figure>
+        <img class="shot" src="{{IMG:09-privacy.jpg}}" alt="The privacy policy page" />
+        <figcaption><b>FIG 12</b><span>Privacy policy — themed, self-hosted</span></figcaption>
+      </figure>
+      <div class="stack">
+        <h2>Ready for the OAuth consent screen.</h2>
+        <ul class="ticks">
+          <li><strong>Privacy policy &amp; terms of service</strong> served from the app's own domain, matching the game's identity.</li>
+          <li>They cover the data actually collected — Google email, name, picture, id — the scopes requested (<code>openid email profile</code>), storage, retention and rights.</li>
+          <li>Both carry the fiction disclaimer and the <strong>Developed by Vishnu Gandarapu</strong> credit.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 DEPLOYMENT -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">13</span> Deployment</p>
+    <div class="grid narrow-media">
+      <div class="stack">
+        <h2>Two platforms, one command.</h2>
+        <ul class="ticks">
+          <li><strong>Front end:</strong> <code>pnpm build &amp;&amp; wrangler deploy</code> ships the SPA to Cloudflare Workers with single-page-app fallback.</li>
+          <li><strong>Back end:</strong> Supabase project — SQL migrations, the signup hook, RLS policies, RPCs, and the <code>judge-query</code> Edge Function with its executor / progress database roles.</li>
+          <li><strong>Content pipeline:</strong> practice fixtures and expected rows are generated by running the canonical solutions through PostgreSQL — expected output is computed, never hand-written.</li>
+        </ul>
+      </div>
+      <div class="tiles">
+        <div class="tile"><div class="k">Origin</div><div class="v amber" style="font-size:1rem;word-break:break-all">dilli-khoj<wbr />.workers.dev</div></div>
+        <div class="tile"><div class="k">Ruin 6</div><div class="v pos">Live</div><small>graded end-to-end</small></div>
+        <div class="tile"><div class="k">Ruins 1–5, 7–20</div><div class="v amber">Drafted</div><small>content authored</small></div>
+        <div class="tile"><div class="k">Revisits</div><div class="v">40</div><small>2 per ruin</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 STATUS + NEXT -->
+  <section class="slide">
+    <p class="eyebrow"><span class="num">14</span> Status &amp; what's next</p>
+    <div class="grid">
+      <div class="stack">
+        <h2>Honest about the gaps.</h2>
+        <p class="body">Ruin 6 is the fully-graded vertical slice. The rest are authored and reviewable, but their hidden fixtures, computed expected rows, near-miss tests and a blind human review are the production step before they ship. Review already found real gaps — incorrect conditions that pass every current fixture in ruins 01, 06 and 19.</p>
+      </div>
+      <ol class="ticks" style="counter-reset:none">
+        <li><strong>Review all 20 questions</strong>, then their revisits.</li>
+        <li><strong>Strengthen hidden fixtures</strong> and genuinely different accepted solutions.</li>
+        <li><strong>Validate</strong> the full local Supabase stack end-to-end.</li>
+        <li><strong>Harden</strong> expensive-query limits, queues and retries.</li>
+        <li><strong>Test</strong> sustained mixed-question performance; improve polling and rendering.</li>
+        <li><strong>Finish</strong> browser, hardware and campus-network testing.</li>
+        <li><strong>Prepare</strong> retention, monitoring and rollback — deploy only after approval.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 16 CLOSING -->
+  <section class="slide closing">
+    <img class="brandbig" src="{{IMG:favicon}}" alt="Dilli Khoj helm mark" />
+    <p class="eyebrow" style="justify-content:center">Dilli Khoj</p>
+    <h2>The city is sealed. The queries open it.</h2>
+    <p class="body" style="text-align:center;max-width:52ch">Learn PostgreSQL by exploring the ruins of a fictional, post-collapse Delhi — twenty archives, one real query at a time.</p>
+    <p class="credit">Developed by Vishnu Gandarapu</p>
+  </section>
+
+</main>
+
+<script>
+  (function () {
+    var deck = document.getElementById("deck");
+    var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
+    var rail = document.getElementById("rail");
+    var progress = document.getElementById("progress");
+    var pager = document.getElementById("pager");
+    var current = 0;
+
+    slides.forEach(function (s, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", "Go to slide " + (i + 1));
+      b.addEventListener("click", function () {
+        slides[i].scrollIntoView({ behavior: "smooth" });
+      });
+      rail.appendChild(b);
+    });
+    var dots = Array.prototype.slice.call(rail.children);
+
+    function setActive(i) {
+      current = i;
+      dots.forEach(function (d, j) { d.setAttribute("aria-current", j === i ? "true" : "false"); });
+      progress.style.width = ((i + 1) / slides.length) * 100 + "%";
+      pager.innerHTML = "<b>" + String(i + 1).padStart(2, "0") + "</b> / " + String(slides.length).padStart(2, "0");
+    }
+
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) setActive(slides.indexOf(e.target));
+        });
+      }, { root: deck, threshold: 0.55 });
+      slides.forEach(function (s) { io.observe(s); });
+    }
+    setActive(0);
+
+    function go(delta) {
+      var next = Math.min(slides.length - 1, Math.max(0, current + delta));
+      if (next !== current) slides[next].scrollIntoView({ behavior: "smooth" });
+    }
+    window.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); go(1); }
+      else if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+      else if (e.key === "Home") { e.preventDefault(); slides[0].scrollIntoView({ behavior: "smooth" }); }
+      else if (e.key === "End") { e.preventDefault(); slides[slides.length - 1].scrollIntoView({ behavior: "smooth" }); }
+    });
+  })();
+</script>
