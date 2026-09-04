@@ -28,7 +28,8 @@ export function createGuideArrows(): GuideArrows {
   shape.lineTo(-0.5, -0.5);
   shape.closePath();
   const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.12, bevelEnabled: false });
-  geo.rotateX(-Math.PI / 2); // lay flat, tip now points +Z
+  geo.rotateX(-Math.PI / 2); // lay flat with the glowing face up (tip now points -Z)
+  geo.rotateY(Math.PI); // flip the tip to +Z so yaw = atan2(dir.x, dir.z) aims it at the target
   geo.scale(0.85, 1, 0.85);
 
   const chevrons: THREE.Mesh[] = [];
