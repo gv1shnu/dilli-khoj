@@ -13,4 +13,5 @@ import { level11 } from './level11';
 import { level12 } from './level12';
 import { level13 } from './level13';
 import { level14 } from './level14';
-export const LEVELS: LevelDefinition[] = [level01, level02, level03, level04, level05, level06, level07, level08, level09, level10, level11, level12, level13, level14];
+import { level15 } from './level15';
+export const LEVELS: LevelDefinition[] = [level01, level02, level03, level04, level05, level06, level07, level08, level09, level10, level11, level12, level13, level14, level15];
