@@ -78,10 +78,12 @@ Do not rely on a client-side email suffix check. The server-side creation hook s
 
 - OAuth provider is Google;
 - email is verified;
-- normalized domain is exactly `example.edu` or `students.example.edu`;
+- normalized domain is exactly `example.edu` or `students.example.edu`, **or** the email is in `game_private.admin_emails` (the admin allowlist);
 - where available, Google's hosted-domain claim agrees with the approved organization.
 
 The UI may provide a friendly error, but database and judge authorization must independently reject other accounts.
+
+**Admin emails vs. domains:** to let a specific admin in without opening a whole domain, add the email to `game_private.admin_emails` (migration `…_admin_allowlist.sql`) rather than adding its domain here. Note Google's audience still applies first: if the OAuth app is **Internal**, an email from a different Workspace org (e.g. `@partner.example`) is rejected by Google before the hook runs — that admin should sign in with an approved-domain account, or the app must be switched to **External**.
 
 ## Local and deployment linkage
 

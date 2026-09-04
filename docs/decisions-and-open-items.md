@@ -34,7 +34,8 @@
 | Content boundaries | Stay on educational game development; no unrelated issues |
 | Question structure | Title → description → sample output → hints |
 | Academic approval | Team discussion; no single external approver named |
-| Admin access | Admin emails will be added later |
+| Admin allowlist | `former.admin@example.edu`, `staff.admin@partner.example` (`game_private.admin_emails` + `src/game/admins.ts`). Admins are also players |
+| Player domains | Only `example.edu` and `students.example.edu`. `partner.example` is **not** added as a general domain (broadens audience; Google Internal-audience would block it anyway) — specific admin emails are allowed through the hook instead |
 | Release cohort | All students at once |
 | Network | Campus Wi-Fi, approximately 2–5 MB/s observed |
 | Launch owner | Project owner/user |
@@ -58,7 +59,7 @@
 3. Complete the Google OAuth client using the setup guide.
 4. Configure the Supabase Google provider, URL allowlist and Before User Created hook.
 5. Link the Supabase CLI and apply the reviewed migrations; deploy the judge.
-6. Provide the **admin allowlist emails** (you + your team) that may open the Question Studio and the player-progress/leaderboard admin views.
+6. ~~Provide the admin allowlist emails~~ — done (`game_private.admin_emails`). Apply the `admin_allowlist` migration with `supabase db push`.
 7. Obtain written permission for institutional logo files if they will appear in the shipped game.
 8. Decide whether the 90-day raw-attempt retention default should be shorter.
 
