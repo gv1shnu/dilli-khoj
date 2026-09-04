@@ -40,7 +40,7 @@ supabase db push
 supabase functions deploy judge-query
 ```
 
-Apply database migrations **before** deploying code that calls new functions. The authorization update requires `20260904110000_shared_identity_policy.sql`; its judge returns 503 if the authorization lookup is unavailable.
+Apply database migrations **before** deploying code that calls new functions. The pending chain starts at `20260904110000_shared_identity_policy.sql`, followed by `20260904120000_all_ruin_fixtures.sql`, `20260904130000_authoritative_gameplay.sql` and `20260904140000_revisits_leaderboard_admin.sql`. Confirm the actual remote migration history before approval. The new judge fails closed if authorization lookup is absent, and the new signed-in web app requires the gameplay RPCs. Deploy migrations, then judge, then web; do not release the web ahead of its backend.
 
 The judge uses two existing Supavisor transaction-pooler secrets on port 6543: `JUDGE_EXECUTOR_DATABASE_URL` and `JUDGE_PROGRESS_DATABASE_URL`. The executor reads fixtures; the progress role calls fixed functions. Never replace either with the database owner identity. Passwords and connection URLs stay server-side.
 

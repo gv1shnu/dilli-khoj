@@ -2,7 +2,7 @@
 
 ## Two execution paths
 
-Implementation status: all 20 local practice paths exist; only Ruin 06 has server grading. The latest maintainer handoff reports that judge deployed with roles, secrets and migrations configured. The local signup/judge policy mismatch is fixed by an unapplied migration and judge update; the live mismatch and browser-local preview unlocks remain. This is not a completed production authorization/progression system. See [implementation status](implementation-status.md) and [next steps](next-steps.md).
+Implementation status: all 20 first-pass questions, trusted gameplay, revisits, leaderboard and audited read-only admin are implemented locally. No hosted rollout was performed. See [implementation status](implementation-status.md) for verification and remaining release gates.
 
 ### Run
 
@@ -10,7 +10,7 @@ Implementation status: all 20 local practice paths exist; only Ruin 06 has serve
 - Uses the visible fixture cached in IndexedDB.
 - Returns immediate PostgreSQL-compatible rows or errors.
 - Is unlimited, free and untrusted.
-- Never changes official XP, server progression or the leaderboard. In the current preview it does update local `passed` state, which the UI uses to unlock the next archive; that state is untrusted.
+- Never changes official XP, server progression or the leaderboard. Only the DEV offline preview uses local `passed` state for preview unlocks; signed-in play reads server clearance.
 
 ### Submit
 
@@ -26,7 +26,7 @@ Implementation status: all 20 local practice paths exist; only Ruin 06 has serve
   "submission_id": "uuid",
   "ruin": 15,
   "variant": "first-pass",
-  "dataset_version": "2026-09-03.1",
+  "dataset_version": "2026-09-04.1",
   "sql": "SELECT ..."
 }
 ```
@@ -34,15 +34,15 @@ Implementation status: all 20 local practice paths exist; only Ruin 06 has serve
 ## Judge sequence
 
 1. Verify the Supabase user JWT.
-2. Verify the Google JWT provider and call `game_private.is_approved_player` using the authenticated subject. It checks the current confirmed, non-anonymous Google Auth record against the same domain/admin policy as signup. District/prerequisite enforcement remains a progression task.
+2. Verify the Google JWT provider and call `game_private.is_approved_player` using the authenticated subject. It checks the current confirmed, non-anonymous Google Auth record against the same domain/admin policy as signup. Check sequential prerequisites before execution and again when recording.
 3. Enforce payload size, one in-flight submission per player and a short per-player cooldown.
 4. Parse one `SELECT` or `WITH ... SELECT`; reject multiple statements, schema-qualified relations and unsafe functions.
 5. Acquire a pooled connection as the restricted executor role.
-6. Start a read-only transaction and apply local statement, lock and cost limits.
+6. Start a read-only transaction and apply local statement and lock timeouts.
 7. Execute the query once per fixture by changing `search_path`.
 8. Canonicalize and compare results using the question's comparison policy.
 9. Call a fixed privileged progression function. Never pass student SQL to the privileged identity.
-10. Return the visible result preview, case count, XP and progression state.
+10. Return the verdict, case count and XP; the client then refreshes server game state.
 
 Current implementation details:
 
@@ -70,7 +70,7 @@ Recommended initial limits for the small educational datasets:
 - 50 preview rows;
 - 250–500 ms statement timeout per fixture;
 - 100 ms lock timeout;
-- planner-cost ceiling through `pg_plan_filter`;
+- planner-cost ceiling through `pg_plan_filter` (proposed, not implemented);
 - an allowlist of curriculum-safe functions;
 - no database `TEMP` privilege;
 - no access to `vault`, `auth`, internal metadata tables or arbitrary user-defined functions.
@@ -79,7 +79,7 @@ Tune these only from tests. A two-second statement timeout is too expensive when
 
 ## Correctness policy
 
-Result semantics decide success. AST and `EXPLAIN` are used for safety, relation rewriting/validation and analytics—not to reject a semantically correct alternative merely because it avoided the intended syntax.
+Result semantics decide success. AST validation is used for safety, not to require a particular curriculum syntax. `EXPLAIN` analytics/cost checks remain proposed.
 
 The `HAVING` ruin may record whether `HAVING` appeared for instructor insight, but its verdict depends only on safe execution and fixture results.
 
@@ -88,7 +88,7 @@ The `HAVING` ruin may record whether `HAVING` appeared for instructor insight, b
 - `submission_id` is unique per player request.
 - Retrying the same ID returns the stored verdict and never awards XP twice.
 - First-time completion locks the player's progress row before updating XP and district state.
-- Revisit attempts use a different non-scoring endpoint or explicit `practice=true` mode.
+- `begin_revisit` selects a non-scoring alternate objective; revisit SQL runs locally and the judge accepts only `first-pass`.
 
 The implemented first-pass endpoint acquires a private five-second lease keyed by player UUID before execution. A 300 ms per-player cooldown absorbs accidental double clicks. The final recording function uses the unique `(player_id, submission_id)` constraint and locks progression rows, so a retry cannot award XP twice.
 
@@ -119,3 +119,18 @@ The Edge Function creates at most one executor and one progress connection per w
 - Install a service worker only after confirming update/rollback behavior.
 - Ask students to open the landing page 10–15 minutes before play begins, even if the game opens for everyone at the same time.
 - Provide a visible capability check for WebAssembly, IndexedDB and browser version before downloading world content.
+
+
+## Server gameplay API
+
+Authenticated browser RPCs `game_state`, `game_action` and `begin_revisit` verify the current approved player. The browser cannot write profile XP or ruin progress directly. Purchases and first solves lock the profile row, bind retry IDs, enforce prerequisites and affordability, and stamp completion once. `game_state` returns only hints/solutions already purchased by that player.
+
+`completion_leaderboard` exposes top 20 completers plus the caller's eligible rank. It orders XP descending then `completed_at - auth.users.created_at` ascending. This is sign-up-to-completion wall time, including loading and time away; later revisits cannot change it.
+
+`admin_players` and `admin_question` require current database allowlisting and record access in a private audit table. These are read-only endpoints; editing uses the DEV authoring pipeline. Canonical SQL is returned only through purchased help or the protected admin endpoint, never bundled into student assets.
+
+Numeric comparison uses PostgreSQL type OIDs to normalize bigint/numeric wire values without losing decimal precision or treating ordinary text as numeric. Row fetches stop at the configured cap plus one. A result-byte ceiling and planner-cost gate remain unimplemented release risks.
+
+## Measured local performance
+
+[Local load results](local-load-results.json) record 25/50/100/200 requests per second against one Node handler process and disposable PostgreSQL 17. All verdicts were correct, but 200 requests/second produced about 17-second p95 latency. This is a queueing blocker, not a successful capacity claim. Hosted HTTP, Edge isolates, Supavisor and the free-tier project require separate authorized measurement.

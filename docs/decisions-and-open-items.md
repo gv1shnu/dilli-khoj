@@ -45,7 +45,7 @@
 | Area | Default |
 | --- | --- |
 | XP | Start 100; solve +20; survey +5; hint -10; reveal -20; wrong 0; help affordability-gated |
-| Leaderboard order | Completers only, then XP descending and completion time ascending; exact timing exclusions need reconciliation |
+| Leaderboard order | Completers only, then XP descending and completion time ascending; server-recorded sign-up-to-completion wall time |
 | Data collection | Minimum identity, progress, submissions, verdicts, latency and hint usage |
 | Retention | Delete raw SQL and detailed attempts after 90 days; retain anonymous aggregates |
 | Hidden grading | One visible plus two hidden fixtures; one hidden runtime fixture fallback if free-tier load fails |
@@ -59,10 +59,10 @@
 3. Handoff reports Cloudflare live, Google OAuth/provider/redirects working, migrations applied and judge deployed. Do not recreate these resources; confirm current state before release.
 4. Confirm Before User Created hook enablement, disable unused Email/Anonymous providers, and complete the Google External production rollout when ready. The handoff reports External / Testing today.
 5. Authorize deployment of a reviewed current build when ready; the hosted site reportedly predates recent gameplay changes.
-6. ~~Provide the admin allowlist emails and apply the migration~~ — reported done. Production admin authorization still needs implementation.
+6. ~~Provide the admin allowlist emails and apply the migration~~ — reported done. Server-protected admin reads are implemented locally; rollout and real-session validation remain pending.
 7. Obtain written permission for institutional logo files if they will appear in the shipped game.
 8. Decide whether the 90-day raw-attempt retention default should be shorter.
-9. Resolve completion timing: sign-up-to-completion wall time versus excluding loading/revisit time. Code currently stores first-play local timestamps as a preview proxy.
+9. Completion timing resolved: server-recorded sign-up-to-completion wall time (owner decision, 4 September 2026).
 10. Decide whether to retain the default Supabase domain on Google consent. Custom branding must not introduce spending without explicit budget approval.
 
 ## Feasibility watchlist

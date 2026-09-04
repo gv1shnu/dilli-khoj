@@ -43,6 +43,7 @@ pnpm --version
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm test:assets
 test -s dist/models/soldier.glb
 ```
 
@@ -56,6 +57,8 @@ Run the dev server and open **http://localhost:5173/#admin**. Question Studio ed
 
 ```bash
 pnpm content:generate
+pnpm content:judge
+pnpm content:revisits
 pnpm test
 ```
 
@@ -63,7 +66,25 @@ Never commit hand-edited computed answers. Canonical solutions and hidden cases 
 
 ## Optional backend tools
 
-Browser work needs no Docker or local PostgreSQL. Backend integration testing needs a Docker-compatible runtime and Supabase CLI; judge runtime checking needs Deno 2.x.
+Browser work needs no Docker or local PostgreSQL. The standalone judge integration harness needs PostgreSQL 17 binaries. On macOS with Homebrew, install `postgresql@17`; elsewhere set `PG_BINDIR` to its binary directory. The harness creates a disposable loopback-only cluster on port 55439 (override `TEST_PG_PORT`), uses synthetic accounts and applies every migration. It never uses a hosted database. Judge runtime checking needs Deno 2.x.
+
+```bash
+pnpm test:integration
+pnpm test:load
+```
+
+The load command writes aggregate timing evidence to `docs/local-load-results.json`. Run it separately from browser/unit tests to avoid laptop resource contention. This is a local handler/driver benchmark, not an HTTP or Supavisor capacity test.
+
+For Chromium tests, install Google Chrome and keep `pnpm dev` running in another terminal:
+
+```bash
+pnpm test:browser
+pnpm test:browser:auth
+```
+
+The first checks all 20 offline questions. The second requires the browser URL/publishable configuration and mocks Supabase requests to test account isolation, paid help and trusted unlocks without writing live data. It does not verify real OAuth. Run the tests sequentially; the 3D world and PGlite can be demanding on a laptop.
+
+Full backend release validation additionally needs a Docker-compatible runtime and Supabase CLI for Auth, PostgREST and pgTAP/RLS tests.
 
 ```bash
 deno check --config supabase/functions/judge-query/deno.json supabase/functions/judge-query/index.ts

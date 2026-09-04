@@ -1,5 +1,6 @@
-import { DATASET_VERSION, ruinSix } from "../questions/ruin-six";
+import { PRACTICE_VERSION, practiceQuestion } from "../questions/practice";
 import { supabase } from "./supabase";
+import { pendingSubmission, finishSubmission } from "./submission-request";
 
 export interface JudgeVerdict {
   correct: boolean;
@@ -9,28 +10,38 @@ export interface JudgeVerdict {
   xp: number;
 }
 
-export async function submitToJudge(sql: string, ruinId: number = ruinSix.id): Promise<JudgeVerdict> {
-  if (ruinId !== ruinSix.id) {
-    throw new Error("This archive is practice-only until its server fixtures are released.");
-  }
+export async function submitToJudge(
+  sql: string,
+  ruinId: number = 1,
+): Promise<JudgeVerdict> {
+  practiceQuestion(ruinId);
   if (!supabase) {
-    throw new Error("The server judge is not configured in this browser. Practice is still available.");
+    throw new Error(
+      "The server judge is not configured in this browser. Practice is still available.",
+    );
   }
 
   const { data: sessionData } = await supabase.auth.getSession();
-  if (!sessionData.session) throw new Error("Sign in before submitting for progression.");
+  if (!sessionData.session)
+    throw new Error("Sign in before submitting for progression.");
 
-  const { data, error } = await supabase.functions.invoke<JudgeVerdict>("judge-query", {
-    body: {
-      submission_id: crypto.randomUUID(),
-      ruin: ruinSix.id,
-      variant: "first-pass",
-      dataset_version: DATASET_VERSION,
-      sql,
+  const player = sessionData.session.user.id;
+  const pending = pendingSubmission(player, ruinId, PRACTICE_VERSION, sql);
+  const { data, error } = await supabase.functions.invoke<JudgeVerdict>(
+    "judge-query",
+    {
+      body: {
+        submission_id: pending.id,
+        ruin: ruinId,
+        variant: "first-pass",
+        dataset_version: PRACTICE_VERSION,
+        sql,
+      },
     },
-  });
+  );
 
   if (error) throw new Error(error.message);
   if (!data) throw new Error("The judge returned no verdict.");
+  finishSubmission(player, ruinId, pending.id);
   return data;
 }

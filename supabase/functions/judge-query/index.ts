@@ -17,6 +17,7 @@ interface JudgeCase {
   hidden: boolean;
   comparison: "ordered" | "unordered";
   expectedColumns: string[];
+  expectedTypes?: number[];
   expectedRows: unknown[][];
 }
 
@@ -58,17 +59,26 @@ let connections: Connections | undefined;
 export default {
   fetch: withSupabase({ auth: "user" }, async (request, context) => {
     if (request.method !== "POST") {
-      return Response.json({ message: "Use POST for query submissions." }, { status: 405 });
+      return Response.json(
+        { message: "Use POST for query submissions." },
+        { status: 405 },
+      );
     }
 
     const contentLength = Number(request.headers.get("content-length") ?? "0");
     if (Number.isFinite(contentLength) && contentLength > 12_000) {
-      return Response.json({ message: "Submission payload is too large." }, { status: 413 });
+      return Response.json(
+        { message: "Submission payload is too large." },
+        { status: 413 },
+      );
     }
 
     const player = context.userClaims;
     if (!player?.id || player.appMetadata?.provider !== "google") {
-      return Response.json({ message: "Use an approved university Google account." }, { status: 403 });
+      return Response.json(
+        { message: "Use an approved university Google account." },
+        { status: 403 },
+      );
     }
 
     // JWT authentication runs in withSupabase first. Authorization uses current
@@ -79,17 +89,26 @@ export default {
         select game_private.is_approved_player(${player.id}::uuid) as approved
       `;
       if (rows[0]?.approved !== true) {
-        return Response.json({ message: "Use a verified approved university Google account." }, { status: 403 });
+        return Response.json(
+          { message: "Use a verified approved university Google account." },
+          { status: 403 },
+        );
       }
     } catch {
-      return Response.json({ message: "Account access could not be verified. Try again." }, { status: 503 });
+      return Response.json(
+        { message: "Account access could not be verified. Try again." },
+        { status: 503 },
+      );
     }
 
     let body: SubmissionBody;
     try {
       body = validateBody(await request.json());
     } catch (error) {
-      return Response.json({ message: getErrorMessage(error) }, { status: 400 });
+      return Response.json(
+        { message: getErrorMessage(error) },
+        { status: 400 },
+      );
     }
 
     const startedAt = performance.now();
@@ -101,30 +120,43 @@ export default {
           ${player.id}::uuid,
           ${body.submission_id}::uuid,
           ${body.ruin}::smallint,
-          ${body.dataset_version}::text
+          ${body.dataset_version}::text,
+          ${body.sql}::text
         ) as preparation
       `;
       preparation = rows[0].preparation;
     } catch {
       return Response.json(
-        { message: "This question version is not available. Refresh the game." },
+        {
+          message: "This question version is not available. Refresh the game.",
+        },
         { status: 409 },
       );
     }
 
     const lease = preparation.lease;
-    if (lease.status === "cached" && lease.verdict) return Response.json(lease.verdict);
+    if (lease.status === "cached" && lease.verdict)
+      return Response.json(lease.verdict);
     if (lease.status === "locked") {
-      return Response.json({ message: "One submission is already being checked." }, { status: 409 });
+      return Response.json(
+        { message: "One submission is already being checked." },
+        { status: 409 },
+      );
     }
     if (lease.status === "rate_limited") {
-      return Response.json({ message: "Wait a moment before submitting again." }, { status: 429 });
+      return Response.json(
+        { message: "Wait a moment before submitting again." },
+        { status: 429 },
+      );
     }
 
     const manifest = preparation.manifest;
     if (!manifest) {
       await releaseLease(progress, player.id, body.submission_id);
-      return Response.json({ message: "The judge manifest is unavailable." }, { status: 503 });
+      return Response.json(
+        { message: "The judge manifest is unavailable." },
+        { status: 503 },
+      );
     }
 
     const policy = await inspectJudgeQuery(body.sql, {
@@ -155,14 +187,20 @@ export default {
           policy.normalizedSql,
           testCase.fixtureSchema,
           manifest.statementTimeoutMs,
+          manifest.maxResultRows,
         );
 
         const matches =
           result.rows.length <= manifest.maxResultRows &&
           compareResult(
-            { columns: result.columns, rows: result.rows },
+            {
+              columns: result.columns,
+              rows: result.rows,
+              columnTypes: result.columnTypes,
+            },
             {
               columns: testCase.expectedColumns,
+              columnTypes: testCase.expectedTypes,
               rows: testCase.expectedRows,
               comparison: testCase.comparison,
             },
@@ -173,7 +211,8 @@ export default {
       verdictCode = isTimeout(error) ? "timeout" : "sql_error";
     }
 
-    const correct = verdictCode === "wrong_result" && casesPassed === manifest.cases.length;
+    const correct =
+      verdictCode === "wrong_result" && casesPassed === manifest.cases.length;
     if (correct) verdictCode = "ok";
 
     try {
@@ -190,7 +229,10 @@ export default {
     } catch (error) {
       await releaseLease(progress, player.id, body.submission_id);
       console.error("Failed to record judge verdict", getErrorMessage(error));
-      return Response.json({ message: "The verdict could not be saved. Try again." }, { status: 503 });
+      return Response.json(
+        { message: "The verdict could not be saved. Try again." },
+        { status: 503 },
+      );
     }
   }),
 };
@@ -262,20 +304,40 @@ async function executeCase(
   submittedSql: string,
   fixtureSchema: string,
   timeoutMs: number,
-): Promise<{ columns: string[]; rows: Record<string, unknown>[] }> {
-  if (!/^fixture_r\d{2}_(?:visible|hidden_[a-z])$/.test(fixtureSchema)) {
+  maxRows: number,
+): Promise<{
+  columns: string[];
+  columnTypes: number[];
+  rows: Record<string, unknown>[];
+}> {
+  if (
+    !/^fixture_r\d{2}_(?:v\d{8}_\d+_)?(?:visible|hidden_[a-z])$/.test(
+      fixtureSchema,
+    )
+  ) {
     throw new Error("Invalid fixture schema in judge manifest.");
   }
 
   return executor.begin("read only", async (transaction) => {
     await transaction.unsafe(`set local statement_timeout = '${timeoutMs}ms'`);
     await transaction.unsafe("set local lock_timeout = '100ms'");
-    await transaction.unsafe(`set local search_path = "${fixtureSchema}", pg_catalog`);
-    const result = await transaction.unsafe<Record<string, unknown>[]>(submittedSql);
-    return {
-      columns: result.columns.map((column) => column.name),
-      rows: Array.from(result),
-    };
+    await transaction.unsafe(
+      `set local search_path = "${fixtureSchema}", pg_catalog`,
+    );
+    // Limit transferred rows without altering the student's query semantics.
+    const rows: Record<string, unknown>[] = [];
+    let columns: string[] = [];
+    let columnTypes: number[] = [];
+    const query = transaction.unsafe<Record<string, unknown>[]>(submittedSql);
+    // Describe before cursor execution also preserves columns for an empty result.
+    const description = await transaction.unsafe(submittedSql).describe();
+    columns = description.columns.map((column) => column.name);
+    columnTypes = description.columns.map((column) => column.type);
+    for await (const batch of query.cursor(maxRows + 1)) {
+      rows.push(...batch);
+      if (rows.length > maxRows) break;
+    }
+    return { columns, columnTypes, rows };
   });
 }
 
@@ -286,10 +348,14 @@ function validateBody(value: unknown): SubmissionBody {
   if (typeof body.submission_id !== "string" || !isUuid(body.submission_id)) {
     throw new Error("submission_id must be a UUID.");
   }
-  if (!Number.isInteger(body.ruin) || Number(body.ruin) < 1 || Number(body.ruin) > 20) {
+  if (
+    !Number.isInteger(body.ruin) ||
+    Number(body.ruin) < 1 ||
+    Number(body.ruin) > 20
+  ) {
     throw new Error("ruin must be between 1 and 20.");
   }
-  if (typeof body.variant !== "string" || !/^[a-z0-9-]{1,40}$/.test(body.variant)) {
+  if (body.variant !== "first-pass") {
     throw new Error("variant is invalid.");
   }
   if (

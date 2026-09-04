@@ -39,6 +39,9 @@ jobs:
       - name: Production build
         run: pnpm build
 
+      - name: Check student assets
+        run: pnpm test:assets
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:

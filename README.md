@@ -2,7 +2,7 @@
 
 A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore a 3D world, restore twenty archives, and practise the DBMS curriculum through SQL.
 
-**Status: development preview, not ready for a classroom-wide release.** All twenty questions work locally. The deployed judge supports Ruin 06; the remaining server integrations are in progress on `build/foundation`.
+**Status: development preview, not ready for a classroom-wide release.** This branch implements all twenty server-graded questions and trusted progression. The hosted handoff reports an older Ruin 06-only judge; the new implementation has not been deployed.
 
 ## Scope
 
@@ -10,7 +10,7 @@ A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore
 - Read-only SQL: `SELECT` and `WITH … SELECT`, including aggregates, windows, subqueries and joins.
 - Unlimited local practice in browser PostgreSQL (PGlite).
 - Hidden-case server grading, sequential progression and an XP economy.
-- Planned topic-matched revisits, completers-only leaderboard and restricted administration.
+- Topic-matched revisits, completers-only leaderboard and restricted read-only administration.
 - Target cohort: up to 3,000 students on modern Mac browsers; ₹0 operating target.
 
 Art direction inspiration from [Exceletia by edusatyaki](https://github.com/edusatyaki/Exceletia). See [credits](CREDITS.md) for shipped assets and attribution.
@@ -38,13 +38,13 @@ Open **http://localhost:5173**. Development supports offline practice and a loca
 | --- | --- |
 | World | Infinite tiled landscape, animated Soldier, navigation, ambience and personal map |
 | Questions | All 20 playable locally; three generated test datasets per question |
-| Authorization | Local fix aligns three domains and server admin allowlist; rollout and real OAuth checks pending |
-| Server grading | Ruin 06 deployed; all-ruin fixtures and integration are next |
-| Progress and XP | Visible passes currently unlock the local preview; they are **not trusted completion** |
-| Drafts | Persist in this browser; account isolation is still pending |
-| Help and revisits | Free preview hints and same-question revisits; paid server help and different questions pending |
-| Administration | DEV-only Question Studio; production admin and completion leaderboard pending |
-| Release validation | Unit tests and focused browser checks pass; full backend integration, load and browser coverage pending |
+| Authorization | Shared three-domain/admin policy tested locally; real OAuth and rollout pending |
+| Server grading | All 20 implemented and exercised against local PostgreSQL; three cases per question |
+| Progress and XP | Server transactions own unlocks, awards and purchases; local Run is untrusted |
+| Drafts | Browser-local, scoped by account; no cross-device synchronization |
+| Help and revisits | Paid server help; two non-scoring alternate objectives per ruin |
+| Administration | Audited server-protected reads; content editing through DEV studio and reviewed source |
+| Release validation | 98 tests and 20-ruin Chromium smoke pass; high-load latency and full Supabase integration block release |
 
 The live site may serve an older build. A working preview does not establish capacity for 3,000 simultaneous students. PGlite's WASM/data payload is substantial; campus download capacity and free database compute need measurement.
 
@@ -54,7 +54,7 @@ The live site may serve an older build. A working preview does not establish cap
 flowchart LR
   Source[Private authoring sources] --> Generator[Fixture generator]
   Generator --> Public[Visible-only browser content]
-  Generator -. next .-> Vault[Private server fixtures and answers]
+  Generator --> Vault[Private server fixtures and answers]
   Public --> Browser[React + Three.js]
   Browser -->|Run: free practice| PGlite[Browser PostgreSQL worker]
   Browser -->|Submit + authenticated JWT| Judge[Supabase judge]

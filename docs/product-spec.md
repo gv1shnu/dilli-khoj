@@ -93,7 +93,7 @@ The leaderboard lists **only players who have completed the game** (all 20 ruins
 1. XP remaining, descending;
 2. total time from sign-up to completion, ascending, as the tie-break.
 
-Display name and XP (and optionally completion time). Never display email addresses. Show the top twenty plus the current player's own position if they have completed. Loading time and revisit practice do not count as solving.
+Display name and XP (and optionally completion time). Never display email addresses. Show the top twenty plus the current player's own position if they have completed. The time tie-break is wall-clock time from server-recorded sign-up to first completion (owner decision, 4 September 2026); it includes time spent loading or away from the game. Revisits cannot change the recorded completion time.
 
 Implemented as `compareCompletion` / `hasCompleted` in `src/game/scoring.ts`; cross-player data requires the server backend.
 

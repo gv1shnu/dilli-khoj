@@ -1,6 +1,10 @@
 import { PRACTICE_VERSION } from "../questions/practice";
 
 export const PRACTICE_STORAGE_KEY = `dk_practice_${PRACTICE_VERSION}`;
+/** The legacy shared key is deliberately never imported into a signed-in account. */
+export function practiceStorageKey(playerId: string | null): string {
+  return `${PRACTICE_STORAGE_KEY}_${playerId ?? "local-dev"}`;
+}
 
 export interface PracticeSession {
   selectedId: number;
@@ -42,7 +46,11 @@ export function parsePracticeSession(raw: string | null): PracticeSession {
     const drafts: Record<number, string> = {};
     if (data.drafts && typeof data.drafts === "object") {
       for (const [id, sql] of Object.entries(data.drafts)) {
-        if (validId(Number(id)) && typeof sql === "string" && new TextEncoder().encode(sql).length <= 10_000) {
+        if (
+          validId(Number(id)) &&
+          typeof sql === "string" &&
+          new TextEncoder().encode(sql).length <= 10_000
+        ) {
           drafts[Number(id)] = sql;
         }
       }

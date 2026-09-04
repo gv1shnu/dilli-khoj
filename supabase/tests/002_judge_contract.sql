@@ -31,7 +31,7 @@ select ok(
 select ok(
   has_function_privilege(
     'dilli_judge_progress',
-    'game_private.prepare_judge_submission(uuid,uuid,smallint,text)',
+    'game_private.prepare_judge_submission(uuid,uuid,smallint,text,text)',
     'execute'
   ),
   'progress role can call fixed preparation function'

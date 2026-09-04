@@ -1,0 +1,945 @@
+[
+  {
+    "ruin": 1,
+    "variant": 0,
+    "title": "Archive 1 · Revisit 1",
+    "description": "Return attribute and data_type for shelter attributes, sorted by attribute.",
+    "expected": {
+      "columns": [
+        "attribute",
+        "data_type"
+      ],
+      "rows": [
+        {
+          "attribute": "capacity",
+          "data_type": "integer"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 1,
+    "variant": 1,
+    "title": "Archive 1 · Revisit 2",
+    "description": "Return entity and attribute for key attributes, sorted by entity and attribute.",
+    "expected": {
+      "columns": [
+        "entity",
+        "attribute"
+      ],
+      "rows": [
+        {
+          "entity": "resident",
+          "attribute": "resident_id"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 2,
+    "variant": 0,
+    "title": "Archive 2 · Revisit 1",
+    "description": "Return attribute for nullable bus attributes, sorted by attribute.",
+    "expected": {
+      "columns": [
+        "attribute"
+      ],
+      "rows": [
+        {
+          "attribute": "radio_code"
+        },
+        {
+          "attribute": "unknown"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 2,
+    "variant": 1,
+    "title": "Archive 2 · Revisit 2",
+    "description": "Return attribute for non-nullable bus attributes with no key, sorted by attribute.",
+    "expected": {
+      "columns": [
+        "attribute"
+      ],
+      "rows": [
+        {
+          "attribute": "colour"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 3,
+    "variant": 0,
+    "title": "Archive 3 · Revisit 1",
+    "description": "Return child_entity and child_attribute for references to shelter, sorted by both columns.",
+    "expected": {
+      "columns": [
+        "child_entity",
+        "child_attribute"
+      ],
+      "rows": [
+        {
+          "child_entity": "residents",
+          "child_attribute": "shelter_id"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 3,
+    "variant": 1,
+    "title": "Archive 3 · Revisit 2",
+    "description": "Return child_entity and child_attribute for references to ward, sorted by both columns.",
+    "expected": {
+      "columns": [
+        "child_entity",
+        "child_attribute"
+      ],
+      "rows": [
+        {
+          "child_entity": "families",
+          "child_attribute": "ward"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 4,
+    "variant": 0,
+    "title": "Archive 4 · Revisit 1",
+    "description": "Return object_name and op for DML entries, newest first with missing timestamps last.",
+    "expected": {
+      "columns": [
+        "object_name",
+        "op"
+      ],
+      "rows": [
+        {
+          "object_name": "residents",
+          "op": "INSERT"
+        },
+        {
+          "object_name": "pumps",
+          "op": "UPDATE"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 4,
+    "variant": 1,
+    "title": "Archive 4 · Revisit 2",
+    "description": "Return object_name and op for CREATE TABLE entries, sorted by object_name.",
+    "expected": {
+      "columns": [
+        "object_name",
+        "op"
+      ],
+      "rows": [
+        {
+          "object_name": "shelters",
+          "op": "CREATE TABLE"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 5,
+    "variant": 0,
+    "title": "Archive 5 · Revisit 1",
+    "description": "Return grantee and object_name for explicitly revoked SELECT privileges, sorted by both columns.",
+    "expected": {
+      "columns": [
+        "grantee",
+        "object_name"
+      ],
+      "rows": [
+        {
+          "grantee": "porter",
+          "object_name": "crates"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 5,
+    "variant": 1,
+    "title": "Archive 5 · Revisit 2",
+    "description": "Return grantee and object_name for granted INSERT privileges, sorted by both columns.",
+    "expected": {
+      "columns": [
+        "grantee",
+        "object_name"
+      ],
+      "rows": [
+        {
+          "grantee": "builder",
+          "object_name": "repairs"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 6,
+    "variant": 0,
+    "title": "Archive 6 · Revisit 1",
+    "description": "Return stall_id for closed K-7 stalls, sorted by stall_id.",
+    "expected": {
+      "columns": [
+        "stall_id"
+      ],
+      "rows": [
+        {
+          "stall_id": 101
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 6,
+    "variant": 1,
+    "title": "Archive 6 · Revisit 2",
+    "description": "Return stall_id for open stalls outside K-7, sorted by stall_id.",
+    "expected": {
+      "columns": [
+        "stall_id"
+      ],
+      "rows": [
+        {
+          "stall_id": 103
+        },
+        {
+          "stall_id": 105
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 7,
+    "variant": 0,
+    "title": "Archive 7 · Revisit 1",
+    "description": "Return distinct non-null home_ward values among pilgrims arriving after day 2, sorted by home_ward.",
+    "expected": {
+      "columns": [
+        "home_ward"
+      ],
+      "rows": [
+        {
+          "home_ward": "W-2"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 7,
+    "variant": 1,
+    "title": "Archive 7 · Revisit 2",
+    "description": "Return distinct non-null home_ward values among pilgrims arriving before day 3, sorted by home_ward descending.",
+    "expected": {
+      "columns": [
+        "home_ward"
+      ],
+      "rows": [
+        {
+          "home_ward": "W-2"
+        },
+        {
+          "home_ward": "W-1"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 8,
+    "variant": 0,
+    "title": "Archive 8 · Revisit 1",
+    "description": "Return shop_name for shops whose name begins with Paper, case-insensitively, sorted by shop_name.",
+    "expected": {
+      "columns": [
+        "shop_name"
+      ],
+      "rows": [
+        {
+          "shop_name": "Paper Lantern"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 8,
+    "variant": 1,
+    "title": "Archive 8 · Revisit 2",
+    "description": "Return shop_name for shops whose trade ends with ink, case-insensitively, sorted by shop_name.",
+    "expected": {
+      "columns": [
+        "shop_name"
+      ],
+      "rows": [
+        {
+          "shop_name": "Ink Corner"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 9,
+    "variant": 0,
+    "title": "Archive 9 · Revisit 1",
+    "description": "Return vault_id for sealed vaults in D-1 or D-3, sorted by vault_id.",
+    "expected": {
+      "columns": [
+        "vault_id"
+      ],
+      "rows": [
+        {
+          "vault_id": 15
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 9,
+    "variant": 1,
+    "title": "Archive 9 · Revisit 2",
+    "description": "Return vault_id for unsealed vaults outside D-1, D-3 and D-9, sorted by vault_id.",
+    "expected": {
+      "columns": [
+        "vault_id"
+      ],
+      "rows": [
+        {
+          "vault_id": 14
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 10,
+    "variant": 0,
+    "title": "Archive 10 · Revisit 1",
+    "description": "Return item and value_coins for the second and third most valuable finds; break value ties by item ascending.",
+    "expected": {
+      "columns": [
+        "item",
+        "value_coins"
+      ],
+      "rows": [
+        {
+          "item": "Copper dial",
+          "value_coins": 90
+        },
+        {
+          "item": "Tin whistle",
+          "value_coins": 90
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 10,
+    "variant": 1,
+    "title": "Archive 10 · Revisit 2",
+    "description": "Return item and value_coins for the two least valuable finds; break value ties by item ascending.",
+    "expected": {
+      "columns": [
+        "item",
+        "value_coins"
+      ],
+      "rows": [
+        {
+          "item": "Worn buckle",
+          "value_coins": 10
+        },
+        {
+          "item": "Amber lens",
+          "value_coins": 90
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 11,
+    "variant": 0,
+    "title": "Archive 11 · Revisit 1",
+    "description": "Return dish and lower-cased notes as notes_lower, sorted by dish.",
+    "expected": {
+      "columns": [
+        "dish",
+        "notes_lower"
+      ],
+      "rows": [
+        {
+          "dish": "chai",
+          "notes_lower": null
+        },
+        {
+          "dish": "dal",
+          "notes_lower": "stir gently"
+        },
+        {
+          "dish": "rice",
+          "notes_lower": "नींबू"
+        },
+        {
+          "dish": "roti",
+          "notes_lower": ""
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 11,
+    "variant": 1,
+    "title": "Archive 11 · Revisit 2",
+    "description": "Return dish and the first three note characters as note_start, sorted by dish.",
+    "expected": {
+      "columns": [
+        "dish",
+        "note_start"
+      ],
+      "rows": [
+        {
+          "dish": "chai",
+          "note_start": null
+        },
+        {
+          "dish": "dal",
+          "note_start": "Sti"
+        },
+        {
+          "dish": "rice",
+          "note_start": "नीं"
+        },
+        {
+          "dish": "roti",
+          "note_start": ""
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 12,
+    "variant": 0,
+    "title": "Archive 12 · Revisit 1",
+    "description": "Return pump_id and absolute backup flow as backup_flow, treating missing backup as zero, sorted by pump_id.",
+    "expected": {
+      "columns": [
+        "pump_id",
+        "backup_flow"
+      ],
+      "rows": [
+        {
+          "pump_id": 1,
+          "backup_flow": "0"
+        },
+        {
+          "pump_id": 2,
+          "backup_flow": "0.25"
+        },
+        {
+          "pump_id": 3,
+          "backup_flow": "0"
+        },
+        {
+          "pump_id": 4,
+          "backup_flow": "7.5"
+        },
+        {
+          "pump_id": 5,
+          "backup_flow": "1.2"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 12,
+    "variant": 1,
+    "title": "Archive 12 · Revisit 2",
+    "description": "Return pump_id and rounded primary flow as main_flow, treating missing primary flow as zero, sorted by pump_id.",
+    "expected": {
+      "columns": [
+        "pump_id",
+        "main_flow"
+      ],
+      "rows": [
+        {
+          "pump_id": 1,
+          "main_flow": "12"
+        },
+        {
+          "pump_id": 2,
+          "main_flow": "10"
+        },
+        {
+          "pump_id": 3,
+          "main_flow": "0"
+        },
+        {
+          "pump_id": 4,
+          "main_flow": "0"
+        },
+        {
+          "pump_id": 5,
+          "main_flow": "9"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 13,
+    "variant": 0,
+    "title": "Archive 13 · Revisit 1",
+    "description": "Return departure date as date and count of named trains as named_trains per date, sorted by date.",
+    "expected": {
+      "columns": [
+        "date",
+        "named_trains"
+      ],
+      "rows": [
+        {
+          "date": "2042-02-01T00:00:00.000Z",
+          "named_trains": 1
+        },
+        {
+          "date": "2042-02-02T00:00:00.000Z",
+          "named_trains": 1
+        },
+        {
+          "date": null,
+          "named_trains": 1
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 13,
+    "variant": 1,
+    "title": "Archive 13 · Revisit 2",
+    "description": "Return departure date as date and earliest timestamp as first_departure per non-null date, sorted by date.",
+    "expected": {
+      "columns": [
+        "date",
+        "first_departure"
+      ],
+      "rows": [
+        {
+          "date": "2042-02-01T00:00:00.000Z",
+          "first_departure": "2042-01-31T19:30:00.000Z"
+        },
+        {
+          "date": "2042-02-02T00:00:00.000Z",
+          "first_departure": "2042-02-01T18:30:00.000Z"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 14,
+    "variant": 0,
+    "title": "Archive 14 · Revisit 1",
+    "description": "Return crop and number of lots as lot_count, sorted by crop.",
+    "expected": {
+      "columns": [
+        "crop",
+        "lot_count"
+      ],
+      "rows": [
+        {
+          "crop": "beans",
+          "lot_count": 1
+        },
+        {
+          "crop": "millet",
+          "lot_count": 2
+        },
+        {
+          "crop": "rice",
+          "lot_count": 3
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 14,
+    "variant": 1,
+    "title": "Archive 14 · Revisit 2",
+    "description": "Return crop and maximum crates in one lot as max_crates, sorted by crop.",
+    "expected": {
+      "columns": [
+        "crop",
+        "max_crates"
+      ],
+      "rows": [
+        {
+          "crop": "beans",
+          "max_crates": null
+        },
+        {
+          "crop": "millet",
+          "max_crates": 3
+        },
+        {
+          "crop": "rice",
+          "max_crates": 7
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 15,
+    "variant": 0,
+    "title": "Archive 15 · Revisit 1",
+    "description": "Return heap_no for heaps with total metal at most 800 kg, sorted by heap_no.",
+    "expected": {
+      "columns": [
+        "heap_no"
+      ],
+      "rows": [
+        {
+          "heap_no": "H-B"
+        },
+        {
+          "heap_no": "H-E"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 15,
+    "variant": 1,
+    "title": "Archive 15 · Revisit 2",
+    "description": "Return heap_no for heaps with more than one metal record, sorted by heap_no.",
+    "expected": {
+      "columns": [
+        "heap_no"
+      ],
+      "rows": [
+        {
+          "heap_no": "H-A"
+        },
+        {
+          "heap_no": "H-E"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 16,
+    "variant": 0,
+    "title": "Archive 16 · Revisit 1",
+    "description": "Return bin and number of parcels lighter than 20 kg as light_count, sorted by bin.",
+    "expected": {
+      "columns": [
+        "bin",
+        "light_count"
+      ],
+      "rows": [
+        {
+          "bin": "B-A",
+          "light_count": 1
+        },
+        {
+          "bin": "B-B",
+          "light_count": 1
+        },
+        {
+          "bin": "B-C",
+          "light_count": 0
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 16,
+    "variant": 1,
+    "title": "Archive 16 · Revisit 2",
+    "description": "Return bin and number of parcels with unknown weight as unknown_count, sorted by bin.",
+    "expected": {
+      "columns": [
+        "bin",
+        "unknown_count"
+      ],
+      "rows": [
+        {
+          "bin": "B-A",
+          "unknown_count": 0
+        },
+        {
+          "bin": "B-B",
+          "unknown_count": 1
+        },
+        {
+          "bin": "B-C",
+          "unknown_count": 0
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 17,
+    "variant": 0,
+    "title": "Archive 17 · Revisit 1",
+    "description": "Return line, rider, taps and line_rank using descending taps with shared ranks and no gaps, sorted by line, line_rank, rider.",
+    "expected": {
+      "columns": [
+        "line",
+        "rider",
+        "taps",
+        "line_rank"
+      ],
+      "rows": [
+        {
+          "line": "Blue",
+          "rider": "Adi",
+          "taps": 40,
+          "line_rank": 1
+        },
+        {
+          "line": "Blue",
+          "rider": "Mira",
+          "taps": 40,
+          "line_rank": 1
+        },
+        {
+          "line": "Blue",
+          "rider": "Dev",
+          "taps": 20,
+          "line_rank": 2
+        },
+        {
+          "line": "Gold",
+          "rider": "Noor",
+          "taps": 25,
+          "line_rank": 1
+        },
+        {
+          "line": "Gold",
+          "rider": "Tara",
+          "taps": 10,
+          "line_rank": 2
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 17,
+    "variant": 1,
+    "title": "Archive 17 · Revisit 2",
+    "description": "Return line, rider, taps and position numbering each line by descending taps then rider, sorted by line and position.",
+    "expected": {
+      "columns": [
+        "line",
+        "rider",
+        "taps",
+        "position"
+      ],
+      "rows": [
+        {
+          "line": "Blue",
+          "rider": "Adi",
+          "taps": 40,
+          "position": 1
+        },
+        {
+          "line": "Blue",
+          "rider": "Mira",
+          "taps": 40,
+          "position": 2
+        },
+        {
+          "line": "Blue",
+          "rider": "Dev",
+          "taps": 20,
+          "position": 3
+        },
+        {
+          "line": "Gold",
+          "rider": "Noor",
+          "taps": 25,
+          "position": 1
+        },
+        {
+          "line": "Gold",
+          "rider": "Tara",
+          "taps": 10,
+          "position": 2
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 18,
+    "variant": 0,
+    "title": "Archive 18 · Revisit 1",
+    "description": "Return hour, signal and the next signal as next_signal, null after the final reading, sorted by hour.",
+    "expected": {
+      "columns": [
+        "hour",
+        "signal",
+        "next_signal"
+      ],
+      "rows": [
+        {
+          "hour": 0,
+          "signal": 10,
+          "next_signal": 20
+        },
+        {
+          "hour": 1,
+          "signal": 20,
+          "next_signal": 30
+        },
+        {
+          "hour": 2,
+          "signal": 30,
+          "next_signal": null
+        },
+        {
+          "hour": 3,
+          "signal": null,
+          "next_signal": 40
+        },
+        {
+          "hour": 4,
+          "signal": 40,
+          "next_signal": null
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 18,
+    "variant": 1,
+    "title": "Archive 18 · Revisit 2",
+    "description": "Return hour, signal and the sum of signals so far as running_signal, sorted by hour.",
+    "expected": {
+      "columns": [
+        "hour",
+        "signal",
+        "running_signal"
+      ],
+      "rows": [
+        {
+          "hour": 0,
+          "signal": 10,
+          "running_signal": 10
+        },
+        {
+          "hour": 1,
+          "signal": 20,
+          "running_signal": 30
+        },
+        {
+          "hour": 2,
+          "signal": 30,
+          "running_signal": 60
+        },
+        {
+          "hour": 3,
+          "signal": null,
+          "running_signal": 60
+        },
+        {
+          "hour": 4,
+          "signal": 40,
+          "running_signal": 100
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 19,
+    "variant": 0,
+    "title": "Archive 19 · Revisit 1",
+    "description": "Return well_id and depth_m for wells shallower than the average depth, sorted by depth_m then well_id.",
+    "expected": {
+      "columns": [
+        "well_id",
+        "depth_m"
+      ],
+      "rows": [
+        {
+          "well_id": 1,
+          "depth_m": "10"
+        },
+        {
+          "well_id": 2,
+          "depth_m": "20"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 19,
+    "variant": 1,
+    "title": "Archive 19 · Revisit 2",
+    "description": "Return well_id and depth_m for wells at the smallest known depth, sorted by well_id.",
+    "expected": {
+      "columns": [
+        "well_id",
+        "depth_m"
+      ],
+      "rows": [
+        {
+          "well_id": 1,
+          "depth_m": "10"
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 20,
+    "variant": 0,
+    "title": "Archive 20 · Revisit 1",
+    "description": "Return tower_name and count of anchored spans as span_count for every tower, including zero counts, sorted by tower_name.",
+    "expected": {
+      "columns": [
+        "tower_name",
+        "span_count"
+      ],
+      "rows": [
+        {
+          "tower_name": "East",
+          "span_count": 1
+        },
+        {
+          "tower_name": "North",
+          "span_count": 2
+        },
+        {
+          "tower_name": "West",
+          "span_count": 0
+        }
+      ]
+    }
+  },
+  {
+    "ruin": 20,
+    "variant": 1,
+    "title": "Archive 20 · Revisit 2",
+    "description": "Return tower_name and span_id only for anchored spans, sorted by tower_name then span_id.",
+    "expected": {
+      "columns": [
+        "tower_name",
+        "span_id"
+      ],
+      "rows": [
+        {
+          "tower_name": "East",
+          "span_id": 3
+        },
+        {
+          "tower_name": "North",
+          "span_id": 1
+        },
+        {
+          "tower_name": "North",
+          "span_id": 2
+        }
+      ]
+    }
+  }
+]

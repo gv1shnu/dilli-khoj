@@ -18,9 +18,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "An entity's attributes are just the rows where `entity` matches; filter then sort."
-    ],
     "schema": [
       {
         "name": "catalog_columns",
@@ -48,6 +45,7 @@
     ],
     "starterSql": "SELECT attribute, data_type\nFROM catalog_columns\nORDER BY attribute;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"catalog_columns\" (\"entity\" text, \"attribute\" text, \"data_type\" text, \"is_key\" boolean);\nINSERT INTO \"catalog_columns\" VALUES\n('resident', 'resident_id', 'integer', true),\n('resident', 'name', 'text', false),\n('shelter', 'capacity', 'integer', false),\n('resident', 'home_id', 'integer', false),\n(NULL, 'unknown', 'text', false);",
     "expected": {
       "columns": [
@@ -86,9 +84,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "A unique identifier is a primary or candidate key; match either with a set membership test."
-    ],
     "schema": [
       {
         "name": "column_keys",
@@ -115,6 +110,7 @@
     ],
     "starterSql": "SELECT attribute\nFROM column_keys\nWHERE entity = 'bus'\nORDER BY attribute;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"column_keys\" (\"entity\" text, \"attribute\" text, \"key_kind\" text, \"nullable\" boolean);\nINSERT INTO \"column_keys\" VALUES\n('bus', 'bus_id', 'primary', false),\n('bus', 'registration', 'candidate', false),\n('bus', 'radio_code', 'unique', true),\n('bus', 'colour', 'none', false),\n('driver', 'licence', 'candidate', false),\n('bus', 'unknown', NULL, true);",
     "expected": {
       "columns": [
@@ -149,9 +145,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "A foreign key that references `family` is a row whose parent entity is `family`."
-    ],
     "schema": [
       {
         "name": "foreign_keys",
@@ -177,6 +170,7 @@
     ],
     "starterSql": "SELECT child_entity, child_attribute\nFROM foreign_keys\nORDER BY child_entity, child_attribute;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"foreign_keys\" (\"child_entity\" text, \"child_attribute\" text, \"parent_entity\" text, \"parent_attribute\" text);\nINSERT INTO \"foreign_keys\" VALUES\n('residents', 'family_id', 'family', 'id'),\n('ration_cards', 'household', 'family', 'id'),\n('residents', 'shelter_id', 'shelter', 'id'),\n('families', 'ward', 'ward', 'id');",
     "expected": {
       "columns": [
@@ -214,9 +208,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Data-definition changes are the `DDL` rows; filter on `op_kind`, then order by time descending."
-    ],
     "schema": [
       {
         "name": "change_log",
@@ -244,6 +235,7 @@
     ],
     "starterSql": "SELECT object_name, op\nFROM change_log\nORDER BY changed_at DESC;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"change_log\" (\"op\" text, \"object_name\" text, \"op_kind\" text, \"changed_at\" timestamp);\nINSERT INTO \"change_log\" VALUES\n('CREATE TABLE', 'shelters', 'DDL', '2042-01-02 10:00:00'),\n('INSERT', 'residents', 'DML', '2042-01-04 10:00:00'),\n('ALTER TABLE', 'pumps', 'DDL', '2042-01-03 10:00:00'),\n('UPDATE', 'pumps', 'DML', NULL);",
     "expected": {
       "columns": [
@@ -281,9 +273,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Only rows where the privilege is `SELECT` and the boolean `granted` is true count."
-    ],
     "schema": [
       {
         "name": "access_grants",
@@ -311,6 +300,7 @@
     ],
     "starterSql": "SELECT grantee, object_name\nFROM access_grants\nORDER BY grantee;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"access_grants\" (\"grantee\" text, \"object_name\" text, \"privilege\" text, \"granted\" boolean);\nINSERT INTO \"access_grants\" VALUES\n('scout', 'shelters', 'SELECT', true),\n('archivist', 'records', 'SELECT', true),\n('archivist', 'maps', 'SELECT', true),\n('porter', 'crates', 'SELECT', false),\n('builder', 'repairs', 'INSERT', true),\n('unknown', 'maps', 'SELECT', NULL);",
     "expected": {
       "columns": [
@@ -349,9 +339,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Filter both `ward_code` and `status`, then use `ORDER BY`."
-    ],
     "schema": [
       {
         "name": "stalls",
@@ -383,6 +370,7 @@
     ],
     "starterSql": "SELECT stall_id\nFROM stalls\nORDER BY stall_id;",
     "status": "live",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"stalls\" (\"stall_id\" integer, \"stall_name\" text, \"ward_code\" text, \"status\" text, \"daily_rations\" integer);\nINSERT INTO \"stalls\" VALUES\n(101, 'Copper Kettle', 'K-7', 'closed', 0),\n(102, 'Moonlight Grain', 'K-7', 'open', 28),\n(103, 'Red Fort Repairs', 'K-4', 'open', 12),\n(104, 'Old Clock Spices', 'K-7', NULL, 7),\n(105, 'Yamuna Filters', 'K-9', 'open', 19),\n(107, 'Paranthe Power', 'K-7', 'open', 31);",
     "expected": {
       "columns": [
@@ -414,9 +402,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Collapse repeated wards to one row each with `DISTINCT`."
-    ],
     "schema": [
       {
         "name": "pilgrims",
@@ -438,6 +423,7 @@
     ],
     "starterSql": "SELECT home_ward\nFROM pilgrims\nORDER BY home_ward;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"pilgrims\" (\"name\" text, \"home_ward\" text, \"arrival_day\" integer);\nINSERT INTO \"pilgrims\" VALUES\n('Asha', 'W-2', 1),\n('Dev', 'W-1', 2),\n('Mira', 'W-2', 3),\n('Noor', NULL, 4),\n('Adi', NULL, 5);",
     "expected": {
       "columns": [
@@ -472,9 +458,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Match anywhere in the text, case-insensitively, using wildcards around the word."
-    ],
     "schema": [
       {
         "name": "shops",
@@ -493,6 +476,7 @@
     ],
     "starterSql": "SELECT shop_name\nFROM shops\nORDER BY shop_name;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"shops\" (\"shop_name\" text, \"trade\" text);\nINSERT INTO \"shops\" VALUES\n('Scroll House', 'handmade PAPER'),\n('Paper Lantern', 'lamps'),\n('Ink Corner', 'paper and ink'),\n('Lost Ledger', NULL),\n('Wrapping Works', 'wastepaper');",
     "expected": {
       "columns": [
@@ -527,9 +511,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Combine a set-membership check on the ward with a negation of `sealed`."
-    ],
     "schema": [
       {
         "name": "vaults",
@@ -552,6 +533,7 @@
     ],
     "starterSql": "SELECT vault_id\nFROM vaults\nORDER BY vault_id;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"vaults\" (\"vault_id\" integer, \"ward_code\" text, \"sealed\" boolean);\nINSERT INTO \"vaults\" VALUES\n(11, 'D-1', false),\n(12, 'D-3', false),\n(13, 'D-9', false),\n(14, 'D-2', false),\n(15, 'D-1', true),\n(16, 'D-3', NULL),\n(17, NULL, false);",
     "expected": {
       "columns": [
@@ -589,9 +571,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Order by value descending, add `item` as a tie-break, then keep only the top rows."
-    ],
     "schema": [
       {
         "name": "finds",
@@ -609,6 +588,7 @@
     ],
     "starterSql": "SELECT item, value_coins\nFROM finds\nORDER BY value_coins DESC\nLIMIT 3;",
     "status": "drafted",
+    "hintCount": 1,
     "fixtureSql": "CREATE TABLE \"finds\" (\"item\" text, \"value_coins\" integer);\nINSERT INTO \"finds\" VALUES\n('Zinc compass', 90),\n('Amber lens', 90),\n('Tin whistle', 90),\n('Copper dial', 90),\n('Worn buckle', 10);",
     "expected": {
       "columns": [
@@ -650,10 +630,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "String functions transform each value: one upper-cases text, another counts characters.",
-      "Alias the two computed columns exactly as `dish_caps` and `note_len`."
-    ],
     "schema": [
       {
         "name": "recipes",
@@ -671,6 +647,7 @@
     ],
     "starterSql": "SELECT dish, notes\nFROM recipes\nORDER BY dish;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"recipes\" (\"dish\" text, \"notes\" text);\nINSERT INTO \"recipes\" VALUES\n('dal', 'Stir gently'),\n('chai', NULL),\n('roti', ''),\n('rice', 'नींबू');",
     "expected": {
       "columns": [
@@ -716,10 +693,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "A null backup would poison the sum; replace it with zero first.",
-      "Round the total to a whole number with a numeric function."
-    ],
     "schema": [
       {
         "name": "pumps",
@@ -743,6 +716,7 @@
     ],
     "starterSql": "SELECT pump_id, litres_per_min, backup_lpm\nFROM pumps\nORDER BY pump_id;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"pumps\" (\"pump_id\" integer, \"litres_per_min\" numeric, \"backup_lpm\" numeric);\nINSERT INTO \"pumps\" VALUES\n(1, 12.4, NULL),\n(2, 10.25, 0.25),\n(3, 0, 0),\n(4, NULL, 7.5),\n(5, 8.6, -1.2);",
     "expected": {
       "columns": [
@@ -792,10 +766,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Reduce each timestamp to its date before grouping.",
-      "Group by that date and count the rows in each group."
-    ],
     "schema": [
       {
         "name": "departures",
@@ -813,6 +783,7 @@
     ],
     "starterSql": "SELECT depart_at\nFROM departures\nORDER BY depart_at;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"departures\" (\"train\" text, \"depart_at\" timestamp);\nINSERT INTO \"departures\" VALUES\n('A', '2042-02-01 23:59:00'),\n(NULL, '2042-02-01 01:00:00'),\n('B', '2042-02-02 00:00:00'),\n('C', NULL);",
     "expected": {
       "columns": [
@@ -854,10 +825,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "One output row per crop means grouping by crop.",
-      "Sum the crates within each group."
-    ],
     "schema": [
       {
         "name": "lots",
@@ -875,6 +842,7 @@
     ],
     "starterSql": "SELECT crop, crates\nFROM lots\nORDER BY crop;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"lots\" (\"crop\" text, \"crates\" integer);\nINSERT INTO \"lots\" VALUES\n('rice', 7),\n('rice', 7),\n('rice', NULL),\n('millet', 3),\n('millet', -1),\n('beans', NULL);",
     "expected": {
       "columns": [
@@ -913,10 +881,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Filter the groups after they are formed, not the individual rows.",
-      "The threshold applies to the summed metal per heap."
-    ],
     "schema": [
       {
         "name": "heaps",
@@ -934,6 +898,7 @@
     ],
     "starterSql": "SELECT heap_no, metal_kg\nFROM heaps\nORDER BY heap_no;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"heaps\" (\"heap_no\" text, \"metal_kg\" numeric);\nINSERT INTO \"heaps\" VALUES\n('H-A', 500),\n('H-A', 400),\n('H-B', 800),\n('H-C', 801),\n('H-D', NULL),\n('H-E', 1000),\n('H-E', -300);",
     "expected": {
       "columns": [
@@ -968,10 +933,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Turn each parcel into 1 when heavy and 0 otherwise with `CASE`.",
-      "Summing those flags per bin gives the heavy count."
-    ],
     "schema": [
       {
         "name": "parcels",
@@ -989,6 +950,7 @@
     ],
     "starterSql": "SELECT bin, weight_kg\nFROM parcels\nORDER BY bin;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"parcels\" (\"bin\" text, \"weight_kg\" numeric);\nINSERT INTO \"parcels\" VALUES\n('B-A', 20),\n('B-A', 21),\n('B-A', 19.9),\n('B-B', 3),\n('B-B', NULL),\n('B-C', 40);",
     "expected": {
       "columns": [
@@ -1036,10 +998,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "A window function ranks rows without collapsing them.",
-      "Partition by `line` and order by `taps` descending so ties share a rank."
-    ],
     "schema": [
       {
         "name": "riders",
@@ -1061,6 +1019,7 @@
     ],
     "starterSql": "SELECT line, rider, taps\nFROM riders\nORDER BY line, taps DESC;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"riders\" (\"line\" text, \"rider\" text, \"taps\" integer);\nINSERT INTO \"riders\" VALUES\n('Blue', 'Mira', 40),\n('Blue', 'Adi', 40),\n('Blue', 'Dev', 20),\n('Gold', 'Noor', 25),\n('Gold', 'Tara', 10);",
     "expected": {
       "columns": [
@@ -1125,10 +1084,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "A window function can look back one row in an ordered sequence.",
-      "Order the window by `hour` so the previous row is the previous hour."
-    ],
     "schema": [
       {
         "name": "readings",
@@ -1146,6 +1101,7 @@
     ],
     "starterSql": "SELECT hour, signal\nFROM readings\nORDER BY hour;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"readings\" (\"hour\" integer, \"signal\" integer);\nINSERT INTO \"readings\" VALUES\n(2, 30),\n(0, 10),\n(3, NULL),\n(1, 20),\n(4, 40);",
     "expected": {
       "columns": [
@@ -1201,10 +1157,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "Compute the average depth once, then compare each row against it.",
-      "A scalar subquery in the `WHERE` clause returns that single average."
-    ],
     "schema": [
       {
         "name": "wells",
@@ -1223,6 +1175,7 @@
     ],
     "starterSql": "SELECT well_id, depth_m\nFROM wells\nORDER BY depth_m DESC, well_id;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"wells\" (\"well_id\" integer, \"depth_m\" numeric);\nINSERT INTO \"wells\" VALUES\n(1, 10),\n(2, 20),\n(3, 40),\n(4, 40),\n(5, NULL);",
     "expected": {
       "columns": [
@@ -1260,10 +1213,6 @@
       ]
     ],
     "ordered": true,
-    "hints": [
-      "First inner-join spans to their tower on the shared key.",
-      "A set operation appends the towers with no matching span; check with `NOT EXISTS`."
-    ],
     "schema": [
       {
         "name": "spans",
@@ -1297,6 +1246,7 @@
     ],
     "starterSql": "SELECT t.tower_name, s.span_id\nFROM towers t\nJOIN spans s ON s.tower_id = t.tower_id\nORDER BY t.tower_name, s.span_id;",
     "status": "drafted",
+    "hintCount": 2,
     "fixtureSql": "CREATE TABLE \"spans\" (\"span_id\" integer, \"tower_id\" integer);\nINSERT INTO \"spans\" VALUES\n(1, 1),\n(2, 1),\n(3, 2),\n(4, NULL);\nCREATE TABLE \"towers\" (\"tower_id\" integer, \"tower_name\" text);\nINSERT INTO \"towers\" VALUES\n(1, 'North'),\n(2, 'East'),\n(3, 'West');",
     "expected": {
       "columns": [
