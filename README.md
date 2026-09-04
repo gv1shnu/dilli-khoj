@@ -76,6 +76,8 @@ Student SQL runs under a restricted execution role, separate from the identity t
 | [Implementation status](docs/implementation-status.md) | Verified features and known gaps |
 | [Navigation and performance review](docs/navigation-and-performance-review.md) | App/repository paths, geographic map access, performance pros/cons and SQL evaluation |
 | [Next steps](docs/next-steps.md) | Ordered development and release checklist |
+| [Question review](docs/question-review.md) | Current review queue, confirmed fixture weaknesses and owner decisions |
+| [handoff](docs/handoff.md) | Resume development with context, commands and constraints |
 | [Question authoring](docs/question-authoring.md) | Writing, fixtures, equivalent SQL and review requirements |
 | [Submission architecture](docs/submission-architecture.md) | Judge contracts, trust boundaries and performance constraints |
 | [Decisions](docs/decisions-and-open-items.md) | Settled choices and unresolved product decisions |

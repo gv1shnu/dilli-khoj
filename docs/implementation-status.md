@@ -37,7 +37,8 @@ Reviewed 4 September 2026. Branch: `build/foundation`. **Development preview; cl
 - No new live migrations, judge deployment or web deployment have been performed. Handoff reports an older hosted build and Ruin 06 judge; current remote state was not independently rechecked.
 - Full Supabase Auth/PostgREST/hook/pooler integration and real multi-device sessions remain unverified. Minimal Auth tables in local tests do not replace that gate.
 - Sustained mixed-query load, hosted free-tier compute and campus download capacity remain unproven. Clean local results do not remove those release gates.
-- Blind human question review, additional adversarial SQL tests, Safari/Firefox and baseline hardware coverage remain required.
+- Question review has started: wrong-condition probes can pass all three fixtures for 01, 06 and 19; see [review ledger](question-review.md). Each question has a canonical query plus two variants, but many variants are cosmetic and do not establish the required structural diversity. Blind human review and stronger acceptance cases remain required.
+- Safari/Firefox and baseline hardware coverage remain required.
 - No planner-cost ceiling or result-byte ceiling is implemented. Statement/lock timeouts, AST policy, read-only grants and row limits provide partial resource controls.
 - Revisit drafts are session-only; first-pass drafts persist on the current browser, scoped by account, without cross-device synchronization.
 - Admin is read-only in production. Content edits are exported from the DEV studio, reviewed, regenerated and deployed by maintainers.
