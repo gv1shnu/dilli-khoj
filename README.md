@@ -2,22 +2,19 @@
 
 Dilli Khoj is a classroom-friendly PostgreSQL treasure hunt set in a fictional, post-collapse Delhi. Students explore twenty ruins, practise against PostgreSQL in the browser, and submit safe read-only queries to an authoritative hidden-case judge.
 
-Current milestone: **foundation vertical slice** — Ruin 06 at Chandni Chowk.
+Current milestone: **all 20 ruins playable locally**; authoritative grading live for Ruin 06.
 
 ## What works now
 
-- Roamable Three.js ruin with WASD/arrow movement and collisions.
-- A short Module 3 `SELECT`/`WHERE` question in the fixed title → description → sample output → hints format.
-- PostgreSQL-compatible local practice in a PGlite Web Worker with IndexedDB persistence.
-- Instant visible-case pass/fail feedback, result preview and query errors.
-- Google OAuth client wiring for Supabase.
-- An authenticated Edge Function judge with PostgreSQL 17 parsing, three result fixtures and idempotent XP awards.
-- Separate executor/progression database roles, a per-player submission lease, cooldown and tight transaction timeouts.
-- Cloudflare Workers Static Assets configuration for the production origin.
-- Versioned Supabase auth, profile, progress, attempt and Ruin 06 fixture migrations.
-- Unit tests for query-policy edge cases and ordered result comparison.
+- Roamable 3D overgrown-ruins world (Three.js): animated character, third-person orbit camera, wind-swept grass, guide arrows to the nearest amber archive, procedural ambience, and a first-run how-to-play overlay.
+- All 20 ruins are playable locally through an archive browser: open any ruin, read the question (title → description → sample output → hints), Run against PostgreSQL in a PGlite Web Worker, with saved SQL drafts and local practice progress.
+- Three datasets per question; the visible case's expected rows are computed by real PostgreSQL. Canonical/authoring solutions are excluded from production builds.
+- Authoritative Edge Function judge (PostgreSQL 17 parsing, hidden cases, idempotent XP, restricted roles) — grades **Ruin 06**; ruins 1–5 and 7–20 are drafted and await server fixtures.
+- 7 districts and the XP economy are encoded (`src/game/ruins.ts`, `src/game/scoring.ts`).
+- Admin **Question Studio** (dev-only, `#admin`): every ruin tagged by level/district/topic, each with its visible test case; edit and add questions locally and export JSON to commit.
+- CI (typecheck, tests, build, Deno judge check) and Cloudflare/Supabase deploy workflows.
 
-The judge code is not deployed yet. It needs the two restricted transaction-pooler URLs, the client publishable key, migrations and Google Auth configuration. Until then, local practice is intentionally labelled development mode and is never a progression authority.
+Not yet live: real sign-in and authoritative grading beyond Ruin 06. Local practice is non-scoring and never a progression authority. See [implementation status](docs/implementation-status.md) and the [deployment runbook](docs/deployment-runbook.md).
 
 ## Run locally
 
@@ -31,6 +28,14 @@ pnpm dev
 
 The app runs without a publishable key in development mode: local **Run** works, while Google sign-in and authoritative **Submit** explain what is missing. To enable authentication, replace the placeholder in `.env.local` with the Supabase browser publishable key. Never place a secret/service-role key in a `VITE_` variable.
 
+## Author questions (dev only)
+
+Open `http://localhost:5173/#admin` while running `pnpm dev` for the **Question Studio**: every ruin tagged by level, district and topic, with its visible test case. Edit or add questions there (changes persist in the browser) and use **Export JSON** to save them for committing. This view and all canonical solutions are stripped from production builds. Regenerate the practice fixtures/expected rows with:
+
+```bash
+pnpm content:generate
+```
+
 ## Verify
 
 ```bash
@@ -43,7 +48,7 @@ The build emits PGlite's PostgreSQL WebAssembly and data files. They are the dom
 
 ## Deploy the static shell
 
-Production origin: `https://treasure-hunt.example.workers.dev`
+Production origin: `https://dilli-khoj.treasure-hunt.workers.dev`
 
 ```bash
 pnpm deploy

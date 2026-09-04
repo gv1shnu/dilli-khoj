@@ -40,6 +40,20 @@ Source: `NST DBMS 2026.xlsx`, `Topic Tree`, Modules 1–8. Spelling is normalize
 | 19 | Agrasen ki Baoli | 7 | Nested and correlated subqueries |
 | 20 | Signature Bridge | 8 | Multi-table joins, join conditions, outer-join reasoning and a set operation |
 
+## Districts
+
+The 20 ruins are grouped into 7 districts (contiguous ranges that unlock in order). Encoded in `src/game/ruins.ts`.
+
+| # | District | Ruins | Modules |
+| ---: | --- | --- | --- |
+| 1 | Yamuna Gates | 1–3 | 1 |
+| 2 | The Records Quarter | 4–5 | 2 |
+| 3 | Chandni Chowk Bazaars | 6–10 | 3 |
+| 4 | Kitchens & Conduits | 11–13 | 4 |
+| 5 | The Outer Yards | 14–16 | 5 |
+| 6 | The Ridge Lines | 17–18 | 6 |
+| 7 | Deep Foundations | 19–20 | 7–8 |
+
 ## Coverage notes
 
 - Modules 1 and 2 are taught through read-only artefacts because the game permits DQL only.

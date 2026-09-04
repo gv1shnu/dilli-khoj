@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "treasure-hunt",
+  "name": "dilli-khoj",
   "account_id": "a34c3ecff69a697ae99c602e883ddb53",
   "compatibility_date": "2026-09-03",
   "workers_dev": true,

@@ -14,7 +14,7 @@ Approved domains:
 - A Supabase publishable key for browser configuration. Retrieve it from **Connect** or **Settings → API Keys**. Prefer `sb_publishable_...`; legacy `anon` keys are being deprecated.
 - Google OAuth configured in the dashboard. Keep its client secret out of chat and Git.
 
-Confirmed production origin: `https://treasure-hunt.example.workers.dev`
+Confirmed production origin: `https://dilli-khoj.treasure-hunt.workers.dev`
 
 Both approved domains belong to the same Google Workspace organization, so the Google app may use an **Internal** audience.
 
@@ -25,9 +25,9 @@ Both approved domains belong to the same Google Workspace organization, so the G
 3. Create or copy the publishable key for the browser.
 4. Do not copy a secret key into browser variables or source control.
 5. Go to **Authentication → URL Configuration**.
-6. Set **Site URL** to `https://treasure-hunt.example.workers.dev`.
+6. Set **Site URL** to `https://dilli-khoj.treasure-hunt.workers.dev`.
 7. Add redirect URLs for:
-   - `https://treasure-hunt.example.workers.dev/**`;
+   - `https://dilli-khoj.treasure-hunt.workers.dev/**`;
    - a Cloudflare preview URL only when preview sign-in is intentionally enabled;
    - `http://localhost:5173/**` for development.
 8. Go to **Authentication → Providers → Google**. Leave this page open; it displays the Supabase callback URL needed by Google.
@@ -57,7 +57,7 @@ Official references:
 5. Request only `openid`, `email` and `profile` scopes. The game does not need Google Drive, Calendar or contacts.
 6. Create a client with application type **Web application**.
 7. Add authorized JavaScript origins:
-   - `https://treasure-hunt.example.workers.dev`;
+   - `https://dilli-khoj.treasure-hunt.workers.dev`;
    - `http://localhost:5173` for development.
 8. Add this exact authorized redirect URI:
 
