@@ -1,0 +1,1326 @@
+[
+  {
+    "id": 1,
+    "title": "Reading the Resident Schema",
+    "description": "The gate catalog lists every attribute of each entity. Return `attribute` and `data_type` for the `resident` entity, sorted by `attribute`.",
+    "sampleColumns": [
+      "attribute",
+      "data_type"
+    ],
+    "sampleRows": [
+      [
+        "sample_col_a",
+        "text"
+      ],
+      [
+        "sample_col_b",
+        "integer"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "An entity's attributes are just the rows where `entity` matches; filter then sort."
+    ],
+    "schema": [
+      {
+        "name": "catalog_columns",
+        "columns": [
+          {
+            "name": "entity",
+            "type": "text",
+            "note": "entity/table name"
+          },
+          {
+            "name": "attribute",
+            "type": "text",
+            "note": "column name"
+          },
+          {
+            "name": "data_type",
+            "type": "text"
+          },
+          {
+            "name": "is_key",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT attribute, data_type\nFROM catalog_columns\nORDER BY attribute;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"catalog_columns\" (\"entity\" text, \"attribute\" text, \"data_type\" text, \"is_key\" boolean);\nINSERT INTO \"catalog_columns\" VALUES\n('resident', 'resident_id', 'integer', true),\n('resident', 'name', 'text', false),\n('shelter', 'capacity', 'integer', false),\n('resident', 'home_id', 'integer', false),\n(NULL, 'unknown', 'text', false);",
+    "expected": {
+      "columns": [
+        "attribute",
+        "data_type"
+      ],
+      "rows": [
+        {
+          "attribute": "home_id",
+          "data_type": "integer"
+        },
+        {
+          "attribute": "name",
+          "data_type": "text"
+        },
+        {
+          "attribute": "resident_id",
+          "data_type": "integer"
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "title": "Keys to the Bus Bay",
+    "description": "Some attributes can identify a `bus` on their own. Return each `attribute` whose `key_kind` is `primary` or `candidate`. Sort by `attribute`.",
+    "sampleColumns": [
+      "attribute"
+    ],
+    "sampleRows": [
+      [
+        "sample_key_1"
+      ],
+      [
+        "sample_key_2"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "A unique identifier is a primary or candidate key; match either with a set membership test."
+    ],
+    "schema": [
+      {
+        "name": "column_keys",
+        "columns": [
+          {
+            "name": "entity",
+            "type": "text"
+          },
+          {
+            "name": "attribute",
+            "type": "text"
+          },
+          {
+            "name": "key_kind",
+            "type": "text",
+            "note": "primary | candidate | unique | none"
+          },
+          {
+            "name": "nullable",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT attribute\nFROM column_keys\nWHERE entity = 'bus'\nORDER BY attribute;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"column_keys\" (\"entity\" text, \"attribute\" text, \"key_kind\" text, \"nullable\" boolean);\nINSERT INTO \"column_keys\" VALUES\n('bus', 'bus_id', 'primary', false),\n('bus', 'registration', 'candidate', false),\n('bus', 'radio_code', 'unique', true),\n('bus', 'colour', 'none', false),\n('driver', 'licence', 'candidate', false),\n('bus', 'unknown', NULL, true);",
+    "expected": {
+      "columns": [
+        "attribute"
+      ],
+      "rows": [
+        {
+          "attribute": "bus_id"
+        },
+        {
+          "attribute": "registration"
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "title": "Tracing the Family Links",
+    "description": "The register records foreign keys. List every reference that points at the `family` entity: return `child_entity` and `child_attribute`, ordered by both.",
+    "sampleColumns": [
+      "child_entity",
+      "child_attribute"
+    ],
+    "sampleRows": [
+      [
+        "sample_child",
+        "sample_ref_col"
+      ],
+      [
+        "sample_child_2",
+        "sample_ref_col_2"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "A foreign key that references `family` is a row whose parent entity is `family`."
+    ],
+    "schema": [
+      {
+        "name": "foreign_keys",
+        "columns": [
+          {
+            "name": "child_entity",
+            "type": "text"
+          },
+          {
+            "name": "child_attribute",
+            "type": "text"
+          },
+          {
+            "name": "parent_entity",
+            "type": "text"
+          },
+          {
+            "name": "parent_attribute",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT child_entity, child_attribute\nFROM foreign_keys\nORDER BY child_entity, child_attribute;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"foreign_keys\" (\"child_entity\" text, \"child_attribute\" text, \"parent_entity\" text, \"parent_attribute\" text);\nINSERT INTO \"foreign_keys\" VALUES\n('residents', 'family_id', 'family', 'id'),\n('ration_cards', 'household', 'family', 'id'),\n('residents', 'shelter_id', 'shelter', 'id'),\n('families', 'ward', 'ward', 'id');",
+    "expected": {
+      "columns": [
+        "child_entity",
+        "child_attribute"
+      ],
+      "rows": [
+        {
+          "child_entity": "ration_cards",
+          "child_attribute": "household"
+        },
+        {
+          "child_entity": "residents",
+          "child_attribute": "family_id"
+        }
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "title": "Evidence of the Rebuild",
+    "description": "The records room keeps a change log. Return `object_name` and `op` for every entry whose `op_kind` is `DDL`, newest first by `changed_at`.",
+    "sampleColumns": [
+      "object_name",
+      "op"
+    ],
+    "sampleRows": [
+      [
+        "sample_table",
+        "CREATE TABLE"
+      ],
+      [
+        "sample_index",
+        "ALTER TABLE"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Data-definition changes are the `DDL` rows; filter on `op_kind`, then order by time descending."
+    ],
+    "schema": [
+      {
+        "name": "change_log",
+        "columns": [
+          {
+            "name": "op",
+            "type": "text",
+            "note": "e.g. CREATE TABLE, INSERT"
+          },
+          {
+            "name": "object_name",
+            "type": "text"
+          },
+          {
+            "name": "op_kind",
+            "type": "text",
+            "note": "DDL | DML"
+          },
+          {
+            "name": "changed_at",
+            "type": "timestamp"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT object_name, op\nFROM change_log\nORDER BY changed_at DESC;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"change_log\" (\"op\" text, \"object_name\" text, \"op_kind\" text, \"changed_at\" timestamp);\nINSERT INTO \"change_log\" VALUES\n('CREATE TABLE', 'shelters', 'DDL', '2042-01-02 10:00:00'),\n('INSERT', 'residents', 'DML', '2042-01-04 10:00:00'),\n('ALTER TABLE', 'pumps', 'DDL', '2042-01-03 10:00:00'),\n('UPDATE', 'pumps', 'DML', NULL);",
+    "expected": {
+      "columns": [
+        "object_name",
+        "op"
+      ],
+      "rows": [
+        {
+          "object_name": "pumps",
+          "op": "ALTER TABLE"
+        },
+        {
+          "object_name": "shelters",
+          "op": "CREATE TABLE"
+        }
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "title": "Who Holds the Keys",
+    "description": "List `grantee` and `object_name` where a `SELECT` privilege was granted (`granted` is true). Sort by `grantee`, then `object_name`.",
+    "sampleColumns": [
+      "grantee",
+      "object_name"
+    ],
+    "sampleRows": [
+      [
+        "sample_role",
+        "sample_object"
+      ],
+      [
+        "sample_role_2",
+        "sample_object_2"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Only rows where the privilege is `SELECT` and the boolean `granted` is true count."
+    ],
+    "schema": [
+      {
+        "name": "access_grants",
+        "columns": [
+          {
+            "name": "grantee",
+            "type": "text",
+            "note": "role name"
+          },
+          {
+            "name": "object_name",
+            "type": "text"
+          },
+          {
+            "name": "privilege",
+            "type": "text",
+            "note": "SELECT | INSERT | ..."
+          },
+          {
+            "name": "granted",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT grantee, object_name\nFROM access_grants\nORDER BY grantee;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"access_grants\" (\"grantee\" text, \"object_name\" text, \"privilege\" text, \"granted\" boolean);\nINSERT INTO \"access_grants\" VALUES\n('scout', 'shelters', 'SELECT', true),\n('archivist', 'records', 'SELECT', true),\n('archivist', 'maps', 'SELECT', true),\n('porter', 'crates', 'SELECT', false),\n('builder', 'repairs', 'INSERT', true),\n('unknown', 'maps', 'SELECT', NULL);",
+    "expected": {
+      "columns": [
+        "grantee",
+        "object_name"
+      ],
+      "rows": [
+        {
+          "grantee": "archivist",
+          "object_name": "maps"
+        },
+        {
+          "grantee": "archivist",
+          "object_name": "records"
+        },
+        {
+          "grantee": "scout",
+          "object_name": "shelters"
+        }
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "title": "The Last Open Stalls",
+    "description": "Return `stall_id` for K-7 stalls whose status is `open`. Sort by `stall_id`.",
+    "sampleColumns": [
+      "stall_id"
+    ],
+    "sampleRows": [
+      [
+        21
+      ],
+      [
+        46
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Filter both `ward_code` and `status`, then use `ORDER BY`."
+    ],
+    "schema": [
+      {
+        "name": "stalls",
+        "columns": [
+          {
+            "name": "stall_id",
+            "type": "integer",
+            "note": "primary key"
+          },
+          {
+            "name": "stall_name",
+            "type": "text"
+          },
+          {
+            "name": "ward_code",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "note": "open | closed | NULL"
+          },
+          {
+            "name": "daily_rations",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT stall_id\nFROM stalls\nORDER BY stall_id;",
+    "status": "live",
+    "fixtureSql": "CREATE TABLE \"stalls\" (\"stall_id\" integer, \"stall_name\" text, \"ward_code\" text, \"status\" text, \"daily_rations\" integer);\nINSERT INTO \"stalls\" VALUES\n(101, 'Copper Kettle', 'K-7', 'closed', 0),\n(102, 'Moonlight Grain', 'K-7', 'open', 28),\n(103, 'Red Fort Repairs', 'K-4', 'open', 12),\n(104, 'Old Clock Spices', 'K-7', NULL, 7),\n(105, 'Yamuna Filters', 'K-9', 'open', 19),\n(107, 'Paranthe Power', 'K-7', 'open', 31);",
+    "expected": {
+      "columns": [
+        "stall_id"
+      ],
+      "rows": [
+        {
+          "stall_id": 102
+        },
+        {
+          "stall_id": 107
+        }
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "title": "Every Ward Represented",
+    "description": "Pilgrims gather on the steps. Return each distinct `home_ward` that appears in `pilgrims` — one row per ward — sorted by `home_ward`.",
+    "sampleColumns": [
+      "home_ward"
+    ],
+    "sampleRows": [
+      [
+        "W-00"
+      ],
+      [
+        "W-99"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Collapse repeated wards to one row each with `DISTINCT`."
+    ],
+    "schema": [
+      {
+        "name": "pilgrims",
+        "columns": [
+          {
+            "name": "name",
+            "type": "text"
+          },
+          {
+            "name": "home_ward",
+            "type": "text"
+          },
+          {
+            "name": "arrival_day",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT home_ward\nFROM pilgrims\nORDER BY home_ward;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"pilgrims\" (\"name\" text, \"home_ward\" text, \"arrival_day\" integer);\nINSERT INTO \"pilgrims\" VALUES\n('Asha', 'W-2', 1),\n('Dev', 'W-1', 2),\n('Mira', 'W-2', 3),\n('Noor', NULL, 4),\n('Adi', NULL, 5);",
+    "expected": {
+      "columns": [
+        "home_ward"
+      ],
+      "rows": [
+        {
+          "home_ward": "W-1"
+        },
+        {
+          "home_ward": "W-2"
+        },
+        {
+          "home_ward": null
+        }
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "title": "The Paper Traders",
+    "description": "Return `shop_name` for every shop whose `trade` mentions paper in any capitalisation. Sort by `shop_name`.",
+    "sampleColumns": [
+      "shop_name"
+    ],
+    "sampleRows": [
+      [
+        "Sample Stationers"
+      ],
+      [
+        "Zeta Scrolls"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Match anywhere in the text, case-insensitively, using wildcards around the word."
+    ],
+    "schema": [
+      {
+        "name": "shops",
+        "columns": [
+          {
+            "name": "shop_name",
+            "type": "text"
+          },
+          {
+            "name": "trade",
+            "type": "text",
+            "note": "free text description"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT shop_name\nFROM shops\nORDER BY shop_name;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"shops\" (\"shop_name\" text, \"trade\" text);\nINSERT INTO \"shops\" VALUES\n('Scroll House', 'handmade PAPER'),\n('Paper Lantern', 'lamps'),\n('Ink Corner', 'paper and ink'),\n('Lost Ledger', NULL),\n('Wrapping Works', 'wastepaper');",
+    "expected": {
+      "columns": [
+        "shop_name"
+      ],
+      "rows": [
+        {
+          "shop_name": "Ink Corner"
+        },
+        {
+          "shop_name": "Scroll House"
+        },
+        {
+          "shop_name": "Wrapping Works"
+        }
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "title": "Unsealed in the Silver Lane",
+    "description": "Return `vault_id` for vaults in ward `D-1`, `D-3`, or `D-9` that are not sealed (`sealed` is false). Sort by `vault_id`.",
+    "sampleColumns": [
+      "vault_id"
+    ],
+    "sampleRows": [
+      [
+        900
+      ],
+      [
+        901
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Combine a set-membership check on the ward with a negation of `sealed`."
+    ],
+    "schema": [
+      {
+        "name": "vaults",
+        "columns": [
+          {
+            "name": "vault_id",
+            "type": "integer",
+            "note": "primary key"
+          },
+          {
+            "name": "ward_code",
+            "type": "text"
+          },
+          {
+            "name": "sealed",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT vault_id\nFROM vaults\nORDER BY vault_id;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"vaults\" (\"vault_id\" integer, \"ward_code\" text, \"sealed\" boolean);\nINSERT INTO \"vaults\" VALUES\n(11, 'D-1', false),\n(12, 'D-3', false),\n(13, 'D-9', false),\n(14, 'D-2', false),\n(15, 'D-1', true),\n(16, 'D-3', NULL),\n(17, NULL, false);",
+    "expected": {
+      "columns": [
+        "vault_id"
+      ],
+      "rows": [
+        {
+          "vault_id": 11
+        },
+        {
+          "vault_id": 12
+        },
+        {
+          "vault_id": 13
+        }
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "title": "The Three Richest Finds",
+    "description": "Return `item` and `value_coins` for the three most valuable finds, highest value first. Break ties by `item` ascending.",
+    "sampleColumns": [
+      "item",
+      "value_coins"
+    ],
+    "sampleRows": [
+      [
+        "Sample Relic",
+        999
+      ],
+      [
+        "Sample Coin",
+        998
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Order by value descending, add `item` as a tie-break, then keep only the top rows."
+    ],
+    "schema": [
+      {
+        "name": "finds",
+        "columns": [
+          {
+            "name": "item",
+            "type": "text"
+          },
+          {
+            "name": "value_coins",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT item, value_coins\nFROM finds\nORDER BY value_coins DESC\nLIMIT 3;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"finds\" (\"item\" text, \"value_coins\" integer);\nINSERT INTO \"finds\" VALUES\n('Zinc compass', 90),\n('Amber lens', 90),\n('Tin whistle', 90),\n('Copper dial', 90),\n('Worn buckle', 10);",
+    "expected": {
+      "columns": [
+        "item",
+        "value_coins"
+      ],
+      "rows": [
+        {
+          "item": "Amber lens",
+          "value_coins": 90
+        },
+        {
+          "item": "Copper dial",
+          "value_coins": 90
+        },
+        {
+          "item": "Tin whistle",
+          "value_coins": 90
+        }
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "title": "Karim's Recipe Cards",
+    "description": "For each dish return its name upper-cased as `dish_caps` and the length of `notes` as `note_len`. Sort by `dish`.",
+    "sampleColumns": [
+      "dish_caps",
+      "note_len"
+    ],
+    "sampleRows": [
+      [
+        "SAMPLE DISH",
+        42
+      ],
+      [
+        "ZETA CURRY",
+        17
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "String functions transform each value: one upper-cases text, another counts characters.",
+      "Alias the two computed columns exactly as `dish_caps` and `note_len`."
+    ],
+    "schema": [
+      {
+        "name": "recipes",
+        "columns": [
+          {
+            "name": "dish",
+            "type": "text"
+          },
+          {
+            "name": "notes",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT dish, notes\nFROM recipes\nORDER BY dish;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"recipes\" (\"dish\" text, \"notes\" text);\nINSERT INTO \"recipes\" VALUES\n('dal', 'Stir gently'),\n('chai', NULL),\n('roti', ''),\n('rice', 'नींबू');",
+    "expected": {
+      "columns": [
+        "dish_caps",
+        "note_len"
+      ],
+      "rows": [
+        {
+          "dish_caps": "CHAI",
+          "note_len": null
+        },
+        {
+          "dish_caps": "DAL",
+          "note_len": 11
+        },
+        {
+          "dish_caps": "RICE",
+          "note_len": 5
+        },
+        {
+          "dish_caps": "ROTI",
+          "note_len": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "title": "Total Flow at Wazirabad",
+    "description": "Return `pump_id` and the rounded combined flow `litres_per_min + backup_lpm` as `total_flow`, treating a missing `backup_lpm` as zero. Sort by `pump_id`.",
+    "sampleColumns": [
+      "pump_id",
+      "total_flow"
+    ],
+    "sampleRows": [
+      [
+        500,
+        120
+      ],
+      [
+        501,
+        0
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "A null backup would poison the sum; replace it with zero first.",
+      "Round the total to a whole number with a numeric function."
+    ],
+    "schema": [
+      {
+        "name": "pumps",
+        "columns": [
+          {
+            "name": "pump_id",
+            "type": "integer",
+            "note": "primary key"
+          },
+          {
+            "name": "litres_per_min",
+            "type": "numeric"
+          },
+          {
+            "name": "backup_lpm",
+            "type": "numeric",
+            "note": "may be NULL"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT pump_id, litres_per_min, backup_lpm\nFROM pumps\nORDER BY pump_id;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"pumps\" (\"pump_id\" integer, \"litres_per_min\" numeric, \"backup_lpm\" numeric);\nINSERT INTO \"pumps\" VALUES\n(1, 12.4, NULL),\n(2, 10.25, 0.25),\n(3, 0, 0),\n(4, NULL, 7.5),\n(5, 8.6, -1.2);",
+    "expected": {
+      "columns": [
+        "pump_id",
+        "total_flow"
+      ],
+      "rows": [
+        {
+          "pump_id": 1,
+          "total_flow": "12"
+        },
+        {
+          "pump_id": 2,
+          "total_flow": "11"
+        },
+        {
+          "pump_id": 3,
+          "total_flow": "0"
+        },
+        {
+          "pump_id": 4,
+          "total_flow": null
+        },
+        {
+          "pump_id": 5,
+          "total_flow": "7"
+        }
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "title": "Departures by Day",
+    "description": "From `departures`, return each calendar `date` of `depart_at` and the count of trains that day as `trains`. Sort by `date`.",
+    "sampleColumns": [
+      "date",
+      "trains"
+    ],
+    "sampleRows": [
+      [
+        "1999-01-01",
+        9
+      ],
+      [
+        "1999-01-02",
+        4
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Reduce each timestamp to its date before grouping.",
+      "Group by that date and count the rows in each group."
+    ],
+    "schema": [
+      {
+        "name": "departures",
+        "columns": [
+          {
+            "name": "train",
+            "type": "text"
+          },
+          {
+            "name": "depart_at",
+            "type": "timestamp"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT depart_at\nFROM departures\nORDER BY depart_at;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"departures\" (\"train\" text, \"depart_at\" timestamp);\nINSERT INTO \"departures\" VALUES\n('A', '2042-02-01 23:59:00'),\n(NULL, '2042-02-01 01:00:00'),\n('B', '2042-02-02 00:00:00'),\n('C', NULL);",
+    "expected": {
+      "columns": [
+        "date",
+        "trains"
+      ],
+      "rows": [
+        {
+          "date": "2042-02-01T00:00:00.000Z",
+          "trains": 2
+        },
+        {
+          "date": "2042-02-02T00:00:00.000Z",
+          "trains": 1
+        },
+        {
+          "date": null,
+          "trains": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "title": "Crates at Azadpur Mandi",
+    "description": "Return each `crop` and its total `crates` as `total_crates` across all lots. Sort by `crop`.",
+    "sampleColumns": [
+      "crop",
+      "total_crates"
+    ],
+    "sampleRows": [
+      [
+        "sample-crop",
+        1200
+      ],
+      [
+        "zeta-grain",
+        8
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "One output row per crop means grouping by crop.",
+      "Sum the crates within each group."
+    ],
+    "schema": [
+      {
+        "name": "lots",
+        "columns": [
+          {
+            "name": "crop",
+            "type": "text"
+          },
+          {
+            "name": "crates",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT crop, crates\nFROM lots\nORDER BY crop;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"lots\" (\"crop\" text, \"crates\" integer);\nINSERT INTO \"lots\" VALUES\n('rice', 7),\n('rice', 7),\n('rice', NULL),\n('millet', 3),\n('millet', -1),\n('beans', NULL);",
+    "expected": {
+      "columns": [
+        "crop",
+        "total_crates"
+      ],
+      "rows": [
+        {
+          "crop": "beans",
+          "total_crates": null
+        },
+        {
+          "crop": "millet",
+          "total_crates": 2
+        },
+        {
+          "crop": "rice",
+          "total_crates": 14
+        }
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "title": "Heaps Above the Line",
+    "description": "Return `heap_no` for disposal heaps whose total recovered `metal_kg` exceeds 800. Sort by `heap_no`. `HAVING` is the intended lesson.",
+    "sampleColumns": [
+      "heap_no"
+    ],
+    "sampleRows": [
+      [
+        "H-00"
+      ],
+      [
+        "H-99"
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Filter the groups after they are formed, not the individual rows.",
+      "The threshold applies to the summed metal per heap."
+    ],
+    "schema": [
+      {
+        "name": "heaps",
+        "columns": [
+          {
+            "name": "heap_no",
+            "type": "text"
+          },
+          {
+            "name": "metal_kg",
+            "type": "numeric"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT heap_no, metal_kg\nFROM heaps\nORDER BY heap_no;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"heaps\" (\"heap_no\" text, \"metal_kg\" numeric);\nINSERT INTO \"heaps\" VALUES\n('H-A', 500),\n('H-A', 400),\n('H-B', 800),\n('H-C', 801),\n('H-D', NULL),\n('H-E', 1000),\n('H-E', -300);",
+    "expected": {
+      "columns": [
+        "heap_no"
+      ],
+      "rows": [
+        {
+          "heap_no": "H-A"
+        },
+        {
+          "heap_no": "H-C"
+        }
+      ]
+    }
+  },
+  {
+    "id": 16,
+    "title": "Heavy Parcels per Bin",
+    "description": "For each `bin`, return the count of parcels weighing at least 20 kg as `heavy_count`. Sort by `bin`. Try `CASE`; equivalent queries work too.",
+    "sampleColumns": [
+      "bin",
+      "heavy_count"
+    ],
+    "sampleRows": [
+      [
+        "BIN-0",
+        5
+      ],
+      [
+        "BIN-9",
+        0
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Turn each parcel into 1 when heavy and 0 otherwise with `CASE`.",
+      "Summing those flags per bin gives the heavy count."
+    ],
+    "schema": [
+      {
+        "name": "parcels",
+        "columns": [
+          {
+            "name": "bin",
+            "type": "text"
+          },
+          {
+            "name": "weight_kg",
+            "type": "numeric"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT bin, weight_kg\nFROM parcels\nORDER BY bin;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"parcels\" (\"bin\" text, \"weight_kg\" numeric);\nINSERT INTO \"parcels\" VALUES\n('B-A', 20),\n('B-A', 21),\n('B-A', 19.9),\n('B-B', 3),\n('B-B', NULL),\n('B-C', 40);",
+    "expected": {
+      "columns": [
+        "bin",
+        "heavy_count"
+      ],
+      "rows": [
+        {
+          "bin": "B-A",
+          "heavy_count": 2
+        },
+        {
+          "bin": "B-B",
+          "heavy_count": 0
+        },
+        {
+          "bin": "B-C",
+          "heavy_count": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "title": "Ranking the Rush",
+    "description": "Return `line`, `rider`, `taps` and `line_rank`: rank descending taps within each line, sharing ranks for ties and leaving gaps. Sort by `line`, `line_rank`, then `rider`.",
+    "sampleColumns": [
+      "line",
+      "rider",
+      "taps",
+      "line_rank"
+    ],
+    "sampleRows": [
+      [
+        "Sample",
+        "rider-a",
+        999,
+        1
+      ],
+      [
+        "Sample",
+        "rider-b",
+        998,
+        2
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "A window function ranks rows without collapsing them.",
+      "Partition by `line` and order by `taps` descending so ties share a rank."
+    ],
+    "schema": [
+      {
+        "name": "riders",
+        "columns": [
+          {
+            "name": "line",
+            "type": "text"
+          },
+          {
+            "name": "rider",
+            "type": "text"
+          },
+          {
+            "name": "taps",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT line, rider, taps\nFROM riders\nORDER BY line, taps DESC;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"riders\" (\"line\" text, \"rider\" text, \"taps\" integer);\nINSERT INTO \"riders\" VALUES\n('Blue', 'Mira', 40),\n('Blue', 'Adi', 40),\n('Blue', 'Dev', 20),\n('Gold', 'Noor', 25),\n('Gold', 'Tara', 10);",
+    "expected": {
+      "columns": [
+        "line",
+        "rider",
+        "taps",
+        "line_rank"
+      ],
+      "rows": [
+        {
+          "line": "Blue",
+          "rider": "Adi",
+          "taps": 40,
+          "line_rank": 1
+        },
+        {
+          "line": "Blue",
+          "rider": "Mira",
+          "taps": 40,
+          "line_rank": 1
+        },
+        {
+          "line": "Blue",
+          "rider": "Dev",
+          "taps": 20,
+          "line_rank": 3
+        },
+        {
+          "line": "Gold",
+          "rider": "Noor",
+          "taps": 25,
+          "line_rank": 1
+        },
+        {
+          "line": "Gold",
+          "rider": "Tara",
+          "taps": 10,
+          "line_rank": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": 18,
+    "title": "The Previous Signal",
+    "description": "Return `hour`, `signal`, and the previous reading's `signal` as `prev_signal` (null for the first), ordered by `hour`.",
+    "sampleColumns": [
+      "hour",
+      "signal",
+      "prev_signal"
+    ],
+    "sampleRows": [
+      [
+        0,
+        55,
+        null
+      ],
+      [
+        1,
+        60,
+        55
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "A window function can look back one row in an ordered sequence.",
+      "Order the window by `hour` so the previous row is the previous hour."
+    ],
+    "schema": [
+      {
+        "name": "readings",
+        "columns": [
+          {
+            "name": "hour",
+            "type": "integer"
+          },
+          {
+            "name": "signal",
+            "type": "integer"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT hour, signal\nFROM readings\nORDER BY hour;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"readings\" (\"hour\" integer, \"signal\" integer);\nINSERT INTO \"readings\" VALUES\n(2, 30),\n(0, 10),\n(3, NULL),\n(1, 20),\n(4, 40);",
+    "expected": {
+      "columns": [
+        "hour",
+        "signal",
+        "prev_signal"
+      ],
+      "rows": [
+        {
+          "hour": 0,
+          "signal": 10,
+          "prev_signal": null
+        },
+        {
+          "hour": 1,
+          "signal": 20,
+          "prev_signal": 10
+        },
+        {
+          "hour": 2,
+          "signal": 30,
+          "prev_signal": 20
+        },
+        {
+          "hour": 3,
+          "signal": null,
+          "prev_signal": 30
+        },
+        {
+          "hour": 4,
+          "signal": 40,
+          "prev_signal": null
+        }
+      ]
+    }
+  },
+  {
+    "id": 19,
+    "title": "Deeper than Average",
+    "description": "Return `well_id` and `depth_m` for every well deeper than the average well depth. Sort by `depth_m` descending, then `well_id`.",
+    "sampleColumns": [
+      "well_id",
+      "depth_m"
+    ],
+    "sampleRows": [
+      [
+        700,
+        99.9
+      ],
+      [
+        701,
+        88.8
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "Compute the average depth once, then compare each row against it.",
+      "A scalar subquery in the `WHERE` clause returns that single average."
+    ],
+    "schema": [
+      {
+        "name": "wells",
+        "columns": [
+          {
+            "name": "well_id",
+            "type": "integer",
+            "note": "primary key"
+          },
+          {
+            "name": "depth_m",
+            "type": "numeric"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT well_id, depth_m\nFROM wells\nORDER BY depth_m DESC, well_id;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"wells\" (\"well_id\" integer, \"depth_m\" numeric);\nINSERT INTO \"wells\" VALUES\n(1, 10),\n(2, 20),\n(3, 40),\n(4, 40),\n(5, NULL);",
+    "expected": {
+      "columns": [
+        "well_id",
+        "depth_m"
+      ],
+      "rows": [
+        {
+          "well_id": 3,
+          "depth_m": "40"
+        },
+        {
+          "well_id": 4,
+          "depth_m": "40"
+        }
+      ]
+    }
+  },
+  {
+    "id": 20,
+    "title": "Spans and Their Towers",
+    "description": "Return `tower_name` and `span_id` for each anchored span, plus unoccupied towers with null `span_id`. Sort by `tower_name`, then `span_id`. Try joins and `UNION`; equivalent queries work too.",
+    "sampleColumns": [
+      "tower_name",
+      "span_id"
+    ],
+    "sampleRows": [
+      [
+        "Sample North Tower",
+        10
+      ],
+      [
+        "Sample South Tower",
+        null
+      ]
+    ],
+    "ordered": true,
+    "hints": [
+      "First inner-join spans to their tower on the shared key.",
+      "A set operation appends the towers with no matching span; check with `NOT EXISTS`."
+    ],
+    "schema": [
+      {
+        "name": "spans",
+        "columns": [
+          {
+            "name": "span_id",
+            "type": "integer",
+            "note": "primary key"
+          },
+          {
+            "name": "tower_id",
+            "type": "integer",
+            "note": "-> towers.tower_id"
+          }
+        ]
+      },
+      {
+        "name": "towers",
+        "columns": [
+          {
+            "name": "tower_id",
+            "type": "integer",
+            "note": "primary key"
+          },
+          {
+            "name": "tower_name",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "starterSql": "SELECT t.tower_name, s.span_id\nFROM towers t\nJOIN spans s ON s.tower_id = t.tower_id\nORDER BY t.tower_name, s.span_id;",
+    "status": "drafted",
+    "fixtureSql": "CREATE TABLE \"spans\" (\"span_id\" integer, \"tower_id\" integer);\nINSERT INTO \"spans\" VALUES\n(1, 1),\n(2, 1),\n(3, 2),\n(4, NULL);\nCREATE TABLE \"towers\" (\"tower_id\" integer, \"tower_name\" text);\nINSERT INTO \"towers\" VALUES\n(1, 'North'),\n(2, 'East'),\n(3, 'West');",
+    "expected": {
+      "columns": [
+        "tower_name",
+        "span_id"
+      ],
+      "rows": [
+        {
+          "tower_name": "East",
+          "span_id": 3
+        },
+        {
+          "tower_name": "North",
+          "span_id": 1
+        },
+        {
+          "tower_name": "North",
+          "span_id": 2
+        },
+        {
+          "tower_name": "West",
+          "span_id": null
+        }
+      ]
+    }
+  }
+]

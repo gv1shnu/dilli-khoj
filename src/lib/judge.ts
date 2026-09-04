@@ -9,7 +9,10 @@ export interface JudgeVerdict {
   xp: number;
 }
 
-export async function submitToJudge(sql: string): Promise<JudgeVerdict> {
+export async function submitToJudge(sql: string, ruinId: number = ruinSix.id): Promise<JudgeVerdict> {
+  if (ruinId !== ruinSix.id) {
+    throw new Error("This archive is practice-only until its server fixtures are released.");
+  }
   if (!supabase) {
     throw new Error("The server judge is not configured in this browser. Practice is still available.");
   }

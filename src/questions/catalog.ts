@@ -191,7 +191,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 5,
     title: "Who Holds the Keys",
     description:
-      "The vault logs access grants. List `grantee` and `object_name` where a `SELECT` privilege was actually granted (`granted` is true). Sort by `grantee`.",
+      "List `grantee` and `object_name` where a `SELECT` privilege was granted (`granted` is true). Sort by `grantee`, then `object_name`.",
     sampleColumns: ["grantee", "object_name"],
     sampleRows: [
       ["sample_role", "sample_object"],
@@ -212,10 +212,10 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     starterSql: "SELECT grantee, object_name\nFROM access_grants\nORDER BY grantee;",
     canonicalSolution:
-      "SELECT grantee, object_name\nFROM access_grants\nWHERE privilege = 'SELECT'\n  AND granted\nORDER BY grantee;",
+      "SELECT grantee, object_name\nFROM access_grants\nWHERE privilege = 'SELECT'\n  AND granted\nORDER BY grantee, object_name;",
     acceptedVariants: [
-      "SELECT grantee, object_name FROM access_grants WHERE privilege = 'SELECT' AND granted = true ORDER BY grantee;",
-      "SELECT grantee, object_name FROM access_grants WHERE granted AND privilege ILIKE 'select' ORDER BY 1;",
+      "SELECT grantee, object_name FROM access_grants WHERE privilege = 'SELECT' AND granted = true ORDER BY grantee, object_name;",
+      "SELECT grantee, object_name FROM access_grants WHERE granted AND privilege ILIKE 'select' ORDER BY 1, 2;",
     ],
     status: "drafted",
   },
@@ -423,7 +423,7 @@ const QUESTIONS: RuinQuestion[] = [
       "SELECT pump_id, round(litres_per_min + coalesce(backup_lpm, 0)) AS total_flow\nFROM pumps\nORDER BY pump_id;",
     acceptedVariants: [
       "SELECT pump_id, round(litres_per_min + COALESCE(backup_lpm, 0.0)) AS total_flow FROM pumps ORDER BY 1;",
-      "SELECT pump_id, round(coalesce(litres_per_min,0) + coalesce(backup_lpm,0)) AS total_flow FROM pumps ORDER BY pump_id;",
+      "SELECT pump_id, round(litres_per_min + CASE WHEN backup_lpm IS NULL THEN 0 ELSE backup_lpm END) AS total_flow FROM pumps ORDER BY pump_id;",
     ],
     status: "drafted",
   },
@@ -455,8 +455,8 @@ const QUESTIONS: RuinQuestion[] = [
     canonicalSolution:
       "SELECT depart_at::date AS date, count(*) AS trains\nFROM departures\nGROUP BY depart_at::date\nORDER BY date;",
     acceptedVariants: [
-      "SELECT date(depart_at) AS date, count(*) AS trains FROM departures GROUP BY 1 ORDER BY 1;",
-      "SELECT cast(depart_at AS date) AS date, count(train) AS trains FROM departures GROUP BY cast(depart_at AS date) ORDER BY date;",
+      "SELECT CAST(depart_at AS date) AS date, count(*) AS trains FROM departures GROUP BY 1 ORDER BY 1;",
+      "WITH days AS (SELECT depart_at::date AS date FROM departures) SELECT date, count(*) AS trains FROM days GROUP BY date ORDER BY date;",
     ],
     status: "drafted",
   },
@@ -527,7 +527,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 16,
     title: "Heavy Parcels per Bin",
     description:
-      "For each `bin`, return the count of parcels weighing at least 20 kg as `heavy_count`, using a CASE expression inside the aggregate. Sort by `bin`.",
+      "For each `bin`, return the count of parcels weighing at least 20 kg as `heavy_count`. Sort by `bin`. Try `CASE`; equivalent queries work too.",
     sampleColumns: ["bin", "heavy_count"],
     sampleRows: [
       ["BIN-0", 5],
@@ -560,7 +560,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 17,
     title: "Ranking the Rush",
     description:
-      "Within each `line`, rank riders by `taps` (highest first) with `RANK`. Return `line`, `rider`, `taps` and the rank as `line_rank`. Sort by `line`, then `line_rank`.",
+      "Return `line`, `rider`, `taps` and `line_rank`: rank descending taps within each line, sharing ranks for ties and leaving gaps. Sort by `line`, `line_rank`, then `rider`.",
     sampleColumns: ["line", "rider", "taps", "line_rank"],
     sampleRows: [
       ["Sample", "rider-a", 999, 1],
@@ -583,10 +583,10 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     starterSql: "SELECT line, rider, taps\nFROM riders\nORDER BY line, taps DESC;",
     canonicalSolution:
-      "SELECT line, rider, taps,\n       RANK() OVER (PARTITION BY line ORDER BY taps DESC) AS line_rank\nFROM riders\nORDER BY line, line_rank;",
+      "SELECT line, rider, taps,\n       RANK() OVER (PARTITION BY line ORDER BY taps DESC) AS line_rank\nFROM riders\nORDER BY line, line_rank, rider;",
     acceptedVariants: [
-      "SELECT line, rider, taps, rank() OVER w AS line_rank FROM riders WINDOW w AS (PARTITION BY line ORDER BY taps DESC) ORDER BY line, line_rank;",
-      "SELECT r.line, r.rider, r.taps, RANK() OVER (PARTITION BY r.line ORDER BY r.taps DESC) AS line_rank FROM riders r ORDER BY 1, 4;",
+      "SELECT line, rider, taps, rank() OVER w AS line_rank FROM riders WINDOW w AS (PARTITION BY line ORDER BY taps DESC) ORDER BY line, line_rank, rider;",
+      "SELECT r.line, r.rider, r.taps, RANK() OVER (PARTITION BY r.line ORDER BY r.taps DESC) AS line_rank FROM riders r ORDER BY 1, 4, 2;",
     ],
     status: "drafted",
   },
@@ -594,7 +594,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 18,
     title: "The Previous Signal",
     description:
-      "Order `readings` by `hour` and return `hour`, `signal`, and the prior hour's `signal` as `prev_signal` (null for the first). Sort by `hour`.",
+      "Return `hour`, `signal`, and the previous reading's `signal` as `prev_signal` (null for the first), ordered by `hour`.",
     sampleColumns: ["hour", "signal", "prev_signal"],
     sampleRows: [
       [0, 55, null],
@@ -660,7 +660,7 @@ const QUESTIONS: RuinQuestion[] = [
     id: 20,
     title: "Spans and Their Towers",
     description:
-      "Join `spans` to `towers`, returning `tower_name` and `span_id` for anchored spans; then UNION a row per tower that anchors no span, with `span_id` null. Sort by `tower_name`, then `span_id`.",
+      "Return `tower_name` and `span_id` for each anchored span, plus unoccupied towers with null `span_id`. Sort by `tower_name`, then `span_id`. Try joins and `UNION`; equivalent queries work too.",
     sampleColumns: ["tower_name", "span_id"],
     sampleRows: [
       ["Sample North Tower", 10],
@@ -693,7 +693,7 @@ const QUESTIONS: RuinQuestion[] = [
       "SELECT t.tower_name, s.span_id\nFROM towers t\nJOIN spans s ON s.tower_id = t.tower_id\nUNION\nSELECT t.tower_name, NULL\nFROM towers t\nWHERE NOT EXISTS (SELECT 1 FROM spans s WHERE s.tower_id = t.tower_id)\nORDER BY tower_name, span_id;",
     acceptedVariants: [
       "SELECT t.tower_name, s.span_id FROM towers t LEFT JOIN spans s ON s.tower_id = t.tower_id ORDER BY t.tower_name, s.span_id;",
-      "SELECT t.tower_name, s.span_id FROM spans s JOIN towers t USING (tower_id) UNION SELECT tower_name, NULL FROM towers WHERE tower_id NOT IN (SELECT tower_id FROM spans) ORDER BY 1, 2;",
+      "SELECT t.tower_name, s.span_id FROM spans s JOIN towers t USING (tower_id) UNION SELECT tower_name, NULL FROM towers WHERE tower_id NOT IN (SELECT tower_id FROM spans WHERE tower_id IS NOT NULL) ORDER BY 1, 2;",
     ],
     status: "drafted",
   },

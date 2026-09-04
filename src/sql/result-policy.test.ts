@@ -7,6 +7,12 @@ const expected = {
 };
 
 describe("ordered result comparison", () => {
+  it("compares PostgreSQL dates with generated JSON dates", () => {
+    expect(matchesOrderedResult(
+      { columns: ["date"], rows: [{ date: new Date("2042-01-01T00:00:00.000Z") }] },
+      { columns: ["date"], rows: [{ date: "2042-01-01T00:00:00.000Z" }] },
+    )).toBe(true);
+  });
   it("accepts the expected columns, values and order", () => {
     expect(matchesOrderedResult(expected, expected)).toBe(true);
   });

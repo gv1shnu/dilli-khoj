@@ -273,6 +273,13 @@ You can deploy from your laptop first (simplest), then automate it in Part G.
 
 ### F1. First deploy from your laptop
 
+The owner-confirmed account ID is `a34c3ecff69a697ae99c602e883ddb53`,
+pinned in `wrangler.jsonc`. Before deploying, run `pnpm exec wrangler whoami`
+and confirm the authenticated user has access to this account. If not, log out
+and log in to the intended account; do not change the pinned ID to bypass an
+authentication error. Any `CLOUDFLARE_ACCOUNT_ID` environment variable must match
+this ID too. The intended URL remains `https://treasure-hunt.example.workers.dev`.
+
 ```bash
 cd /Users/YOUR_NAME/Dev/treasure-hunt
 pnpm deploy
@@ -297,7 +304,7 @@ exist in `.github/workflows/`; they just need secrets.
 ### G1. Get the two Cloudflare values
 
 1. **Account ID:** Cloudflare dashboard → **Workers & Pages** → right sidebar shows
-   **Account ID**. Copy it.
+   **Account ID**. It must match the pinned ID `a34c3ecff69a697ae99c602e883ddb53`.
 2. **API token:** Cloudflare dashboard → **My Profile** → **API Tokens** →
    **Create Token** → template **Edit Cloudflare Workers** → create → copy the token
    (shown once).

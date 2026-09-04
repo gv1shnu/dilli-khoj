@@ -12,6 +12,7 @@ import { createGuideArrows } from "./guide";
 
 interface RuinSceneProps {
   onProximityChange: (nearTerminal: boolean) => void;
+  inputPaused?: boolean;
 }
 
 const TERMINAL = new THREE.Vector3(0, 0, 0);
@@ -19,9 +20,11 @@ const WALK_SPEED = 4.2;
 const RUN_SPEED = 8.4;
 const WORLD_RADIUS = 92;
 
-export function RuinScene({ onProximityChange }: RuinSceneProps) {
+export function RuinScene({ onProximityChange, inputPaused = false }: RuinSceneProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const proximityCallback = useRef(onProximityChange);
+  const paused = useRef(inputPaused);
+  useEffect(() => { paused.current = inputPaused; }, [inputPaused]);
 
   useEffect(() => {
     proximityCallback.current = onProximityChange;
@@ -149,9 +152,10 @@ export function RuinScene({ onProximityChange }: RuinSceneProps) {
     const ambience = createAmbience();
     const keys = new Set<string>();
     const isTyping = (target: EventTarget | null) =>
-      target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement;
+      target instanceof HTMLElement && !!target.closest("textarea,input,select,button,[contenteditable=true]");
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isTyping(event.target)) return;
+      if (paused.current || isTyping(event.target)) return;
+      if (event.code.startsWith("Arrow")) event.preventDefault();
       keys.add(event.code);
       if (event.code === "KeyM") ambience.setEnabled(!ambience.enabled());
       ambience.resume();
@@ -159,6 +163,8 @@ export function RuinScene({ onProximityChange }: RuinSceneProps) {
     const onKeyUp = (event: KeyboardEvent) => keys.delete(event.code);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    const clearKeys = () => keys.clear();
+    window.addEventListener("blur", clearKeys);
 
     const onFirstPointer = () => ambience.resume();
     renderer.domElement.addEventListener("pointerdown", onFirstPointer);
@@ -199,6 +205,8 @@ export function RuinScene({ onProximityChange }: RuinSceneProps) {
     const animate = () => {
       const delta = Math.min(clock.getDelta(), 0.05);
       const elapsed = clock.elapsedTime;
+      if (paused.current) keys.clear();
+      controls.enabled = !paused.current;
 
       // Camera-relative movement basis (flattened to ground plane).
       camera.getWorldDirection(forward);
@@ -298,6 +306,7 @@ export function RuinScene({ onProximityChange }: RuinSceneProps) {
       observer.disconnect();
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", clearKeys);
       renderer.domElement.removeEventListener("pointerdown", onFirstPointer);
       controls.dispose();
       ambience.dispose();

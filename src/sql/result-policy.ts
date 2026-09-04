@@ -16,7 +16,7 @@ export function matchesOrderedResult(actual: TabularResult, expected: TabularRes
 }
 
 function stableValue(value: unknown): string {
-  if (value instanceof Date) return value.toISOString();
+  if (value instanceof Date) return JSON.stringify(value.toISOString());
   if (typeof value === "bigint") return value.toString();
   return JSON.stringify(value);
 }

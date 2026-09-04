@@ -193,6 +193,13 @@ h2 {
   scrollbar-width: thin;
 }
 
+.archive-navigation { display: flex; gap: 8px; margin: 16px 0; }
+.archive-navigation select { min-width: 0; flex: 1; color: var(--ink); background: #18201c; border: 1px solid var(--line); padding: 8px; }
+.archive-open { margin-top: 14px; width: 100%; }
+.archive-schema { display: grid; gap: 5px; padding: 10px 0; }
+.archive-schema code { overflow-wrap: anywhere; }
+.draft-note { display: block; margin-top: 5px; color: var(--muted); font-size: 0.65rem; }
+
 .terminal-header {
   display: flex;
   align-items: flex-start;

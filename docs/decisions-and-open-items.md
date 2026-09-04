@@ -10,6 +10,7 @@
 | Supabase | Project `your-project-ref` |
 | Repository | Private GitHub repository `gv1shnu/treasure-hunt` |
 | Static hosting | Cloudflare Workers Static Assets at `treasure-hunt.example.workers.dev` |
+| Cloudflare account | Owner-confirmed `a34c3ecff69a697ae99c602e883ddb53`; pinned in `wrangler.jsonc` |
 | Google Workspace | Both approved domains belong to the same Workspace organization |
 | Development access | Local repository write access granted; use the owner's Git identity |
 | Deadline | No date; release by readiness gate |
