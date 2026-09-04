@@ -18,7 +18,6 @@ interface RuinSceneProps {
 const TERMINAL = new THREE.Vector3(0, 0, 0);
 const WALK_SPEED = 4.2;
 const RUN_SPEED = 8.4;
-const WORLD_RADIUS = 92;
 
 export function RuinScene({ onProximityChange, inputPaused = false }: RuinSceneProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -113,27 +112,10 @@ export function RuinScene({ onProximityChange, inputPaused = false }: RuinSceneP
     playerLamp.position.set(0, 1.6, 0);
     character.object.add(playerLamp);
 
-    // ---- The SQL archive beacon (blooms) ------------------------------------
-    const beacon = new THREE.Group();
-    const pedestal = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.1, 1.5, 1.1, 8),
-      new THREE.MeshStandardMaterial({ map: null, color: 0x2a2620, metalness: 0.6, roughness: 0.4 }),
-    );
-    pedestal.position.y = 0.55;
-    pedestal.castShadow = true;
-    pedestal.receiveShadow = true;
-    beacon.add(pedestal);
-    const core = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.8),
-      new THREE.MeshStandardMaterial({ color: 0xf7d9a0, emissive: 0xffa62e, emissiveIntensity: 3.2 }),
-    );
-    core.position.y = 2.1;
-    beacon.add(core);
-    const beaconLight = new THREE.PointLight(0xffb454, 16, 20, 2);
-    beaconLight.position.y = 2.4;
-    beacon.add(beaconLight);
-    beacon.position.copy(TERMINAL);
-    scene.add(beacon);
+    // The amber archive (pedestal, glowing core, light) lives in the world now, tiled
+    // across the looping 3x3 grid. Gameplay still happens around the origin.
+    const TILE = world.tile;
+    const HALF = TILE / 2;
 
     // Amber archive positions (one today; the array lets the guide point at the
     // nearest as more ruins come online).
@@ -233,14 +215,23 @@ export function RuinScene({ onProximityChange, inputPaused = false }: RuinSceneP
         // Axis-separated sliding collision.
         if (blocked(nx, pos.z)) nx = pos.x;
         if (blocked(pos.x, nz)) nz = pos.z;
-        const radial = Math.hypot(nx, nz);
-        if (radial > WORLD_RADIUS) {
-          const k = WORLD_RADIUS / radial;
-          nx *= k;
-          nz *= k;
-        }
         nextPos.set(nx, 0, nz);
         pos.copy(nextPos);
+
+        // Toroidal wrap: keep the player in the central tile so the world loops.
+        // The camera and its target shift by the same amount, so it is seamless.
+        const wrapX = pos.x > HALF ? -TILE : pos.x < -HALF ? TILE : 0;
+        const wrapZ = pos.z > HALF ? -TILE : pos.z < -HALF ? TILE : 0;
+        if (wrapX !== 0 || wrapZ !== 0) {
+          pos.x += wrapX;
+          pos.z += wrapZ;
+          camera.position.x += wrapX;
+          camera.position.z += wrapZ;
+          controls.target.x += wrapX;
+          controls.target.z += wrapZ;
+          prevTarget.x += wrapX;
+          prevTarget.z += wrapZ;
+        }
         // Face travel direction, smoothly (accounting for the model's -Z front).
         const targetYaw = Math.atan2(move.x, move.z) + MODEL_YAW_OFFSET;
         const cur = character.object.rotation.y;
@@ -251,12 +242,9 @@ export function RuinScene({ onProximityChange, inputPaused = false }: RuinSceneP
 
       character.setLocomotion(speed01);
       character.update(delta);
-      world.update(delta, elapsed);
+      world.update(delta, elapsed, character.object.position);
 
-      // Beacon shimmer + proximity.
-      core.rotation.y += delta * 1.1;
-      core.position.y = 2.1 + Math.sin(elapsed * 2.1) * 0.14;
-      beaconLight.intensity = 14 + Math.sin(elapsed * 3.2) * 3;
+      // Proximity to the amber archive at the origin.
       const near = character.object.position.distanceTo(TERMINAL) < 4.4;
       if (near !== wasNear) {
         wasNear = near;
