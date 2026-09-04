@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { DISTRICTS, ruinById } from "./ruins";
-import { visibleRegions } from "./geography";
+import { REGIONS } from "./geography";
+import { clearedCount, currentRuinId, isUnlocked } from "./progression";
 
 interface GeographicMapProps {
   cleared: readonly number[];
@@ -30,18 +31,21 @@ export function GeographicMap({
   const prefix = useId().replace(/:/g, "");
   const [hovered, setHovered] = useState<number | null>(null);
   const [motion, setMotion] = useState(true);
-  const regions = visibleRegions(cleared, fullAccess);
+  // Show the whole city; regions the player has not earned are greyed and locked.
+  const regions = REGIONS;
+  const open = (id: number) => fullAccess || isUnlocked(id, cleared);
   const inspected =
     regions.find((region) => region.id === (hovered ?? selectedId)) ??
-    regions.at(-1);
+    regions.find((region) => region.id === currentRuinId(cleared));
   const detail = inspected ? ruinById(inspected.id)! : null;
+  const detailOpen = detail ? open(detail.id) : false;
   return (
     <section
       className={`geo-atlas ${motion ? "" : "geo-still"}`}
       aria-label={
         fullAccess
           ? "Complete geographic world map"
-          : "Cleared geographic regions"
+          : "Your geographic world map"
       }
     >
       <div className="geo-toolbar">
@@ -49,7 +53,7 @@ export function GeographicMap({
           <i className="geo-dot" />{" "}
           {fullAccess
             ? "COMPLETE ATLAS"
-            : `${regions.length} / 20 REGIONS REVEALED`}
+            : `${clearedCount(cleared)} / 20 REGIONS RESTORED`}
         </span>
         <button
           className="ghost-button"
@@ -266,6 +270,19 @@ export function GeographicMap({
               strokeWidth="2"
               fill="none"
             />
+            {regions.map((region) =>
+              open(region.id) ? null : (
+                <polygon
+                  key={`mist-${region.id}`}
+                  className="geo-locked-land"
+                  points={region.polygon}
+                  fill="#0c130f"
+                  fillOpacity="0.82"
+                  stroke="#0c130f"
+                  strokeWidth="1"
+                />
+              ),
+            )}
           </g>
           <rect
             width="1000"
@@ -301,31 +318,26 @@ export function GeographicMap({
         </svg>
         {regions.map((region) => {
           const ruin = ruinById(region.id)!;
+          const unlocked = open(region.id);
           const selected = inspected?.id === region.id;
           return (
             <button
               key={region.id}
-              className={`geo-marker ${selected ? "geo-marker--selected" : ""}`}
+              className={`geo-marker ${selected ? "geo-marker--selected" : ""} ${unlocked ? "" : "geo-marker--locked"}`}
               style={{ left: `${region.x / 10}%`, top: `${region.y / 7.4}%` }}
-              aria-label={`${ruin.place} · ${fullAccess ? "Inspect" : "Restored — revisit"}`}
-              title={ruin.place}
+              aria-label={`${ruin.place} · ${unlocked ? (fullAccess ? "Inspect" : cleared.includes(region.id) ? "Restored — revisit" : "Current archive") : "Locked"}`}
+              aria-disabled={!unlocked}
+              title={unlocked ? ruin.place : `${ruin.place} · locked`}
               onMouseEnter={() => setHovered(region.id)}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(region.id)}
               onBlur={() => setHovered(null)}
-              onClick={() => onSelect(region.id)}
+              onClick={() => unlocked && onSelect(region.id)}
             >
-              <span>{String(region.id).padStart(2, "0")}</span>
+              <span>{unlocked ? String(region.id).padStart(2, "0") : "🔒"}</span>
             </button>
           );
         })}
-        {!regions.length && (
-          <div className="geo-empty">
-            <span>UNEXPLORED DELHI</span>
-            <h3>The city is still under mist.</h3>
-            <p>Restore your first archive to reveal its region here.</p>
-          </div>
-        )}
       </div>
       <div className="geo-caption" aria-live="polite">
         {detail ? (
@@ -338,12 +350,22 @@ export function GeographicMap({
               <h3>{detail.place}</h3>
               <p>{detail.target}</p>
             </div>
-            <button
-              className="primary-button"
-              onClick={() => onSelect(detail.id)}
-            >
-              {fullAccess ? "Inspect archive" : "Revisit archive"}
-            </button>
+            {detailOpen ? (
+              <button
+                className="primary-button"
+                onClick={() => onSelect(detail.id)}
+              >
+                {fullAccess
+                  ? "Inspect archive"
+                  : cleared.includes(detail.id)
+                    ? "Revisit archive"
+                    : "Open archive"}
+              </button>
+            ) : (
+              <span className="geo-locked-note">
+                🔒 Locked — restore the earlier ruins first
+              </span>
+            )}
           </>
         ) : (
           <p>

@@ -533,6 +533,53 @@ button:disabled {
   }
 }
 
+/* Floating XP change above the avatar (server solve / hint / reveal). */
+.xp-floats {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.xp-float {
+  font: 800 1.6rem/1 Impact, "Arial Narrow", sans-serif;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  animation: xp-rise 1.5s ease-out forwards;
+}
+
+.xp-float--gain {
+  color: var(--mint);
+}
+
+.xp-float--loss {
+  color: var(--red);
+}
+
+@keyframes xp-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.7);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1.1);
+  }
+  30% {
+    transform: translateY(-6px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) scale(1);
+  }
+}
+
 .result-scroll {
   max-height: 150px;
   overflow: auto;
@@ -1554,6 +1601,21 @@ button.admin-link {
 .geo-marker:focus-visible {
   outline: 3px solid #f3dfac;
   outline-offset: 3px;
+}
+.geo-marker--locked {
+  background: rgba(30, 38, 32, 0.7);
+  color: #8a938a;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.85;
+}
+.geo-marker--locked::before {
+  display: none;
+}
+.geo-locked-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: italic;
 }
 .geo-caption {
   display: flex;

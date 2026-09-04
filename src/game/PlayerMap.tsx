@@ -73,7 +73,7 @@ export function PlayerMap({
         <p className="pmap-lead">
           {fullAccess
             ? "All twenty regions are open for administrator inspection."
-            : `${clearedCount(cleared)} of 20 regions revealed. Only restored land appears; the rest of Delhi waits under mist.`}
+            : `${clearedCount(cleared)} of 20 regions restored. The whole city is drawn — greyed regions unlock as you clear the ones before them.`}
         </p>
         <GeographicMap
           cleared={cleared}

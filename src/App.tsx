@@ -45,6 +45,8 @@ type Status = {
   message: string;
 };
 const INTRO_SEEN_KEY = "dk_intro_seen_v1";
+// The editor opens empty apart from a nudge; students write the whole query.
+const BLANK_QUERY = "-- write your query here\n";
 
 export function App() {
   const [hash, setHash] = useState(() => window.location.hash);
@@ -167,7 +169,7 @@ function GameShell({
   const [revisitDraft, setRevisitDraft] = useState("");
   const sql = revisitQuestion
     ? revisitDraft
-    : (session.drafts[question.id] ?? question.starterSql);
+    : (session.drafts[question.id] ?? BLANK_QUERY);
   const [nearTerminal, setNearTerminal] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(true);
   const [result, setResult] = useState<TabularResult | null>(null);
@@ -179,8 +181,32 @@ function GameShell({
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [xpFloats, setXpFloats] = useState<{ id: number; delta: number }[]>([]);
   const operation = useRef(0);
   const busy = useRef(false);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const prevXp = useRef<number | null>(null);
+
+  // Put the cursor ready on the next line when a fresh archive opens.
+  useEffect(() => {
+    if (status.kind === "loading" || !terminalOpen) return;
+    const el = editorRef.current;
+    if (!el) return;
+    el.focus();
+    const end = el.value.length;
+    el.setSelectionRange(end, end);
+  }, [question.id, terminalOpen, revisitQuestion, status.kind]);
+
+  // Float the XP change above the avatar on solve / hint / reveal.
+  useEffect(() => {
+    if (xp === null) return;
+    const prev = prevXp.current;
+    prevXp.current = xp;
+    if (prev === null || prev === xp) return;
+    const delta = xp - prev;
+    const floatId = Date.now() + Math.random();
+    setXpFloats((current) => [...current, { id: floatId, delta }]);
+  }, [xp]);
 
   useEffect(() => {
     try {
@@ -317,7 +343,7 @@ function GameShell({
               });
           if (!alive.current) return;
           setRevisit({ ruin: id, variant: next.variant });
-          setRevisitDraft(practiceQuestion(id).starterSql);
+          setRevisitDraft(BLANK_QUERY);
         } catch (e) {
           setStatus({ kind: "error", message: getErrorMessage(e) });
           return;
@@ -449,6 +475,22 @@ function GameShell({
         onProximityChange={setNearTerminal}
         inputPaused={terminalOpen || showIntro || showMap || Boolean(community)}
       />
+      {xpFloats.length > 0 && (
+        <div className="xp-floats" aria-hidden="true">
+          {xpFloats.map((f) => (
+            <span
+              key={f.id}
+              className={`xp-float ${f.delta >= 0 ? "xp-float--gain" : "xp-float--loss"}`}
+              onAnimationEnd={() =>
+                setXpFloats((current) => current.filter((item) => item.id !== f.id))
+              }
+            >
+              {f.delta >= 0 ? "+" : "−"}
+              {Math.abs(f.delta)} XP
+            </span>
+          ))}
+        </div>
+      )}
       {showIntro && <IntroOverlay onClose={dismissIntro} />}
       {community && (
         <CommunityPanel
@@ -678,16 +720,18 @@ function GameShell({
             ))}
           </details>
           <label className="editor-label" htmlFor="sql-editor">
-            Query{" "}
-            <span className="draft-note">
-              {storageAvailable
-                ? "Saved on this device"
-                : "Storage unavailable · copy your query before leaving"}
-            </span>
+            Query
+            {!storageAvailable && (
+              <span className="draft-note">
+                {" "}
+                Storage unavailable · copy your query before leaving
+              </span>
+            )}
           </label>
           <textarea
             id="sql-editor"
             className="sql-editor"
+            ref={editorRef}
             value={sql}
             disabled={loading}
             spellCheck={false}

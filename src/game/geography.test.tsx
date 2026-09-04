@@ -1,37 +1,48 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { GeographicMap } from "./GeographicMap";
-import { LANDMARKS, REGIONS, visibleRegions } from "./geography";
+import { LANDMARKS, REGIONS } from "./geography";
 
 describe("geographic map visibility", () => {
-  it("keeps the current frontier and all uncleared regions off the player map", () => {
-    expect(visibleRegions([1, 2, 3]).map((region) => region.id)).toEqual([
-      1, 2, 3,
-    ]);
+  it("shows all regions with the frontier open and future regions locked", () => {
     const html = renderToStaticMarkup(
       <GeographicMap cleared={[1, 2, 3]} onSelect={() => {}} />,
     );
     expect(html).toContain("Purana Qila quarantine gate · Restored — revisit");
-    expect(html).not.toContain("Old Delhi records room");
-    expect(html).not.toContain("Signature Bridge");
-    expect(html.match(/class="geo-marker /g)).toHaveLength(3);
+    const markers = html.match(/<button class="geo-marker [^>]*>/g)!;
+    expect(markers).toHaveLength(20);
+    for (const [index, marker] of markers.entries()) {
+      const locked = index >= 4;
+      expect(marker.includes("geo-marker--locked")).toBe(locked);
+      expect(marker.includes('aria-disabled="true"')).toBe(locked);
+      if (locked) expect(marker).toMatch(/aria-label="[^"]+ · Locked"/);
+    }
+    expect(markers[3]).toContain("Old Delhi records room · Current archive");
+    expect(html).toContain("Open archive");
   });
-  it("starts entirely fogged, without a selectable future landmark", () => {
+  it("starts with ruin one open and all nineteen future regions visible but locked", () => {
     const html = renderToStaticMarkup(
       <GeographicMap cleared={[]} onSelect={() => {}} />,
     );
-    expect(html).toContain("The city is still under mist.");
-    expect(html).not.toContain('class="geo-marker');
-    expect(visibleRegions([])).toEqual([]);
+    const markers = html.match(/<button class="geo-marker [^>]*>/g)!;
+    expect(markers).toHaveLength(20);
+    expect(markers[0]).toContain("Purana Qila quarantine gate · Current archive");
+    expect(markers[0]).not.toContain("geo-marker--locked");
+    for (const marker of markers.slice(1)) {
+      expect(marker).toContain("geo-marker--locked");
+      expect(marker).toContain('aria-disabled="true"');
+      expect(marker).toMatch(/aria-label="[^"]+ · Locked"/);
+    }
+    expect(html).toContain("Open archive");
   });
   it("gives the admin atlas all twenty inspectable regions independent of player progress", () => {
-    expect(visibleRegions([], true)).toHaveLength(20);
     const html = renderToStaticMarkup(
       <GeographicMap cleared={[]} fullAccess onSelect={() => {}} />,
     );
     expect(html).toContain("Signature Bridge · Inspect");
     expect(html.match(/class="geo-marker /g)).toHaveLength(20);
     expect(html).not.toContain("Restored — revisit");
+    expect(html).not.toContain("geo-marker--locked");
   });
   it("creates valid bounded geographic parcels for every curriculum landmark", () => {
     expect(REGIONS.map((region) => region.id)).toEqual(
