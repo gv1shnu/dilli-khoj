@@ -30,6 +30,15 @@ export function App() {
   if (hash.startsWith("#admin") && WorldMap) {
     return <Suspense fallback={<p>Opening authoring map…</p>}><WorldMap /></Suspense>;
   }
+  if (import.meta.env.PROD && !supabase) {
+    return <main className="gate-backdrop" role="alert">
+      <div className="gate-card">
+        <h1>Dilli Khoj is unavailable</h1>
+        <p>Sign-in is not configured. Please contact the game organizer.</p>
+      </div>
+    </main>;
+  }
+
   return <GameShell />;
 }
 
@@ -59,9 +68,8 @@ function GameShell() {
   const operation = useRef(0);
   const busy = useRef(false);
 
-  // Google sign-in is required to play (only when auth is configured). In dev builds a
-  // bypass keeps local testing possible before Google/Supabase are wired up.
-  const requireAuth = Boolean(supabase);
+  // Production always requires sign-in; offline practice is development-only.
+  const requireAuth = import.meta.env.PROD || Boolean(supabase);
   const gated = !showIntro && requireAuth && !signedInName && !devBypass;
 
   useEffect(() => {

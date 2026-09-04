@@ -55,6 +55,7 @@
 ## Owner actions still open
 
 1. ~~Copy the Supabase publishable key into `.env.local`~~ — done.
+2. Export any browser-only Question Studio edits before changing laptops; see [setup](setup.md).
 3. Handoff reports Cloudflare live, Google OAuth/provider/redirects working, migrations applied and judge deployed. Do not recreate these resources; confirm current state before release.
 4. Confirm Before User Created hook enablement, disable unused Email/Anonymous providers, and complete the Google External production rollout when ready. The handoff reports External / Testing today.
 5. Authorize deployment of a reviewed current build when ready; the hosted site reportedly predates recent gameplay changes.

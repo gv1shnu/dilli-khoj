@@ -141,4 +141,4 @@ Official references:
 
 ## Repository access
 
-The development checkout is at `/Users/YOUR_NAME/Dev/treasure-hunt` with remote `https://github.com/gv1shnu/treasure-hunt.git`. Commits use the repository owner's configured Git identity. Never paste a personal access token into chat or store it in the repository.
+Clone into your own project folder using remote `https://github.com/gv1shnu/treasure-hunt.git`. Commits use the repository owner's configured Git identity. Never paste a personal access token into chat or store it in the repository.

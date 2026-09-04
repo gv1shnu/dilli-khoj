@@ -67,8 +67,22 @@ export default {
     }
 
     const player = context.userClaims;
-    if (!player?.id || !isApprovedIdentity(player.email, player.appMetadata)) {
+    if (!player?.id || player.appMetadata?.provider !== "google") {
       return Response.json({ message: "Use an approved university Google account." }, { status: 403 });
+    }
+
+    // JWT authentication runs in withSupabase first. Authorization uses current
+    // verified Auth records and the same private policy as the signup hook.
+    const { executor, progress } = getConnections();
+    try {
+      const rows = await progress<{ approved: boolean }[]>`
+        select game_private.is_approved_player(${player.id}::uuid) as approved
+      `;
+      if (rows[0]?.approved !== true) {
+        return Response.json({ message: "Use a verified approved university Google account." }, { status: 403 });
+      }
+    } catch {
+      return Response.json({ message: "Account access could not be verified. Try again." }, { status: 503 });
     }
 
     let body: SubmissionBody;
@@ -79,7 +93,6 @@ export default {
     }
 
     const startedAt = performance.now();
-    const { executor, progress } = getConnections();
 
     let preparation: Preparation;
     try {
@@ -294,15 +307,6 @@ function validateBody(value: unknown): SubmissionBody {
     dataset_version: body.dataset_version,
     sql: body.sql,
   };
-}
-
-function isApprovedIdentity(
-  email: string | undefined,
-  appMetadata: Record<string, unknown> | undefined,
-): boolean {
-  if (!email || appMetadata?.provider !== "google") return false;
-  const domain = email.toLowerCase().split("@").at(-1);
-  return domain === "example.edu" || domain === "students.example.edu";
 }
 
 function requiredEnvironment(name: string): string {

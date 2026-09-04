@@ -2,7 +2,7 @@
 
 ## Two execution paths
 
-Implementation status: all 20 local practice paths exist; only Ruin 06 has server grading. The latest maintainer handoff reports that judge deployed with roles, secrets and migrations configured. Local code inspection found a signup/judge domain-policy mismatch and browser-local preview unlocks; these are not a completed production authorization/progression system. See [implementation status](implementation-status.md) and [next steps](next-steps.md).
+Implementation status: all 20 local practice paths exist; only Ruin 06 has server grading. The latest maintainer handoff reports that judge deployed with roles, secrets and migrations configured. The local signup/judge policy mismatch is fixed by an unapplied migration and judge update; the live mismatch and browser-local preview unlocks remain. This is not a completed production authorization/progression system. See [implementation status](implementation-status.md) and [next steps](next-steps.md).
 
 ### Run
 
@@ -34,7 +34,7 @@ Implementation status: all 20 local practice paths exist; only Ruin 06 has serve
 ## Judge sequence
 
 1. Verify the Supabase user JWT.
-2. Verify the Google provider, approved email domain and current district.
+2. Verify the Google JWT provider and call `game_private.is_approved_player` using the authenticated subject. It checks the current confirmed, non-anonymous Google Auth record against the same domain/admin policy as signup. District/prerequisite enforcement remains a progression task.
 3. Enforce payload size, one in-flight submission per player and a short per-player cooldown.
 4. Parse one `SELECT` or `WITH ... SELECT`; reject multiple statements, schema-qualified relations and unsafe functions.
 5. Acquire a pooled connection as the restricted executor role.
@@ -46,7 +46,7 @@ Implementation status: all 20 local practice paths exist; only Ruin 06 has serve
 
 Current implementation details:
 
-- `@supabase/server` verifies user JWTs and exposes claims to the Edge Function.
+- `@supabase/server` verifies user JWTs and exposes claims to the Edge Function. Authorization then reads current server Auth records through a fixed boolean function; no client-supplied email, user metadata or bundled allowlist grants access. The new migration must precede judge rollout; authorization lookup errors fail closed with 503.
 - `libpg-query` uses PostgreSQL 17's native parser compiled to WebAssembly; this avoids a partial SQL grammar.
 - The AST rejects non-`SelectStmt` nodes even when hidden inside a CTE, unknown relations, schema-qualified relations, row locks and functions outside the course allowlist.
 - The database role, read-only transaction and grants remain the hard security boundary; the AST is defence in depth and friendly validation.

@@ -4,6 +4,10 @@ Dilli Khoj uses open-source assets. Every third-party asset that ships in the ga
 is listed here with its source and license. Add an entry here whenever you import a
 new asset, and keep any license text the asset requires.
 
+## Art inspiration
+
+Art direction inspiration from [Exceletia by edusatyaki](https://github.com/edusatyaki/Exceletia). This credit does not replace the individual licenses for assets listed below.
+
 ## Engine & libraries
 
 - **three.js** — 3D engine. MIT License. © mrdoob and three.js contributors.
