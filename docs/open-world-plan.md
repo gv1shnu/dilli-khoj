@@ -25,3 +25,38 @@ Canonical solutions and private hints remain outside production assets.
 The Soldier faces -Z; retain its PI orientation correction and guide correction.
 Retain seamless toroidal wrapping; do not add a world-radius clamp.
 No production deployment or live database migrations in this work.
+
+## Implemented
+
+All 20 places have separate level commits. Each has its own authored structures,
+archive coordinates, soundscape and field note. The normal player flow uses physical
+proximity and map travel; the archive dropdown has been removed. Restoring an archive
+opens the next physical area and gate, lights the place and reveals new growth.
+Server state remains the only source of signed-in progression.
+
+The renderer merges static meshes by material, hides distant detailed groups, uses
+cheap outer-tile silhouettes, and cuts away nearby roofs. Player height follows the
+same surfaces used by routing tests. Water needs a supporting walkway. Position is
+saved per player, validated on reload, and cannot restore into a locked area.
+
+## Review locally
+
+- `pnpm dev`, then open `http://localhost:5173` for ordinary play.
+- `http://localhost:5173/#world-studio` is a development-only review tool. Choose
+  any of the 20 areas, preview restoration, or use “Walk route to archive” to
+  exercise actual movement and collision. This tool is removed from production.
+- `pnpm typecheck && pnpm test && pnpm build && pnpm test:assets`.
+- `pnpm test:browser` checks all 20 practice archives using fixture positions;
+  `pnpm test:browser:auth` mocks Supabase to check signed-in boundaries. Both need
+  Chrome and a running development server.
+
+## Content and release
+
+Main and revisit descriptions now use plain language with no SQL syntax prompts.
+Expected answers, data fixtures and grading semantics are unchanged. Content is
+regenerated through the existing pipeline. `scripts/generate-question-copy.mjs`
+generates a forward-only text migration for previously initialized databases.
+The migration is prepared locally, not applied to the live project.
+
+Production release requires review of this branch and the usual owner-authorized
+migration dry run. No main-branch push or production deployment is part of this work.

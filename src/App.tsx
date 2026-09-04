@@ -26,7 +26,12 @@ import {
   parsePracticeSession,
   practiceStorageKey,
 } from "./game/practice-session";
-import { allCleared, clampToUnlocked, currentRuinId, isUnlocked } from "./game/progression";
+import {
+  allCleared,
+  clampToUnlocked,
+  currentRuinId,
+  isUnlocked,
+} from "./game/progression";
 import { submitToJudge } from "./lib/judge";
 import { supabase } from "./lib/supabase";
 import { practiceQuestion } from "./questions/practice";
@@ -38,6 +43,11 @@ const WorldMap = import.meta.env.DEV
       import("./admin/WorldMap").then((module) => ({
         default: module.WorldMap,
       })),
+    )
+  : null;
+const WorldStudio = import.meta.env.DEV
+  ? lazy(() =>
+      import("./admin/WorldStudio").then((m) => ({ default: m.WorldStudio })),
     )
   : null;
 type Status = {
@@ -55,6 +65,12 @@ export function App() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+  if (hash.startsWith("#world-studio") && WorldStudio)
+    return (
+      <Suspense fallback={<p>Opening city studio…</p>}>
+        <WorldStudio />
+      </Suspense>
+    );
   if (hash.startsWith("#admin") && WorldMap) {
     return (
       <Suspense fallback={<p>Opening authoring map…</p>}>
@@ -174,8 +190,14 @@ function GameShell({
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [nearArchive, setNearArchive] = useState<number | null>(null);
   const [locationId, setLocationId] = useState(1);
-  const [travel, setTravel] = useState<{id:number;nonce:number}|null>(null);
-  const [discovery, setDiscovery] = useState<{id:number;title:string;text:string}|null>(null);
+  const [travel, setTravel] = useState<{ id: number; nonce: number } | null>(
+    null,
+  );
+  const [discovery, setDiscovery] = useState<{
+    id: number;
+    title: string;
+    text: string;
+  } | null>(null);
   const openNearby = useRef<() => void>(() => {});
   const [result, setResult] = useState<TabularResult | null>(null);
   const [status, setStatus] = useState<Status>({
@@ -320,10 +342,16 @@ function GameShell({
       const target = event.target;
       if (
         target instanceof HTMLElement &&
-        target.closest("textarea,input,select,button,[contenteditable=true]")
+        target.closest("textarea,input,select,[contenteditable=true]")
       )
         return;
-      if (event.code === "KeyE" && nearTerminal && !showIntro && !showMap && !community)
+      if (
+        event.code === "KeyE" &&
+        nearTerminal &&
+        !showIntro &&
+        !showMap &&
+        !community
+      )
         openNearby.current();
       if (event.code === "Escape") setTerminalOpen(false);
     };
@@ -361,7 +389,9 @@ function GameShell({
     }
   };
 
-  openNearby.current = () => { if (nearArchive !== null) void selectArchive(nearArchive); };
+  openNearby.current = () => {
+    if (nearArchive !== null) void selectArchive(nearArchive);
+  };
 
   const handleRun = async () => {
     if (busy.current) return;
@@ -495,7 +525,9 @@ function GameShell({
               key={f.id}
               className={`xp-float ${f.delta >= 0 ? "xp-float--gain" : "xp-float--loss"}`}
               onAnimationEnd={() =>
-                setXpFloats((current) => current.filter((item) => item.id !== f.id))
+                setXpFloats((current) =>
+                  current.filter((item) => item.id !== f.id),
+                )
               }
             >
               {f.delta >= 0 ? "+" : "−"}
@@ -531,7 +563,12 @@ function GameShell({
       )}
       <header className="topbar">
         <div className="brand-lockup">
-          <img className="brand-mark" src="/favicon.svg" alt="" aria-hidden="true" />
+          <img
+            className="brand-mark"
+            src="/favicon.svg"
+            alt=""
+            aria-hidden="true"
+          />
           <div>
             <p className="eyebrow">
               DELHI // AREA {String(locationId).padStart(2, "0")}
@@ -585,8 +622,8 @@ function GameShell({
         </p>
         <h2>{topic.place}</h2>
         <p>
-          Follow the amber trail to this archive. Restore it to open the next area.
-          Restored places are available for travel on your map.
+          Follow the amber trail to this archive. Restore it to open the next
+          area. Restored places are available for travel on your map.
         </p>
         <div className="mission-progress">
           <span>Ruins restored</span>
@@ -595,7 +632,7 @@ function GameShell({
         <div className="mission-actions">
           <button
             className="ghost-button archive-open"
-            disabled={!nearTerminal}
+            disabled={!nearTerminal || loading}
             onClick={() => openNearby.current()}
           >
             Open archive
@@ -608,11 +645,26 @@ function GameShell({
           </button>
         </div>
       </aside>
-      {!terminalOpen && <div className="world-location" aria-live="polite"><span>YOU ARE EXPLORING</span><strong>{ruinById(locationId)?.place}</strong><small>WASD · walk &nbsp; Shift · run &nbsp; Drag · look &nbsp; M · sound</small></div>}
-      {discovery && !terminalOpen && <aside className="world-discovery"><span>FIELD NOTE / {String(discovery.id).padStart(2,'0')}</span><h3>{discovery.title}</h3><p>{discovery.text}</p></aside>}
+      {!terminalOpen && (
+        <div className="world-location" aria-live="polite">
+          <span>YOU ARE EXPLORING</span>
+          <strong>{ruinById(locationId)?.place}</strong>
+          <small>
+            WASD · walk &nbsp; Shift · run &nbsp; Drag · look &nbsp; M · sound
+          </small>
+        </div>
+      )}
+      {discovery && !terminalOpen && (
+        <aside className="world-discovery">
+          <span>FIELD NOTE / {String(discovery.id).padStart(2, "0")}</span>
+          <h3>{discovery.title}</h3>
+          <p>{discovery.text}</p>
+        </aside>
+      )}
       {nearTerminal && !terminalOpen && (
         <button
           className="interact-prompt"
+          disabled={loading}
           onClick={() => openNearby.current()}
         >
           <kbd>E</kbd> Open archive {String(nearArchive).padStart(2, "0")}
@@ -672,7 +724,9 @@ function GameShell({
                     {column.note ? ` · ${column.note}` : ""}
                   </code>
                 ))}
-                <span className="schema-sample-label">Sample rows · illustrative</span>
+                <span className="schema-sample-label">
+                  Sample rows · illustrative
+                </span>
                 <div className="schema-sample-scroll">
                   <table className="schema-sample">
                     <thead>
@@ -686,7 +740,9 @@ function GameShell({
                       {table.sampleRows.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                           {table.columns.map((column, colIndex) => (
-                            <td key={column.name}>{formatCell(row[colIndex])}</td>
+                            <td key={column.name}>
+                              {formatCell(row[colIndex])}
+                            </td>
                           ))}
                         </tr>
                       ))}

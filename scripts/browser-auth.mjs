@@ -2,6 +2,8 @@
 import assert from "node:assert/strict";
 import { chromium } from "@playwright/test";
 import { loadEnv } from "vite";
+import { loadBrowserWorld, openNearbyArchive } from "./browser-world.mjs";
+const world = await loadBrowserWorld();
 const config = loadEnv("development", process.cwd(), "VITE_");
 const project = new URL(config.VITE_SUPABASE_URL).hostname.split(".")[0];
 const storageKey = `sb-${project}-auth-token`;
@@ -146,8 +148,10 @@ try {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.addInitScript(
-    ({ key, auth }) => {
+    ({ key, auth, positions }) => {
       localStorage.setItem("dk_intro_seen_v1", "1");
+      for (const [positionKey, position] of positions)
+        localStorage.setItem(positionKey, JSON.stringify(position));
       if (!localStorage.getItem("test-user-seeded")) {
         localStorage.setItem(key, JSON.stringify(auth));
         localStorage.setItem("test-user-seeded", "1");
@@ -162,22 +166,30 @@ try {
         );
       }
     },
-    { key: storageKey, auth: session(alice) },
+    {
+      key: storageKey,
+      auth: session(alice),
+      positions: [alice, bob].map((id) => [
+        `${world.practiceStorageKey(id)}:position`,
+        world.positions[1],
+      ]),
+    },
   );
   await page.goto("http://localhost:5173");
   const run = page.getByRole("button", { name: "Run", exact: true });
   const editor = page.locator("#sql-editor");
+  await openNearbyArchive(page);
   await run.waitFor();
   await page.waitForFunction(
     () => !document.querySelector("#sql-editor")?.disabled,
   );
   await page.getByText("105 XP", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "World map", exact: true }).click();
   assert.equal(
-    await page
-      .getByRole("button", { name: "Next archive", exact: true })
-      .isDisabled(),
+    await page.getByRole("button", { name: /Kashmere Gate/ }).isDisabled(),
     true,
   );
+  await page.getByRole("button", { name: "Close map", exact: true }).click();
   await editor.fill(
     "SELECT attribute,data_type FROM catalog_columns WHERE entity='resident' ORDER BY attribute",
   );
@@ -186,12 +198,12 @@ try {
     .getByRole("status")
     .filter({ hasText: "Visible case passed!" })
     .waitFor();
+  await page.getByRole("button", { name: "World map", exact: true }).click();
   assert.equal(
-    await page
-      .getByRole("button", { name: "Next archive", exact: true })
-      .isDisabled(),
+    await page.getByRole("button", { name: /Kashmere Gate/ }).isDisabled(),
     true,
   );
+  await page.getByRole("button", { name: "Close map", exact: true }).click();
   assert.match(await page.locator(".mission-progress").innerText(), /0 \/ 20/);
   await page
     .getByRole("button", { name: "Hint 1 · 10 XP", exact: true })
@@ -212,10 +224,8 @@ try {
     .waitFor();
   assert.match(await page.locator(".mission-progress").innerText(), /1 \/ 20/);
   assert.equal(
-    await page
-      .getByRole("button", { name: "Next archive", exact: true })
-      .isEnabled(),
-    true,
+    await page.getByRole("combobox", { name: "Choose archive" }).count(),
+    0,
   );
   await page.setViewportSize({ width: 700, height: 900 });
   await page.getByRole("button", { name: "World map", exact: true }).click();
@@ -223,10 +233,10 @@ try {
     name: "Your world map",
     exact: true,
   });
-  assert.equal(await atlas.locator(".geo-marker").count(), 1);
+  assert.equal(await atlas.locator(".city-map-buttons button").count(), 20);
   assert.equal(
-    await atlas.getByRole("button", { name: /Kashmere Gate/ }).count(),
-    0,
+    await atlas.getByRole("button", { name: /Kashmere Gate/ }).isEnabled(),
+    true,
   );
   await page.getByRole("button", { name: "Close map", exact: true }).click();
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -244,6 +254,7 @@ try {
     { key: storageKey, auth: session(bob) },
   );
   await page.reload();
+  await openNearbyArchive(page);
   await run.waitFor();
   await page.waitForFunction(
     () => !document.querySelector("#sql-editor")?.disabled,
@@ -296,7 +307,7 @@ try {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "Authenticated UI contracts passed: server-only unlocks, paid help, leaderboard, account-switch isolation, cleared-only player maps, compact map access, full admin maps and revocation. Supabase network fully mocked.",
+    "Authenticated UI contracts passed: server-only unlocks, paid help, leaderboard, account-switch isolation, sequential city maps, compact map access, full admin maps and revocation. Supabase network fully mocked.",
   );
 } finally {
   await browser.close();

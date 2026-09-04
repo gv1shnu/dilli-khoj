@@ -1,5 +1,5 @@
-import type { LevelKit } from './kit';
-import type { Point } from './layout';
+import type { LevelKit } from "./kit";
+import type { Point } from "./layout";
 export interface Soundscape {
   name: string;
   wind: number;
@@ -7,7 +7,7 @@ export interface Soundscape {
   hum: number;
   birds: number;
   tone: number;
-  detail: 'bell'|'metal'|'drip'|'insects'|'wood'|'rail';
+  detail: "bell" | "metal" | "drip" | "insects" | "wood" | "rail";
 }
 export interface LevelDefinition {
   id: number;

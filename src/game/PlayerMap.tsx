@@ -78,14 +78,25 @@ export function PlayerMap({
             ? "All twenty regions are open for administrator inspection."
             : `${clearedCount(cleared)} of 20 regions restored. Travel between restored places. Sealed areas open in archive order.`}
         </p>
-        {fullAccess ? <GeographicMap
-          cleared={cleared}
-          fullAccess={fullAccess}
-          onSelect={(id) => {
-            onSelect(id);
-            onClose();
-          }}
-        /> : <WorldAtlas cleared={cleared} currentLocation={currentLocation} onSelect={(id) => { onSelect(id); onClose(); }} />}
+        {fullAccess ? (
+          <GeographicMap
+            cleared={cleared}
+            fullAccess={fullAccess}
+            onSelect={(id) => {
+              onSelect(id);
+              onClose();
+            }}
+          />
+        ) : (
+          <WorldAtlas
+            cleared={cleared}
+            currentLocation={currentLocation}
+            onSelect={(id) => {
+              onSelect(id);
+              onClose();
+            }}
+          />
+        )}
       </div>
     </div>
   );

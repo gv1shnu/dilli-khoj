@@ -43,6 +43,8 @@ for (const marker of [
   "fixture_r01_v20260904_1_hidden",
   "question_help",
   "Continue for local development",
+  "WORLD LAYOUT STUDIO",
+  "Walk route to archive",
 ]) {
   assert.ok(
     !source.includes(marker),

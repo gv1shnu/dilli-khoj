@@ -16,27 +16,63 @@ interface RuinSceneProps {
   onProximityChange: (nearTerminal: boolean) => void;
   inputPaused?: boolean;
   cleared?: readonly number[];
+  initialLocation?: number;
+  autoWalk?: boolean;
+  onFrameStats?: (stats: {
+    fps: number;
+    calls: number;
+    triangles: number;
+  }) => void;
   storageKey?: string;
   travel?: { id: number; nonce: number } | null;
   onArchiveNear?: (id: number | null) => void;
   onLocationChange?: (id: number) => void;
-  onDiscovery?: (value: { id: number; title: string; text: string } | null) => void;
+  onDiscovery?: (
+    value: { id: number; title: string; text: string } | null,
+  ) => void;
 }
 
 const EMPTY_PROGRESS: readonly number[] = [];
 const WALK_SPEED = 4.2;
 const RUN_SPEED = 8.4;
 
-export function RuinScene({ onProximityChange, inputPaused = false, cleared = EMPTY_PROGRESS, storageKey, travel, onArchiveNear, onLocationChange, onDiscovery }: RuinSceneProps) {
+export function RuinScene({
+  onProximityChange,
+  inputPaused = false,
+  cleared = EMPTY_PROGRESS,
+  storageKey,
+  travel,
+  onArchiveNear,
+  onLocationChange,
+  onDiscovery,
+  initialLocation,
+  onFrameStats,
+  autoWalk = false,
+}: RuinSceneProps) {
+  const autoWalkRef = useRef(autoWalk);
+  autoWalkRef.current = autoWalk;
   const progressRef = useRef(cleared);
   const travelRef = useRef(travel);
-  const events = useRef({ onArchiveNear, onLocationChange, onDiscovery });
-  progressRef.current = cleared; travelRef.current = travel;
-  events.current = { onArchiveNear, onLocationChange, onDiscovery };
+  const events = useRef({
+    onArchiveNear,
+    onLocationChange,
+    onDiscovery,
+    onFrameStats,
+  });
+  progressRef.current = cleared;
+  travelRef.current = travel;
+  events.current = {
+    onArchiveNear,
+    onLocationChange,
+    onDiscovery,
+    onFrameStats,
+  };
   const hostRef = useRef<HTMLDivElement>(null);
   const proximityCallback = useRef(onProximityChange);
   const paused = useRef(inputPaused);
-  useEffect(() => { paused.current = inputPaused; }, [inputPaused]);
+  useEffect(() => {
+    paused.current = inputPaused;
+  }, [inputPaused]);
 
   useEffect(() => {
     proximityCallback.current = onProximityChange;
@@ -47,8 +83,12 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
     if (!host) return;
 
     // ---- Renderer -----------------------------------------------------------
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: "high-performance",
+    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.info.autoReset = false;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -117,16 +157,52 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
     // The Soldier model's front is its -Z axis, so faced-direction yaw is offset by PI.
     const MODEL_YAW_OFFSET = Math.PI;
     const character = createCharacter();
-    character.object.position.copy(world.position(currentRuinId(progressRef.current), "spawn"));
+    character.object.position.copy(
+      world.position(
+        initialLocation ?? currentRuinId(progressRef.current),
+        "spawn",
+      ),
+    );
     try {
-      const saved = JSON.parse(localStorage.getItem(`${storageKey}:position`) ?? "null");
-      if (storageKey && Array.isArray(saved) && saved.length === 3 && saved.every((n: unknown) => typeof n === "number" && Number.isFinite(n)) && Math.abs(saved[0]) < world.tile / 2 && Math.abs(saved[2]) < world.tile / 2 && !world.blocked(saved[0], saved[2])) {
-        character.object.position.set(saved[0], world.height(saved[0], saved[2]), saved[2]);
+      const saved = JSON.parse(
+        localStorage.getItem(`${storageKey}:position`) ?? "null",
+      );
+      if (
+        storageKey &&
+        Array.isArray(saved) &&
+        saved.length === 3 &&
+        saved.every(
+          (n: unknown) => typeof n === "number" && Number.isFinite(n),
+        ) &&
+        Math.abs(saved[0]) < world.tile / 2 &&
+        Math.abs(saved[2]) < world.tile / 2 &&
+        !world.blocked(saved[0], saved[2])
+      ) {
+        character.object.position.set(
+          saved[0],
+          world.height(saved[0], saved[2]),
+          saved[2],
+        );
       }
-    } catch { /* Position persistence is optional. */ }
-    controls.target.copy(character.object.position).add(new THREE.Vector3(0, 1.4, 0));
-    camera.position.copy(character.object.position).add(new THREE.Vector3(0, 9, 16));
-    character.object.rotation.y = 0; // face into the scene (-Z), toward the archive
+    } catch {
+      /* Position persistence is optional. */
+    }
+    controls.target
+      .copy(character.object.position)
+      .add(new THREE.Vector3(0, 1.4, 0));
+    const arrival = world
+      .position(
+        initialLocation ?? currentRuinId(progressRef.current),
+        "archive",
+      )
+      .sub(character.object.position);
+    arrival.y = 0;
+    arrival.normalize();
+    camera.position
+      .copy(character.object.position)
+      .add(new THREE.Vector3(-arrival.x * 16, 10, -arrival.z * 16));
+    character.object.rotation.y =
+      Math.atan2(arrival.x, arrival.z) + MODEL_YAW_OFFSET;
     scene.add(character.object);
 
     // Warm lantern the character carries.
@@ -150,6 +226,8 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
     let lastDiscovery: number | null = null;
     let lastSave = 0;
     let lastStep = 0;
+    let statsAt = 0,
+      statsFrames = 0;
     const guide = createGuideArrows();
     scene.add(guide.group);
 
@@ -164,7 +242,8 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
     const ambience = createAmbience();
     const keys = new Set<string>();
     const isTyping = (target: EventTarget | null) =>
-      target instanceof HTMLElement && !!target.closest("textarea,input,select,button,[contenteditable=true]");
+      target instanceof HTMLElement &&
+      !!target.closest("textarea,input,select,[contenteditable=true]");
     const onKeyDown = (event: KeyboardEvent) => {
       if (paused.current || isTyping(event.target)) return;
       if (event.code.startsWith("Arrow")) event.preventDefault();
@@ -210,13 +289,21 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
     const animate = () => {
       const delta = Math.min(clock.getDelta(), 0.05);
       const elapsed = clock.elapsedTime;
-      if (lastProgress !== progressRef.current) { world.setProgress(progressRef.current); lastProgress = progressRef.current; routeAt = -10; }
+      if (lastProgress !== progressRef.current) {
+        world.setProgress(progressRef.current);
+        lastProgress = progressRef.current;
+        routeAt = -10;
+      }
       if (lastTravel !== travelRef.current) {
         lastTravel = travelRef.current;
         if (lastTravel && progressRef.current.includes(lastTravel.id)) {
-          const dest = world.position(lastTravel.id, 'spawn');
+          const dest = world.position(lastTravel.id, "spawn");
           const shift = dest.clone().sub(character.object.position);
-          character.object.position.copy(dest); camera.position.add(shift); controls.target.add(shift); prevTarget.add(shift); routeAt = -10;
+          character.object.position.copy(dest);
+          camera.position.add(shift);
+          controls.target.add(shift);
+          prevTarget.add(shift);
+          routeAt = -10;
         }
       }
       if (paused.current) keys.clear();
@@ -236,7 +323,18 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
       if (keys.has("KeyD") || keys.has("ArrowRight")) move.add(right);
       if (keys.has("KeyA") || keys.has("ArrowLeft")) move.sub(right);
 
-      const running = keys.has("ShiftLeft") || keys.has("ShiftRight");
+      const auto =
+        import.meta.env.DEV &&
+        autoWalkRef.current &&
+        !paused.current &&
+        !world.nearArchive(character.object.position);
+      if (auto && route[0])
+        move.set(
+          route[0][0] - character.object.position.x,
+          0,
+          route[0][1] - character.object.position.z,
+        );
+      const running = keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
       let speed01 = 0;
       if (move.lengthSq() > 0) {
         move.normalize();
@@ -246,8 +344,13 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
         let nx = pos.x + move.x * speed * delta;
         let nz = pos.z + move.z * speed * delta;
         // Axis-separated sliding collision.
-        if (blocked(nx, pos.z) || world.height(nx, pos.z) - pos.y > .7) nx = pos.x;
-        if (blocked(nx, nz) || world.height(nx, nz) - pos.y > .7) nz = pos.z;
+        if (
+          blocked(nx, pos.z) ||
+          Math.abs(world.height(nx, pos.z) - pos.y) > 0.7
+        )
+          nx = pos.x;
+        if (blocked(nx, nz) || Math.abs(world.height(nx, nz) - pos.y) > 0.7)
+          nz = pos.z;
         nextPos.set(nx, world.height(nx, nz), nz);
         pos.copy(nextPos);
 
@@ -279,29 +382,68 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
       world.update(elapsed, position);
       sky.position.copy(position);
       const location = levelAt(position.x, position.z);
-      if (location && location !== lastLocation && isUnlocked(location, progressRef.current)) {
+      if (
+        location &&
+        location !== lastLocation &&
+        isUnlocked(location, progressRef.current)
+      ) {
         lastLocation = location;
         ambience.setProfile(world.definition(location).sound);
         events.current.onLocationChange?.(location);
       }
       const archiveId = world.nearArchive(position);
       const near = archiveId !== null;
-      if (near !== wasNear) { wasNear = near; proximityCallback.current(near); }
-      if (archiveId !== lastArchive) { lastArchive = archiveId; events.current.onArchiveNear?.(archiveId); }
+      if (near !== wasNear) {
+        wasNear = near;
+        proximityCallback.current(near);
+      }
+      if (archiveId !== lastArchive) {
+        lastArchive = archiveId;
+        events.current.onArchiveNear?.(archiveId);
+      }
       const discovery = world.discovery(position);
-      if ((discovery?.id ?? null) !== lastDiscovery) { lastDiscovery = discovery?.id ?? null; events.current.onDiscovery?.(discovery); }
+      if ((discovery?.id ?? null) !== lastDiscovery) {
+        lastDiscovery = discovery?.id ?? null;
+        events.current.onDiscovery?.(discovery);
+      }
       if (!paused.current && elapsed - routeAt > 2) {
         const target = world.target();
-        route = findRoute([position.x, position.z], [target.x, target.z], blocked);
+        route = findRoute(
+          [position.x, position.z],
+          [target.x, target.z],
+          blocked,
+          3,
+          world.canWalk,
+        );
         routeAt = elapsed;
       }
-      while (route.length > 1 && Math.hypot(position.x - route[0][0], position.z - route[0][1]) < 4) route.shift();
+      while (
+        route.length > 1 &&
+        Math.hypot(position.x - route[0][0], position.z - route[0][1]) < 0.9
+      )
+        route.shift();
       const waypoint = route[0];
-      const target = waypoint ? new THREE.Vector3(waypoint[0], world.height(...waypoint), waypoint[1]) : world.target();
+      const target = waypoint
+        ? new THREE.Vector3(waypoint[0], world.height(...waypoint), waypoint[1])
+        : world.target();
       guide.update(position, target, elapsed, near || !waypoint);
-      if (!paused.current && speed01 > 0 && elapsed - lastStep > (running ? .28 : .45)) { ambience.footstep(true); lastStep = elapsed; }
+      if (
+        !paused.current &&
+        speed01 > 0 &&
+        elapsed - lastStep > (running ? 0.28 : 0.45)
+      ) {
+        ambience.footstep(true);
+        lastStep = elapsed;
+      }
       if (storageKey && elapsed - lastSave > 2) {
-        try { localStorage.setItem(`${storageKey}:position`, JSON.stringify(position.toArray())); } catch { /* Storage is optional. */ }
+        try {
+          localStorage.setItem(
+            `${storageKey}:position`,
+            JSON.stringify(position.toArray()),
+          );
+        } catch {
+          /* Storage is optional. */
+        }
         lastSave = elapsed;
       }
 
@@ -325,7 +467,18 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
       prevTarget.copy(controls.target);
       controls.update();
 
+      renderer.info.reset();
       composer.render();
+      statsFrames++;
+      if (elapsed - statsAt >= 2) {
+        events.current.onFrameStats?.({
+          fps: Math.round(statsFrames / (elapsed - statsAt)),
+          calls: renderer.info.render.calls,
+          triangles: renderer.info.render.triangles,
+        });
+        statsFrames = 0;
+        statsAt = elapsed;
+      }
       frame = requestAnimationFrame(animate);
     };
     animate();
@@ -349,12 +502,20 @@ export function RuinScene({ onProximityChange, inputPaused = false, cleared = EM
       scene.traverse((object) => {
         if (object instanceof THREE.Mesh) {
           object.geometry.dispose();
-          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
           materials.forEach((material) => material.dispose());
         }
       });
     };
   }, []);
 
-  return <div ref={hostRef} className="ruin-scene" aria-label="Explorable Delhi city with twenty archive locations" />;
+  return (
+    <div
+      ref={hostRef}
+      className="ruin-scene"
+      aria-label="Explorable Delhi city with twenty archive locations"
+    />
+  );
 }
