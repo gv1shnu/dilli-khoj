@@ -680,6 +680,237 @@ button:disabled {
   }
 }
 
+/* ---- Sign-in gate ------------------------------------------------------- */
+
+.gate-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(900px 600px at 50% 25%, rgba(20, 14, 6, 0.8), rgba(4, 6, 5, 0.94));
+  backdrop-filter: blur(8px);
+}
+
+.gate-card {
+  width: min(460px, 100%);
+  padding: 30px clamp(20px, 4vw, 36px) 28px;
+  border: 1px solid rgba(244, 173, 69, 0.3);
+  border-top: 3px solid var(--amber);
+  border-radius: 4px;
+  background: rgba(15, 18, 16, 0.98);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.gate-title {
+  margin-top: 4px;
+  font-size: 1.5rem;
+}
+
+.gate-lead {
+  margin: 12px 0 14px;
+  color: #d8d3c7;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.gate-points {
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.gate-points li {
+  position: relative;
+  margin-bottom: 7px;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.gate-points li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--amber);
+}
+
+.gate-error {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 120, 105, 0.5);
+  border-radius: 2px;
+  color: var(--red);
+  background: rgba(255, 120, 105, 0.08);
+  font-size: 0.78rem;
+}
+
+.gate-button {
+  width: 100%;
+  min-height: 46px;
+  font-size: 0.9rem;
+}
+
+.gate-dev {
+  margin-top: 12px;
+  width: 100%;
+  min-height: 34px;
+  opacity: 0.7;
+}
+
+/* ---- Player world map --------------------------------------------------- */
+
+.mission-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.mission-actions .archive-open {
+  flex: 1;
+  margin-top: 0;
+}
+
+.pmap-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(1100px 700px at 50% 15%, rgba(20, 14, 6, 0.7), rgba(4, 6, 5, 0.92));
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+}
+
+.pmap-card {
+  position: relative;
+  width: min(920px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 26px clamp(18px, 3.5vw, 34px) 30px;
+  border: 1px solid rgba(244, 173, 69, 0.28);
+  border-top: 3px solid var(--amber);
+  border-radius: 4px;
+  background: rgba(14, 18, 16, 0.98);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+}
+
+.pmap-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.pmap-title {
+  margin-top: 4px;
+  font-size: 1.5rem;
+}
+
+.pmap-lead {
+  margin: 10px 0 18px;
+  max-width: 68ch;
+  color: #cfcabd;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.pmap-districts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pmap-district-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pmap-district-name {
+  color: var(--amber);
+  font: 600 0.74rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+}
+
+.pmap-colnote {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.pmap-ruins {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.pmap-ruin {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.02);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+
+.pmap-ruin:not(:disabled):hover {
+  border-color: rgba(244, 238, 223, 0.5);
+  transform: translateY(-1px);
+}
+
+.pmap-ruin:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.pmap-ruin-id {
+  font: 700 0.9rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.pmap-ruin-place {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.pmap-ruin-state {
+  color: var(--muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pmap-ruin--cleared {
+  border-left: 3px solid var(--mint);
+}
+
+.pmap-ruin--cleared .pmap-ruin-id {
+  color: var(--mint);
+}
+
+.pmap-ruin--current {
+  border-left: 3px solid var(--amber);
+  background: rgba(244, 173, 69, 0.06);
+}
+
+.pmap-ruin--current .pmap-ruin-id {
+  color: var(--amber);
+}
+
 /* ---- Admin world map ---------------------------------------------------- */
 
 .admin-entry {
