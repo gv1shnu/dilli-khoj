@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Dilli Khoj explorer helm">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d2531"/>
+      <stop offset="1" stop-color="#0b0e0c"/>
+    </linearGradient>
+    <linearGradient id="shell" x1="0.15" y1="0.05" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#f4ead2"/>
+      <stop offset="0.55" stop-color="#e4d3b0"/>
+      <stop offset="1" stop-color="#c2ad86"/>
+    </linearGradient>
+    <linearGradient id="visor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3d47"/>
+      <stop offset="1" stop-color="#141d23"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="13.5" fill="none" stroke="#f4ad45" stroke-opacity="0.28" stroke-width="1.5"/>
+
+  <!-- Explorer helm, 3/4 view -->
+  <g stroke-linejoin="round">
+    <!-- shell -->
+    <path d="M32 8.5c9.4 0 15.8 7.1 15.8 18.2 0 11.4-5.6 20.4-15.8 27-10.2-6.6-15.8-15.6-15.8-27C16.2 15.6 22.6 8.5 32 8.5Z"
+          fill="url(#shell)" stroke="#8fa4ae" stroke-width="1.6"/>
+    <!-- red crown stripe -->
+    <path d="M27.3 10.2c2.9-1 6.5-1 9.4 0l-2 12.6c-1.8-.8-3.6-.8-5.4 0Z" fill="#d1483f"/>
+    <path d="M31 9.6c.7-.1 1.3-.1 2 0l-.7 12.9h-.6Z" fill="#e9695f" opacity="0.8"/>
+    <!-- brow ridge -->
+    <path d="M18.6 24.5 45.4 21" fill="none" stroke="#9aa7ac" stroke-width="1.4" stroke-opacity="0.7"/>
+    <!-- visor -->
+    <path d="M19.6 27.7 44.8 24.4l-2.9 11.7c-2.6 4-13.5 4.3-17 .4Z" fill="url(#visor)" stroke="#0e1519" stroke-width="1"/>
+    <!-- visor glint -->
+    <path d="M22.6 28.8 41.6 26.3l-.7 3.1-18.8 2.4Z" fill="#4f8590" opacity="0.75"/>
+    <!-- chin guard seam -->
+    <path d="M25.5 39.4c3.8 2.3 7.2 2.3 11 .1" fill="none" stroke="#0e1519" stroke-width="1.1" stroke-opacity="0.55"/>
+  </g>
+</svg>

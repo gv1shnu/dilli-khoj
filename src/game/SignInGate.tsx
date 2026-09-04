@@ -17,6 +17,7 @@ export function SignInGate({ onSignIn, error, onDevBypass }: SignInGateProps) {
       aria-label="Sign in to play"
     >
       <div className="gate-card">
+        <img className="gate-mark" src="/favicon.svg" alt="Dilli Khoj helm logo" />
         <p className="eyebrow">DILLI KHOJ</p>
         <h2 className="gate-title">Sign in to enter the ruins</h2>
         <p className="gate-lead">
@@ -37,6 +38,7 @@ export function SignInGate({ onSignIn, error, onDevBypass }: SignInGateProps) {
             Continue for local development
           </button>
         )}
+        <p className="gate-credit">Developed by Vishnu Gandarapu</p>
       </div>
     </div>
   );

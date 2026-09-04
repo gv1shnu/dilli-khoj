@@ -471,11 +471,14 @@ function GameShell({
         />
       )}
       <header className="topbar">
-        <div>
-          <p className="eyebrow">
-            DELHI // ARCHIVE {String(question.id).padStart(2, "0")}
-          </p>
-          <h1>Dilli Khoj</h1>
+        <div className="brand-lockup">
+          <img className="brand-mark" src="/favicon.svg" alt="" aria-hidden="true" />
+          <div>
+            <p className="eyebrow">
+              DELHI // ARCHIVE {String(question.id).padStart(2, "0")}
+            </p>
+            <h1>Dilli Khoj</h1>
+          </div>
         </div>
         <div className="player-strip">
           <FullscreenButton />
@@ -781,6 +784,7 @@ function GameShell({
       )}
       <footer className="world-label">
         <span>DILLI KHOJ · ARCHIVE NETWORK</span>
+        <span>Developed by Vishnu Gandarapu</span>
         <span>
           {import.meta.env.DEV && (
             <>
