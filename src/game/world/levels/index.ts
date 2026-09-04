@@ -7,4 +7,5 @@ import { level05 } from './level05';
 import { level06 } from './level06';
 import { level07 } from './level07';
 import { level08 } from './level08';
-export const LEVELS: LevelDefinition[] = [level01, level02, level03, level04, level05, level06, level07, level08];
+import { level09 } from './level09';
+export const LEVELS: LevelDefinition[] = [level01, level02, level03, level04, level05, level06, level07, level08, level09];
