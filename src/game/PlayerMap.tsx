@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import { clearedCount } from "./progression";
+import { WorldAtlas } from "./world/WorldAtlas";
 import { GeographicMap } from "./GeographicMap";
 
 interface PlayerMapProps {
   cleared: number[];
   fullAccess?: boolean;
+  currentLocation?: number;
   onSelect: (id: number) => void;
   onClose: () => void;
 }
@@ -12,6 +14,7 @@ interface PlayerMapProps {
 export function PlayerMap({
   cleared,
   fullAccess = false,
+  currentLocation = 1,
   onSelect,
   onClose,
 }: PlayerMapProps) {
@@ -73,16 +76,16 @@ export function PlayerMap({
         <p className="pmap-lead">
           {fullAccess
             ? "All twenty regions are open for administrator inspection."
-            : `${clearedCount(cleared)} of 20 regions restored. The whole city is drawn — greyed regions unlock as you clear the ones before them.`}
+            : `${clearedCount(cleared)} of 20 regions restored. Travel between restored places. Sealed areas open in archive order.`}
         </p>
-        <GeographicMap
+        {fullAccess ? <GeographicMap
           cleared={cleared}
           fullAccess={fullAccess}
           onSelect={(id) => {
             onSelect(id);
             onClose();
           }}
-        />
+        /> : <WorldAtlas cleared={cleared} currentLocation={currentLocation} onSelect={(id) => { onSelect(id); onClose(); }} />}
       </div>
     </div>
   );

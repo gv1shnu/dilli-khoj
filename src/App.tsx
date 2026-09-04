@@ -21,12 +21,12 @@ import {
   type GameState,
 } from "./lib/game";
 import revisits from "./questions/revisits.generated.json";
-import { RUIN_SEQUENCE, ruinById } from "./game/ruins";
+import { ruinById } from "./game/ruins";
 import {
   parsePracticeSession,
   practiceStorageKey,
 } from "./game/practice-session";
-import { allCleared, clampToUnlocked, isUnlocked } from "./game/progression";
+import { allCleared, clampToUnlocked, currentRuinId, isUnlocked } from "./game/progression";
 import { submitToJudge } from "./lib/judge";
 import { supabase } from "./lib/supabase";
 import { practiceQuestion } from "./questions/practice";
@@ -165,13 +165,18 @@ function GameShell({
   const progress = server?.progress.find((p) => p.ruin === question.id);
   const hints = offline ? devHints : (progress?.hints ?? []);
   const xp = server?.xp ?? null;
-  const topic = ruinById(question.id)!;
+  const topic = ruinById(currentRuinId(cleared))!;
   const [revisitDraft, setRevisitDraft] = useState("");
   const sql = revisitQuestion
     ? revisitDraft
     : (session.drafts[question.id] ?? BLANK_QUERY);
   const [nearTerminal, setNearTerminal] = useState(false);
-  const [terminalOpen, setTerminalOpen] = useState(true);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [nearArchive, setNearArchive] = useState<number | null>(null);
+  const [locationId, setLocationId] = useState(1);
+  const [travel, setTravel] = useState<{id:number;nonce:number}|null>(null);
+  const [discovery, setDiscovery] = useState<{id:number;title:string;text:string}|null>(null);
+  const openNearby = useRef<() => void>(() => {});
   const [result, setResult] = useState<TabularResult | null>(null);
   const [status, setStatus] = useState<Status>({
     kind: "loading",
@@ -318,17 +323,17 @@ function GameShell({
         target.closest("textarea,input,select,button,[contenteditable=true]")
       )
         return;
-      if (event.code === "KeyE" && nearTerminal && !showIntro)
-        setTerminalOpen(true);
+      if (event.code === "KeyE" && nearTerminal && !showIntro && !showMap && !community)
+        openNearby.current();
       if (event.code === "Escape") setTerminalOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [nearTerminal, showIntro]);
+  }, [nearTerminal, showIntro, showMap, community]);
 
   const selectArchive = async (id: number) => {
     if (busy.current) return;
-    if (!isUnlocked(id, cleared)) return; // sequential: locked ruins are not openable
+    if (!isUnlocked(id, cleared) || id !== nearArchive) return; // Must stand at this unlocked archive.
     busy.current = true;
     setRevisit(null);
     setResult(null);
@@ -355,6 +360,8 @@ function GameShell({
       busy.current = false;
     }
   };
+
+  openNearby.current = () => { if (nearArchive !== null) void selectArchive(nearArchive); };
 
   const handleRun = async () => {
     if (busy.current) return;
@@ -473,6 +480,12 @@ function GameShell({
     <main className="app-shell">
       <RuinScene
         onProximityChange={setNearTerminal}
+        cleared={cleared}
+        storageKey={storageKey}
+        travel={travel}
+        onArchiveNear={setNearArchive}
+        onLocationChange={setLocationId}
+        onDiscovery={setDiscovery}
         inputPaused={terminalOpen || showIntro || showMap || Boolean(community)}
       />
       {xpFloats.length > 0 && (
@@ -502,12 +515,16 @@ function GameShell({
       {showMap && (
         <PlayerMap
           cleared={cleared}
+          currentLocation={locationId}
           fullAccess={Boolean(server?.isAdmin)}
           onSelect={(id) => {
             if (server?.isAdmin) {
               setAdminRuin(id);
               setCommunity("admin");
-            } else void selectArchive(id);
+            } else if (cleared.includes(id)) {
+              setTerminalOpen(false);
+              setTravel({ id, nonce: Date.now() });
+            }
           }}
           onClose={() => setShowMap(false)}
         />
@@ -517,7 +534,7 @@ function GameShell({
           <img className="brand-mark" src="/favicon.svg" alt="" aria-hidden="true" />
           <div>
             <p className="eyebrow">
-              DELHI // ARCHIVE {String(question.id).padStart(2, "0")}
+              DELHI // AREA {String(locationId).padStart(2, "0")}
             </p>
             <h1>Dilli Khoj</h1>
           </div>
@@ -568,8 +585,8 @@ function GameShell({
         </p>
         <h2>{topic.place}</h2>
         <p>
-          {topic.target}. Restore this ruin to unlock the next; revisit restored
-          ruins from your map.
+          Follow the amber trail to this archive. Restore it to open the next area.
+          Restored places are available for travel on your map.
         </p>
         <div className="mission-progress">
           <span>Ruins restored</span>
@@ -578,7 +595,8 @@ function GameShell({
         <div className="mission-actions">
           <button
             className="ghost-button archive-open"
-            onClick={() => setTerminalOpen(true)}
+            disabled={!nearTerminal}
+            onClick={() => openNearby.current()}
           >
             Open archive
           </button>
@@ -590,12 +608,14 @@ function GameShell({
           </button>
         </div>
       </aside>
+      {!terminalOpen && <div className="world-location" aria-live="polite"><span>YOU ARE EXPLORING</span><strong>{ruinById(locationId)?.place}</strong><small>WASD · walk &nbsp; Shift · run &nbsp; Drag · look &nbsp; M · sound</small></div>}
+      {discovery && !terminalOpen && <aside className="world-discovery"><span>FIELD NOTE / {String(discovery.id).padStart(2,'0')}</span><h3>{discovery.title}</h3><p>{discovery.text}</p></aside>}
       {nearTerminal && !terminalOpen && (
         <button
           className="interact-prompt"
-          onClick={() => setTerminalOpen(true)}
+          onClick={() => openNearby.current()}
         >
-          <kbd>E</kbd> Open SQL archive
+          <kbd>E</kbd> Open archive {String(nearArchive).padStart(2, "0")}
         </button>
       )}
       {terminalOpen && (
@@ -620,49 +640,6 @@ function GameShell({
               ×
             </button>
           </div>
-          <nav className="archive-navigation" aria-label="Archive browser">
-            <button
-              className="ghost-button"
-              aria-label="Previous archive"
-              disabled={loading || question.id === 1}
-              onClick={() => selectArchive(question.id - 1)}
-            >
-              ←
-            </button>
-            <select
-              aria-label="Choose archive"
-              value={question.id}
-              disabled={loading}
-              onChange={(event) => selectArchive(Number(event.target.value))}
-            >
-              {RUIN_SEQUENCE.map((entry) => {
-                const unlocked = isUnlocked(entry.id, cleared);
-                const mark = cleared.includes(entry.id)
-                  ? "✓ "
-                  : unlocked
-                    ? ""
-                    : "🔒 ";
-                return (
-                  <option key={entry.id} value={entry.id} disabled={!unlocked}>
-                    {mark}
-                    {String(entry.id).padStart(2, "0")} · {entry.place}
-                  </option>
-                );
-              })}
-            </select>
-            <button
-              className="ghost-button"
-              aria-label="Next archive"
-              disabled={
-                loading ||
-                question.id === 20 ||
-                !isUnlocked(question.id + 1, cleared)
-              }
-              onClick={() => selectArchive(question.id + 1)}
-            >
-              →
-            </button>
-          </nav>
           <p className="question-copy">{question.description}</p>
           <div className="sample-block">
             <span>

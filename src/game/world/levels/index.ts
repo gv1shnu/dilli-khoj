@@ -1,2 +1,3 @@
 import type { LevelDefinition } from '../types';
-export const LEVELS: LevelDefinition[] = [];
+import { level01 } from './level01';
+export const LEVELS: LevelDefinition[] = [level01];

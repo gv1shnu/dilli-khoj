@@ -1765,3 +1765,21 @@ button.admin-link {
     animation: none !important;
   }
 }
+
+/* The physical city and field atlas. */
+.world-location { position:absolute; bottom:54px; left:24px; display:grid; gap:5px; pointer-events:none; text-shadow:0 2px 10px #102020; }
+.world-location span,.world-discovery>span { color:var(--amber); font-size:10px; letter-spacing:.16em; }
+.world-location strong { font-family:Georgia,serif; font-size:25px; color:#f1dec0; }
+.world-location small { font-size:11px; color:#d0d6c7; }
+.world-discovery { position:absolute; top:120px; right:24px; max-width:320px; padding:22px; background:#142b2bed; border-left:2px solid #c8a56d; }
+.world-discovery h3 { font:24px Georgia,serif; margin:10px 0; }
+.world-discovery p { color:#d1d6c8; line-height:1.6; font-size:13px; }
+.city-atlas { max-width:750px; margin:auto; }
+.city-atlas svg { width:100%; max-height:49vh; display:block; }
+.city-map-buttons { display:grid; grid-template-columns:repeat(10,1fr); gap:5px; margin:12px 0; }
+.city-map-buttons button { padding:8px 2px; background:#284640; border:1px solid #6d7c60; color:#f0d6a0; border-radius:4px; }
+.city-map-buttons button[aria-pressed=true] { outline:2px solid var(--amber); }
+.city-map-detail { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.city-map-detail h3 { margin:5px 0; }
+.city-map-detail p { color:var(--muted); font-size:12px; max-width:440px; }
+@media(max-width:700px) { .world-location { bottom:65px; left:16px; } .world-location strong { font-size:19px; } .world-discovery { top:150px; right:12px; max-width:230px; } .city-map-buttons { grid-template-columns:repeat(5,1fr); } .city-map-detail { align-items:stretch; flex-direction:column; gap:8px; } }

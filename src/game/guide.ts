@@ -78,7 +78,7 @@ export function createGuideArrows(): GuideArrows {
       const along = NEAR_START + t * reach;
       mesh.position.set(
         from.x + flat.x * along,
-        0.12 + Math.sin(elapsed * 4 + i) * 0.05,
+        from.y + 0.12 + Math.sin(elapsed * 4 + i) * 0.05,
         from.z + flat.z * along,
       );
       mesh.rotation.y = yaw;
