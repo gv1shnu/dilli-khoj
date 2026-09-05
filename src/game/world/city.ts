@@ -297,8 +297,12 @@ export function buildCity() {
     },
     target: () =>
       position(activeId, cleared.includes(activeId) ? "gate" : "archive"),
-    targetFor: (from: THREE.Vector3): THREE.Vector3 => {
-      if (cleared.includes(activeId)) return position(activeId, "gate");
+    targetFor: (
+      from: THREE.Vector3,
+      requested: "archive" | "gate",
+    ): THREE.Vector3 => {
+      if (requested === "gate" && cleared.includes(activeId))
+        return position(activeId, "gate");
       return periodicTarget(defFor(activeId).archive, from);
     },
     walkTargetFor: (from: THREE.Vector3): THREE.Vector3 => {

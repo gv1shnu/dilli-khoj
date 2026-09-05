@@ -73,7 +73,8 @@ export function IntroOverlay({ onClose }: IntroOverlayProps) {
               An <strong className="intro-amber">amber</strong> is that archive:
               the glowing light rising from a ruin. Twenty different places are
               connected by streets and gates. The arrows follow a walkable route
-              to your next archive.
+              to your next archive. Once a ruin is restored, use Trail direction
+              to point them back to its amber or onward to the next gate.
             </p>
           </section>
 

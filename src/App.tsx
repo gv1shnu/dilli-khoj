@@ -9,7 +9,7 @@ import {
 import { ResultTable, formatCell } from "./components/ResultTable";
 import { FullscreenButton } from "./components/FullscreenButton";
 import { preparePracticeDatabase, runPracticeQuery } from "./db/practice-db";
-import { RuinScene } from "./game/RuinScene";
+import { RuinScene, type TrailTarget } from "./game/RuinScene";
 import { IntroOverlay } from "./game/IntroOverlay";
 import { PlayerMap } from "./game/PlayerMap";
 import { GameEntry, type PlayerIdentity } from "./game/GameEntry";
@@ -195,6 +195,8 @@ function GameShell({
   const [nearArchive, setNearArchive] = useState<number | null>(null);
   const [locationId, setLocationId] = useState(1);
   const topic = ruinById(locationId)!;
+  const restoredHere = cleared.includes(locationId);
+  const [trailTarget, setTrailTarget] = useState<TrailTarget>("archive");
   const [travel, setTravel] = useState<{ id: number; nonce: number } | null>(
     null,
   );
@@ -218,6 +220,12 @@ function GameShell({
   const busy = useRef(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const xpAnchorRef = useRef<HTMLDivElement>(null);
+
+  // Each new ruin begins by leading to its amber. Restoring it opens the
+  // onward choice and makes the gate the most useful default.
+  useEffect(() => {
+    setTrailTarget(restoredHere && locationId < 20 ? "gate" : "archive");
+  }, [locationId, restoredHere]);
 
   // Put the cursor ready on the next line when a fresh archive opens.
   useEffect(() => {
@@ -476,8 +484,7 @@ function GameShell({
         kind === "hint" ? (progress?.hintsOpened ?? 0) + 1 : null,
       );
       const refreshed = await refresh();
-      if (xpBefore !== null && refreshed)
-        showXpChange(refreshed.xp - xpBefore);
+      if (xpBefore !== null && refreshed) showXpChange(refreshed.xp - xpBefore);
       if (alive.current)
         setStatus({
           kind: "idle",
@@ -529,6 +536,7 @@ function GameShell({
         onDiscovery={setDiscovery}
         inputPaused={terminalOpen || showIntro || showMap || Boolean(community)}
         autoWalk={walkthrough}
+        trailTarget={trailTarget}
         xpAnchor={xpAnchorRef}
       />
       {xpFloats.length > 0 && (
@@ -643,13 +651,44 @@ function GameShell({
         <p>
           {cleared.includes(locationId)
             ? locationId < 20
-              ? "This ruin is restored. Follow the amber trail through its open gate to enter the next ruin."
+              ? "This ruin is restored. Point the amber trail back to its amber or through the open gate to the next ruin."
               : "All twenty ruins are restored. This final archive remains open to revisit."
             : "Follow the amber trail to this ruin's archive. Restore it to open the exit gate."}
         </p>
         <div className="mission-progress">
           <span>Ruins restored</span>
           <strong>{cleared.length} / 20</strong>
+        </div>
+        <div
+          className="trail-selector"
+          role="group"
+          aria-label="Amber trail direction"
+        >
+          <span>TRAIL DIRECTION</span>
+          <div>
+            <button
+              type="button"
+              aria-pressed={trailTarget === "archive"}
+              onClick={() => setTrailTarget("archive")}
+            >
+              Current amber
+            </button>
+            <button
+              type="button"
+              aria-pressed={trailTarget === "gate"}
+              disabled={!restoredHere || locationId >= 20}
+              title={
+                locationId >= 20
+                  ? "This is the final ruin"
+                  : !restoredHere
+                    ? "Restore this ruin to open its gate"
+                    : "Point the trail toward the next ruin"
+              }
+              onClick={() => setTrailTarget("gate")}
+            >
+              Next gate
+            </button>
+          </div>
         </div>
         <div className="mission-actions">
           <button

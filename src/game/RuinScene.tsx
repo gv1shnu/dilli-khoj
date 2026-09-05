@@ -12,12 +12,15 @@ import { createAmbience } from "./ambience";
 import { createGuideArrows } from "./guide";
 import { findRoute, type Point } from "./world/layout";
 
+export type TrailTarget = "archive" | "gate";
+
 interface RuinSceneProps {
   onProximityChange: (nearTerminal: boolean) => void;
   inputPaused?: boolean;
   cleared?: readonly number[];
   initialLocation?: number;
   autoWalk?: boolean;
+  trailTarget?: TrailTarget;
   xpAnchor?: RefObject<HTMLDivElement | null>;
   onFrameStats?: (stats: {
     fps: number;
@@ -54,10 +57,13 @@ export function RuinScene({
   initialLocation,
   onFrameStats,
   autoWalk = false,
+  trailTarget = "archive",
   xpAnchor,
 }: RuinSceneProps) {
   const autoWalkRef = useRef(autoWalk);
   autoWalkRef.current = autoWalk;
+  const trailTargetRef = useRef(trailTarget);
+  trailTargetRef.current = trailTarget;
   const progressRef = useRef(cleared);
   const travelRef = useRef(travel);
   const events = useRef({
@@ -388,8 +394,7 @@ export function RuinScene({
       }
       // Movement is decisive by default; holding Shift gives precise walking.
       // Development auto-walk remains slow enough for visual walkthroughs.
-      const walking =
-        keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
+      const walking = keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
       let speed01 = 0;
       if (move.lengthSq() > 0) {
         move.normalize();
@@ -464,9 +469,7 @@ export function RuinScene({
         lastDiscovery = discovery?.id ?? null;
         events.current.onDiscovery?.(discovery);
       }
-      // Before restoration the trail identifies only this ruin's nearest repeated
-      // amber. Once restored it switches to the physical exit gate.
-      const guideTarget = world.targetFor(position);
+      const guideTarget = world.targetFor(position, trailTargetRef.current);
       const guideDistance = Math.hypot(
         position.x - guideTarget.x,
         position.z - guideTarget.z,

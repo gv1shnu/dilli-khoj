@@ -30,6 +30,18 @@ try {
     );
     await page.reload();
     await openNearbyArchive(page);
+    if (q.id === 1) {
+      const currentAmber = page.getByRole("button", {
+          name: "Current amber",
+          exact: true,
+        }),
+        nextGate = page.getByRole("button", {
+          name: "Next gate",
+          exact: true,
+        });
+      assert.equal(await currentAmber.getAttribute("aria-pressed"), "true");
+      assert.equal(await nextGate.isDisabled(), true);
+    }
     assert.equal(
       await page.getByRole("combobox", { name: "Choose archive" }).count(),
       0,
@@ -44,6 +56,26 @@ try {
       .getByRole("status")
       .filter({ hasText: "Visible case passed!" })
       .waitFor();
+    if (q.id === 1) {
+      const currentAmber = page.getByRole("button", {
+          name: "Current amber",
+          exact: true,
+        }),
+        nextGate = page.getByRole("button", {
+          name: "Next gate",
+          exact: true,
+        });
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll("button")].some(
+          (button) =>
+            button.textContent?.trim() === "Next gate" &&
+            button.getAttribute("aria-pressed") === "true",
+        ),
+      );
+      assert.equal(await nextGate.isDisabled(), false);
+      await currentAmber.click();
+      assert.equal(await currentAmber.getAttribute("aria-pressed"), "true");
+    }
     assert.equal(
       await page
         .getByRole("button", { name: "Submit", exact: true })
@@ -93,7 +125,7 @@ try {
     await page.screenshot({ path: process.env.SMOKE_SCREENSHOT });
   assert.deepEqual(errors, []);
   console.log(
-    "Browser smoke passed: 20 physical archives, sequential practice, blank editors, saved drafts, map travel, fresh revisits and write rejection.",
+    "Browser smoke passed: 20 physical archives, player-directed amber trail, sequential practice, blank editors, saved drafts, map travel, fresh revisits and write rejection.",
   );
 } finally {
   await browser.close();
