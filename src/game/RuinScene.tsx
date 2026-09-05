@@ -348,7 +348,10 @@ export function RuinScene({
       if (keys.has("KeyD") || keys.has("ArrowRight")) move.add(right);
       if (keys.has("KeyA") || keys.has("ArrowLeft")) move.sub(right);
 
-      const autoTarget = world.walkTargetFor(character.object.position);
+      const autoTarget = world.walkTargetFor(
+        character.object.position,
+        trailTargetRef.current,
+      );
       const autoStopDistance = progressRef.current.includes(world.location())
         ? 0.5
         : 4.6;

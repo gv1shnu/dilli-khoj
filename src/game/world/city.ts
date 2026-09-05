@@ -267,7 +267,6 @@ export function buildCity() {
       nearest[1],
     );
   };
-
   setProgress([]);
   setLocation(1);
 
@@ -298,16 +297,19 @@ export function buildCity() {
     target: () =>
       position(activeId, cleared.includes(activeId) ? "gate" : "archive"),
     targetFor: (
-      from: THREE.Vector3,
+      _from: THREE.Vector3,
       requested: "archive" | "gate",
     ): THREE.Vector3 => {
       if (requested === "gate" && cleared.includes(activeId))
         return position(activeId, "gate");
-      return periodicTarget(defFor(activeId).archive, from);
+      return position(activeId, "archive");
     },
-    walkTargetFor: (from: THREE.Vector3): THREE.Vector3 => {
-      if (!cleared.includes(activeId))
-        return periodicTarget(defFor(activeId).archive, from);
+    walkTargetFor: (
+      _from: THREE.Vector3,
+      requested: "archive" | "gate",
+    ): THREE.Vector3 => {
+      if (requested === "archive" || !cleared.includes(activeId))
+        return position(activeId, "archive");
       const gate = gates.get(activeId)!;
       const target = position(activeId, "gate");
       if (gate.axis === "x") target.x += gate.direction * 8;

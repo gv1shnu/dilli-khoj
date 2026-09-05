@@ -72,6 +72,11 @@ try {
             button.getAttribute("aria-pressed") === "true",
         ),
       );
+      await page.getByText("+20 XP", { exact: true }).waitFor();
+      assert.equal(
+        await page.getByText("+20 XP", { exact: true }).getAttribute("class"),
+        "xp-float xp-float--gain",
+      );
       assert.equal(await nextGate.isDisabled(), false);
       await currentAmber.click();
       assert.equal(await currentAmber.getAttribute("aria-pressed"), "true");
@@ -125,7 +130,7 @@ try {
     await page.screenshot({ path: process.env.SMOKE_SCREENSHOT });
   assert.deepEqual(errors, []);
   console.log(
-    "Browser smoke passed: 20 physical archives, player-directed amber trail, sequential practice, blank editors, saved drafts, map travel, fresh revisits and write rejection.",
+    "Browser smoke passed: 20 physical archives, player-directed amber trail, practice XP feedback, sequential practice, blank editors, saved drafts, map travel, fresh revisits and write rejection.",
   );
 } finally {
   await browser.close();

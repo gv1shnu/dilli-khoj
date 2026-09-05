@@ -222,10 +222,14 @@ function GameShell({
   const xpAnchorRef = useRef<HTMLDivElement>(null);
 
   // Each new ruin begins by leading to its amber. Restoring it opens the
-  // onward choice and makes the gate the most useful default.
+  // onward choice and makes the gate the most useful default. Map travel to a
+  // restored ruin is a revisit, so it leads back to that ruin's amber.
   useEffect(() => {
-    setTrailTarget(restoredHere && locationId < 20 ? "gate" : "archive");
-  }, [locationId, restoredHere]);
+    const arrivedViaMap = travel?.id === locationId;
+    setTrailTarget(
+      restoredHere && locationId < 20 && !arrivedViaMap ? "gate" : "archive",
+    );
+  }, [locationId, restoredHere, travel?.nonce]);
 
   // Put the cursor ready on the next line when a fresh archive opens.
   useEffect(() => {
@@ -414,11 +418,17 @@ function GameShell({
       if (operation.current !== request) return;
       setResult(nextResult);
       const passed = matchesOrderedResult(nextResult, question.expected);
-      if (passed && offline && !revisitQuestion)
+      const firstPracticePass =
+        passed && offline && !revisitQuestion && !cleared.includes(question.id);
+      if (firstPracticePass) {
         setSession((current) => ({
           ...current,
           passed: [...new Set([...current.passed, question.id])],
         }));
+      }
+      // Local preview has no saved score, but mirrors the live solve feedback
+      // on every correct run so the avatar animation can be reviewed repeatedly.
+      if (passed && offline) showXpChange(20);
       setStatus(
         passed
           ? {
