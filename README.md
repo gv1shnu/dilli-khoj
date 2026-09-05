@@ -20,7 +20,7 @@ Art direction inspiration from [Exceletia by edusatyaki](https://github.com/edus
 See [setup instructions](docs/setup.md) for prerequisites, browser configuration, checks and troubleshooting.
 
 ```bash
-git clone --branch build/foundation https://github.com/gv1shnu/treasure-hunt.git
+git clone --branch open-world https://github.com/gv1shnu/treasure-hunt.git
 cd treasure-hunt
 nvm install
 nvm use
@@ -34,18 +34,18 @@ Open **http://localhost:5173**. Development supports offline practice and a loca
 
 ## What works and what remains
 
-| Area | Current state |
-| --- | --- |
-| World | Infinite tiled landscape, animated Soldier, navigation, ambience and an animated geographic atlas |
-| Questions | All 20 playable locally; three generated test datasets per question |
-| Authorization | Shared three-domain/admin policy tested locally; real OAuth and rollout pending |
-| Server grading | All 20 implemented and exercised against local PostgreSQL; three cases per question |
-| Progress and XP | Server transactions own unlocks, awards and purchases; local Run is untrusted |
-| Drafts | Browser-local, scoped by account; no cross-device synchronization |
-| Help and revisits | Paid server help; two non-scoring alternate objectives per ruin |
-| Map access | Cleared regions only for players; full atlas for admin inspection |
-| Administration | Audited server-protected reads; content editing through DEV studio and reviewed source |
-| Release validation | 102 tests and Chromium checks pass; clean local load is fast, but full Supabase and sustained mixed-load validation remain |
+| Area               | Current state                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| World              | Infinite tiled landscape, animated Soldier, navigation, ambience and an animated geographic atlas           |
+| Questions          | All 20 playable locally; three generated test datasets per question                                         |
+| Authorization      | Shared three-domain/admin policy tested locally; real OAuth and rollout pending                             |
+| Server grading     | All 20 implemented and exercised against local PostgreSQL; three cases per question                         |
+| Progress and XP    | Server transactions own unlocks, awards and purchases; local Run is untrusted                               |
+| Drafts             | Browser-local, scoped by account; no cross-device synchronization                                           |
+| Help and revisits  | Paid server help; two non-scoring alternate objectives per ruin                                             |
+| Map access         | Cleared regions only for players; full atlas for admin inspection                                           |
+| Administration     | Audited server-protected reads; content editing through DEV studio and reviewed source                      |
+| Release validation | 152 tests plus Chrome/WebKit MacBook checks pass; full Supabase and sustained hosted-load validation remain |
 
 The live site may serve an older build. A working preview does not establish capacity for 3,000 simultaneous students. PGlite's WASM/data payload is substantial; campus download capacity and free database compute need measurement.
 
@@ -68,20 +68,22 @@ Student SQL runs under a restricted execution role, separate from the identity t
 
 ## Team guide
 
-| Read this | For |
-| --- | --- |
-| [Setup](docs/setup.md) | Get a new laptop running and validate it |
-| [Product specification](docs/product-spec.md) | Player loop, scoring, privacy and intended scope |
-| [Curriculum map](docs/curriculum-map.md) | The twenty ruins and their learning targets |
-| [Implementation status](docs/implementation-status.md) | Verified features and known gaps |
+| Read this                                                                      | For                                                                                   |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| [Setup](docs/setup.md)                                                         | Get a new laptop running and validate it                                              |
+| [Repository navigation README](README-REPOSITORY.md)                           | Find code, generated content, tests and deployment files                              |
+| [Product specification](docs/product-spec.md)                                  | Player loop, scoring, privacy and intended scope                                      |
+| [Curriculum map](docs/curriculum-map.md)                                       | The twenty ruins and their learning targets                                           |
+| [Implementation status](docs/implementation-status.md)                         | Verified features and known gaps                                                      |
 | [Navigation and performance review](docs/navigation-and-performance-review.md) | App/repository paths, geographic map access, performance pros/cons and SQL evaluation |
-| [Next steps](docs/next-steps.md) | Ordered development and release checklist |
-| [Question review](docs/question-review.md) | Current review queue, confirmed fixture weaknesses and owner decisions |
-| [handoff](docs/handoff.md) | Resume development with context, commands and constraints |
-| [Question authoring](docs/question-authoring.md) | Writing, fixtures, equivalent SQL and review requirements |
-| [Submission architecture](docs/submission-architecture.md) | Judge contracts, trust boundaries and performance constraints |
-| [Decisions](docs/decisions-and-open-items.md) | Settled choices and unresolved product decisions |
-| [Deployment](docs/deployment-runbook.md) | Maintainer-only release process |
+| [Performance statistics](docs/performance-stats.md)                            | Consolidated browser, MacBook, asset and judge measurements                           |
+| [Next steps](docs/next-steps.md)                                               | Ordered development and release checklist                                             |
+| [Question review](docs/question-review.md)                                     | Current review queue, confirmed fixture weaknesses and owner decisions                |
+| [handoff](docs/handoff.md)                                       | Resume development with context, commands and constraints                             |
+| [Question authoring](docs/question-authoring.md)                               | Writing, fixtures, equivalent SQL and review requirements                             |
+| [Submission architecture](docs/submission-architecture.md)                     | Judge contracts, trust boundaries and performance constraints                         |
+| [Decisions](docs/decisions-and-open-items.md)                                  | Settled choices and unresolved product decisions                                      |
+| [Deployment](docs/deployment-runbook.md)                                       | Maintainer-only release process                                                       |
 
 Code entry points: `src/App.tsx` (game shell), `src/game/` (world/progression), `src/questions/` and `scripts/` (content), `supabase/functions/` (judge), `supabase/migrations/` (database).
 

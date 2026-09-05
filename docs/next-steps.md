@@ -20,8 +20,8 @@ for verification evidence and [setup](setup.md) to reproduce it.
   to the generated client and server content pipeline.
 - The current automated baseline is **152 passing tests**, with typecheck, production
   build, browser smoke and mocked authentication contracts also passing.
-- Ruins are constructed on first entry, cutting the measured Ruin 01 development heap
-  from about 122 MB to 42 MB while active play remained at 60 FPS. Covered scenes
+- Ruins are constructed on first entry, cutting the latest measured Ruin 01 development
+  heap from about 122 MB to 36.3 MB while active play remained at 60 FPS. Covered scenes
   render at 12 FPS, and hidden signed-in tabs no longer poll the backend.
 - The slow physical walkthrough now covers Ruins 01–20, all nineteen sequential gates,
   the final state and completed-map revisits. See

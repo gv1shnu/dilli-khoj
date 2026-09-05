@@ -1,0 +1,19 @@
+{
+  "testedAt": "2026-09-05T14:12:36.848Z",
+  "environment": "Local Vite development server, Google Chrome, 1440x900 CSS viewport",
+  "thresholds": {
+    "readyMs": 2500,
+    "minimumFps": 45,
+    "maximumHeapMB": 80
+  },
+  "result": {
+    "readyMs": 867,
+    "fps": 60,
+    "heapMB": 36.3,
+    "transferMB": 17.3,
+    "threeSecondTaskMs": {
+      "active": 181,
+      "covered": 109
+    }
+  }
+}

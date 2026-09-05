@@ -1,6 +1,6 @@
 # Navigation, maps and performance review
 
-Reviewed 4 September 2026 against `build/foundation`. This describes source and local behavior, not an approved hosted release.
+Reviewed 5 September 2026 against `open-world`. This describes source and local behavior, not an approved hosted release.
 
 ## App paths and navigation
 
@@ -142,7 +142,8 @@ Compared with the preceding fullscreen build, the geographic atlas update adds a
 4. **Browser render load.** Covered gameplay now renders at 12 FPS, active play keeps
    the full animation rate, and ruins are constructed only on first entry. A local
    1440×900 Chromium sample held 60 FPS; initial JavaScript heap fell from about 122 MB
-   to 42 MB and main-thread task time fell about 36% while the world map was open.
+   to 36.3 MB in the latest run and main-thread task time fell about 40% while the world
+   map was open.
    The [MacBook matrix](macbook-compatibility.md) also held 60 FPS across six Retina
    Air/Pro viewport profiles in Chrome and WebKit; Chrome Air profiles used four-times
    CPU slowdown. These remain single-machine development samples. Profile long-session

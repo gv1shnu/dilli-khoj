@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { writeFile } from "node:fs/promises";
 import { chromium } from "@playwright/test";
 
 const browser = await chromium.launch({
@@ -87,18 +88,23 @@ try {
     `Initial heap regressed to ${metrics.heapMB} MB`,
   );
 
-  console.log(
-    JSON.stringify(
-      {
-        readyMs,
-        fps,
-        ...metrics,
-        threeSecondTaskMs: { active: activeTaskMs, covered: coveredTaskMs },
-      },
-      null,
-      2,
-    ),
+  const report = {
+    testedAt: new Date().toISOString(),
+    environment:
+      "Local Vite development server, Google Chrome, 1440x900 CSS viewport",
+    thresholds: { readyMs: 2_500, minimumFps: 45, maximumHeapMB: 80 },
+    result: {
+      readyMs,
+      fps,
+      ...metrics,
+      threeSecondTaskMs: { active: activeTaskMs, covered: coveredTaskMs },
+    },
+  };
+  await writeFile(
+    new URL("../docs/browser-performance-results.json", import.meta.url),
+    `${JSON.stringify(report, null, 2)}\n`,
   );
+  console.log(JSON.stringify(report, null, 2));
 } finally {
   await browser.close();
 }

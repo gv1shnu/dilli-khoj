@@ -10,7 +10,7 @@
 With nvm installed:
 
 ```bash
-git clone --branch build/foundation https://github.com/gv1shnu/treasure-hunt.git
+git clone --branch open-world https://github.com/gv1shnu/treasure-hunt.git
 cd treasure-hunt
 nvm install
 nvm use

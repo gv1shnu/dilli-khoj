@@ -50,8 +50,8 @@ release is blocked.** Local implementation does not imply deployment.
 - Fullscreen entry and explicit exit passed interactively in both the game and DEV studio; typecheck/build/asset checks passed afterward.
 - The slow player-facing walkthrough covers Ruins 01–20, all sequential gates, map
   revisits and the final state. A local 1440×900 Chromium sample held 60 FPS; initial
-  heap fell from about 122 MB to 42 MB after lazy ruin construction, and world-map
-  main-thread work fell about 36% after covered-scene throttling.
+  heap fell from about 122 MB to 36.3 MB in the latest run after lazy ruin construction,
+  and world-map main-thread work fell about 40% after covered-scene throttling.
 - The automated [MacBook compatibility matrix](macbook-compatibility.md) passes six
   Retina profiles from 1280×800 through 1728×1117 in Chrome and WebKit. Both throttled
   Air profiles held 60 FPS and started in 1,418ms. Full WebKit gameplay smoke also
@@ -75,3 +75,4 @@ release is blocked.** Local implementation does not imply deployment.
 - Retention policy requires an operational cleanup process before launch; no hosted scheduler was configured.
 
 See [next steps](next-steps.md) for the remaining release work and [deployment](deployment-runbook.md) for the approval boundary.
+The consolidated measurement ledger is [performance statistics](performance-stats.md).
