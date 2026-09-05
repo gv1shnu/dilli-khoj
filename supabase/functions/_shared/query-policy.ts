@@ -48,7 +48,8 @@ const ALLOWED_FUNCTIONS = new Set([
   "position",
   "power",
   "rank",
-  "repeat",
+  // `repeat` is intentionally omitted: no question needs it and it can inflate a single
+  // value to arbitrary size. Keeping it out removes an easy result-size abuse vector.
   "replace",
   "reverse",
   "right",

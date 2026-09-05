@@ -338,17 +338,22 @@ async function executeCase(
     await transaction.unsafe(
       `set local search_path = "${fixtureSchema}", pg_catalog`,
     );
-    // Limit transferred rows without altering the student's query semantics.
-    const rows: Record<string, unknown>[] = [];
-    let columns: string[] = [];
-    let columnTypes: number[] = [];
-    const query = transaction.unsafe<Record<string, unknown>[]>(submittedSql);
-    // Describe before cursor execution also preserves columns for an empty result.
+    // Describe first for column names and type OIDs. This is required even when the
+    // result is empty (comparison checks column shape) and to keep every column of a
+    // duplicate-name projection like `SELECT a, a` (row objects would collapse them).
+    // prepare:false rules out sharing one prepared statement, so rows stream through a
+    // separate cursor that stops as soon as the row or byte ceiling is crossed — a large
+    // result never fully materializes.
     const description = await transaction.unsafe(submittedSql).describe();
-    columns = description.columns.map((column) => column.name);
-    columnTypes = description.columns.map((column) => column.type);
+    const columns = description.columns.map((column) => column.name);
+    const columnTypes = description.columns.map((column) => column.type);
+    const rows: Record<string, unknown>[] = [];
+    const query = transaction.unsafe<Record<string, unknown>[]>(submittedSql);
     for await (const batch of query.cursor(maxRows + 1)) {
-      if (resultByteLength(columns, [...rows, ...batch]) > MAX_RESULT_BYTES)
+      if (
+        resultByteLength(columns, [...rows, ...batch], MAX_RESULT_BYTES) >
+        MAX_RESULT_BYTES
+      )
         throw new ResultTooLargeError();
       rows.push(...batch);
       if (rows.length > maxRows) break;

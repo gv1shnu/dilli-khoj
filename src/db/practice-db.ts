@@ -17,6 +17,18 @@ function getDatabase(): Promise<PGliteWorker> {
   return databasePromise;
 }
 
+/**
+ * Begin downloading and booting the PGlite worker (~10 MB of WebAssembly + data) without
+ * seeding any schema. Call this from browser idle time so the large payload does not
+ * compete with the 3D world's first paint on a slow connection; by the time the player
+ * reaches an archive the engine is usually already warm. Safe to call repeatedly.
+ */
+export function warmPracticeDatabase(): void {
+  void getDatabase().catch(() => {
+    /* A failed warm-up is retried on demand by preparePracticeDatabase. */
+  });
+}
+
 export async function preparePracticeDatabase(ruinId = 6): Promise<void> {
   const question = practiceQuestion(ruinId);
   if (!seeded.has(ruinId))
@@ -51,8 +63,11 @@ export async function runPracticeQuery(
     await transaction.query("SET TRANSACTION READ ONLY");
     await transaction.query(`SET LOCAL search_path TO practice_${ruinId}`);
     await transaction.query("SET LOCAL statement_timeout = '900ms'");
+    // Cap the row count at the SQL layer so a runaway query (a cross join, a large
+    // generated series) can never fully materialise in the worker before the check
+    // below runs. Real answers return far fewer than the cap, so grading is unaffected.
     const result = await transaction.query<Record<string, unknown>>(
-      policy.normalizedSql,
+      `SELECT * FROM (${policy.normalizedSql}) AS _practice_capped LIMIT ${MAX_PRACTICE_RESULT_ROWS + 1}`,
     );
     const columns = result.fields.map((field) => field.name);
     if (
@@ -80,6 +95,14 @@ function practiceResultBytes(
   );
   for (const row of rows)
     for (const column of columns)
-      bytes += encoder.encode(String(row[column] ?? "null")).byteLength + 3;
+      bytes += encoder.encode(cellText(row[column])).byteLength + 3;
   return bytes;
+}
+
+function cellText(value: unknown): string {
+  if (value === null || value === undefined) return "null";
+  // Arrays and jsonb are objects; serialize so their real size counts instead of
+  // collapsing to "[object Object]".
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
 }
