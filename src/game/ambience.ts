@@ -1,5 +1,26 @@
 import type { Soundscape } from "./world/types";
 
+/** The audible controls that must differ between every ruin. */
+export function soundscapeSignature(profile: Soundscape): string {
+  return [
+    profile.wind,
+    profile.water,
+    profile.hum,
+    profile.birds,
+    profile.tone,
+    profile.detail,
+  ].join(":");
+}
+
+function soundscapeSeed(profile: Soundscape): number {
+  let seed = 2166136261;
+  for (const character of `${profile.name}:${soundscapeSignature(profile)}`) {
+    seed ^= character.charCodeAt(0);
+    seed = Math.imul(seed, 16777619);
+  }
+  return seed >>> 0;
+}
+
 const DEFAULT: Soundscape = {
   name: "Fortress wind",
   wind: 0.24,
@@ -26,12 +47,14 @@ export function createAmbience(): Ambience {
     water: GainNode | null = null,
     hum: GainNode | null = null;
   let humOsc: OscillatorNode | null = null,
-    filter: BiquadFilterNode | null = null;
+    filter: BiquadFilterNode | null = null,
+    wash: BiquadFilterNode | null = null;
   let profile = DEFAULT,
     on = true,
     quiet = false,
     disposed = false,
-    timer: number | undefined;
+    timer: number | undefined,
+    detailStep = 0;
   let buffer: AudioBuffer | null = null;
   const volume = () => (on && !document.hidden ? (quiet ? 0.12 : 0.42) : 0);
   const mix = () => {
@@ -42,7 +65,13 @@ export function createAmbience(): Ambience {
     water?.gain.setTargetAtTime(profile.water, t, 1.8);
     hum?.gain.setTargetAtTime(profile.hum, t, 1.8);
     humOsc?.frequency.setTargetAtTime(profile.tone / 4, t, 1.8);
-    filter?.frequency.setTargetAtTime(250 + profile.wind * 1800, t, 1.8);
+    const seed = soundscapeSeed(profile);
+    filter?.frequency.setTargetAtTime(
+      250 + profile.wind * 1800 + (seed % 240),
+      t,
+      1.8,
+    );
+    wash?.frequency.setTargetAtTime(760 + (seed % 820), t, 1.8);
   };
   const note = (
     frequency: number,
@@ -77,33 +106,75 @@ export function createAmbience(): Ambience {
   };
   const detail = () => {
     if (disposed) return;
+    const seed = soundscapeSeed(profile);
+    const step = detailStep++;
+    const pitch = 0.84 + ((seed >>> step % 16) & 15) / 45;
     if (ctx?.state === "running" && on && !document.hidden) {
       if (Math.random() < profile.birds) {
-        note(1800 + Math.random() * 900, 0.18, 0.045, "sine", 2800);
+        note(
+          (1700 + (seed % 620)) * pitch,
+          0.13 + (seed % 8) * 0.012,
+          0.038,
+          "sine",
+          (2450 + (seed % 940)) * pitch,
+        );
       } else
         switch (profile.detail) {
           case "bell":
-            note(profile.tone, 2.8, 0.045);
-            note(profile.tone * 2.76, 1.5, 0.013);
+            note(profile.tone * pitch, 2.8, 0.045);
+            note(profile.tone * 2.76 * pitch, 1.5, 0.013);
             break;
           case "metal":
-            note(profile.tone, 1.1, 0.025, "triangle", profile.tone * 0.97);
+            note(
+              profile.tone * pitch,
+              1.1,
+              0.025,
+              "triangle",
+              profile.tone * 0.97 * pitch,
+            );
             break;
           case "drip":
-            note(profile.tone * 2, 0.16, 0.06, "sine", profile.tone);
+            note(
+              profile.tone * 2 * pitch,
+              0.16,
+              0.06,
+              "sine",
+              profile.tone * pitch,
+            );
             break;
           case "insects":
-            note(profile.tone * 5, 0.6, 0.014, "sine", profile.tone * 5.02);
+            note(
+              profile.tone * 5 * pitch,
+              0.6,
+              0.014,
+              "sine",
+              profile.tone * 5.02 * pitch,
+            );
             break;
           case "wood":
-            note(profile.tone, 0.15, 0.025, "triangle", profile.tone * 0.4);
+            note(
+              profile.tone * pitch,
+              0.15,
+              0.025,
+              "triangle",
+              profile.tone * 0.4 * pitch,
+            );
             break;
           case "rail":
-            note(profile.tone * 2, 1.8, 0.018, "triangle", profile.tone * 1.7);
+            note(
+              profile.tone * 2 * pitch,
+              1.8,
+              0.018,
+              "triangle",
+              profile.tone * 1.7 * pitch,
+            );
             break;
         }
     }
-    timer = window.setTimeout(detail, 3200 + Math.random() * 6500);
+    timer = window.setTimeout(
+      detail,
+      2600 + (seed % 2700) + ((step * 977) % 2100) + Math.random() * 900,
+    );
   };
   const build = () => {
     if (ctx || disposed) return;
@@ -124,7 +195,7 @@ export function createAmbience(): Ambience {
     filter.frequency.value = 600;
     wind = ctx.createGain();
     noise.connect(filter).connect(wind).connect(master);
-    const wash = ctx.createBiquadFilter();
+    wash = ctx.createBiquadFilter();
     wash.type = "bandpass";
     wash.frequency.value = 1100;
     wash.Q.value = 0.3;
@@ -161,6 +232,7 @@ export function createAmbience(): Ambience {
     },
     setProfile: (next) => {
       profile = next;
+      detailStep = 0;
       mix();
     },
     setQuiet: (next) => {

@@ -2,8 +2,15 @@ import { describe, it, expect } from "vitest";
 import { LEVELS } from "./levels";
 import { LevelKit } from "./kit";
 import { findRoute } from "./layout";
+import { soundscapeSignature } from "../ambience";
 
 describe("authored physical locations", () => {
+  it("gives every ruin a distinct audible environment", () => {
+    expect(new Set(LEVELS.map((level) => level.sound.name)).size).toBe(20);
+    expect(
+      new Set(LEVELS.map((level) => soundscapeSignature(level.sound))).size,
+    ).toBe(20);
+  });
   for (const level of LEVELS)
     it(`level ${level.id}: entrance, archive and discovery are reachable`, () => {
       const kit = new LevelKit(level);
