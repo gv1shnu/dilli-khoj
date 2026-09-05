@@ -252,7 +252,7 @@ try {
     name: "Your world map",
     exact: true,
   });
-  assert.equal(await atlas.locator(".city-map-buttons button").count(), 20);
+  assert.equal(await atlas.locator(".atlas-marker").count(), 20);
   assert.equal(
     await atlas.getByRole("button", { name: /Kashmere Gate/ }).isEnabled(),
     true,

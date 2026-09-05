@@ -11,14 +11,24 @@ describe("geographic map visibility", () => {
     expect(atlasPoint(6)[0]).toBeGreaterThan(atlasPoint(10)[0]);
     expect(atlasPoint(11)[0]).toBeLessThan(atlasPoint(15)[0]);
     expect(atlasPoint(16)[0]).toBeGreaterThan(atlasPoint(20)[0]);
+    const gaps = Array.from({ length: 19 }, (_, index) => {
+      const [x1, y1] = atlasPoint(index + 1);
+      const [x2, y2] = atlasPoint(index + 2);
+      return Math.round(Math.hypot(x2 - x1, y2 - y1));
+    });
+    expect(new Set(gaps).size).toBeGreaterThan(10);
 
     const html = renderToStaticMarkup(
       <WorldAtlas cleared={[1, 2]} currentLocation={3} onSelect={() => {}} />,
     );
     expect(html).toContain(
-      'points="70,475 185,475 300,475 415,475 530,475 530,345',
+      'points="82,490 172,456 278,481 382,435 515,458 542,367',
     );
-    expect(html.match(/city-map-button--sealed/g)).toHaveLength(17);
+    expect(html.match(/atlas-marker--sealed/g)).toHaveLength(17);
+    expect(html.match(/class="atlas-marker-icon"/g)).toHaveLength(20);
+    expect(html).not.toContain("city-map-buttons");
+    expect(html).toContain("THE RIDGE");
+    expect(html).toContain("YAMUNA");
     expect(html).toContain(
       "Current ruin. Restore its archive to open the next gate.",
     );
