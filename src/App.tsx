@@ -8,9 +8,14 @@ import {
 } from "react";
 import { ResultTable, formatCell } from "./components/ResultTable";
 import { FullscreenButton } from "./components/FullscreenButton";
-import { preparePracticeDatabase, runPracticeQuery } from "./db/practice-db";
+import {
+  preparePracticeDatabase,
+  runPracticeQuery,
+  warmPracticeDatabase,
+} from "./db/practice-db";
 import { RuinScene, type TrailTarget } from "./game/RuinScene";
 import { IntroOverlay } from "./game/IntroOverlay";
+import { CompletionOverlay } from "./game/CompletionOverlay";
 import { PlayerMap } from "./game/PlayerMap";
 import { GameEntry, type PlayerIdentity } from "./game/GameEntry";
 import { CommunityPanel } from "./game/CommunityPanel";
@@ -234,6 +239,15 @@ function GameShell({
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  // Fire the completion overlay when the final ruin is restored — not on every reload
+  // of an already-finished game.
+  const wasAllCleared = useRef(allCleared(cleared));
+  useEffect(() => {
+    const finished = allCleared(cleared);
+    if (finished && !wasAllCleared.current) setShowCompletion(true);
+    wasAllCleared.current = finished;
+  }, [cleared.length]);
   const [xpFloats, setXpFloats] = useState<{ id: number; delta: number }[]>([]);
   const operation = useRef(0);
   const busy = useRef(false);
@@ -330,6 +344,10 @@ function GameShell({
   }, [question.id, offline]);
 
   useEffect(() => {
+    // Defer the large PGlite payload until the player is actually at (or opening) an
+    // archive, so the 3D world claims startup bandwidth first on a slow connection. The
+    // idle warm-up below usually has the engine ready before this runs.
+    if (!nearTerminal && !terminalOpen) return;
     const request = ++operation.current;
     busy.current = true;
     setResult(null);
@@ -357,7 +375,19 @@ function GameShell({
     return () => {
       operation.current += 1;
     };
-  }, [question.id]);
+  }, [question.id, nearTerminal, terminalOpen]);
+
+  // Warm the practice engine during browser idle time so the ~10 MB download starts
+  // after the world is interactive, not in competition with it.
+  useEffect(() => {
+    const idle = window.requestIdleCallback?.bind(window);
+    if (idle) {
+      const handle = idle(() => warmPracticeDatabase(), { timeout: 4000 });
+      return () => window.cancelIdleCallback?.(handle);
+    }
+    const timer = window.setTimeout(warmPracticeDatabase, 1500);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const dismissIntro = useCallback(() => {
     setShowIntro(false);
@@ -563,7 +593,13 @@ function GameShell({
           setSession((current) => ({ ...current, selectedId: id }));
         }}
         onDiscovery={setDiscovery}
-        inputPaused={terminalOpen || showIntro || showMap || Boolean(community)}
+        inputPaused={
+          terminalOpen ||
+          showIntro ||
+          showMap ||
+          showCompletion ||
+          Boolean(community)
+        }
         autoWalk={walkthrough}
         trailTarget={trailTarget}
         xpAnchor={xpAnchorRef}
@@ -593,6 +629,20 @@ function GameShell({
         </div>
       )}
       {showIntro && <IntroOverlay onClose={dismissIntro} />}
+      {showCompletion && (
+        <CompletionOverlay
+          canViewLeaderboard={!offline}
+          onViewLeaderboard={() => {
+            setShowCompletion(false);
+            setCommunity("leaderboard");
+          }}
+          onRevisit={() => {
+            setShowCompletion(false);
+            setShowMap(true);
+          }}
+          onClose={() => setShowCompletion(false)}
+        />
+      )}
       {community && (
         <CommunityPanel
           admin={community === "admin"}

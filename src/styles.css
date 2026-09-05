@@ -2083,3 +2083,14 @@ button.admin-link {
 .world-studio p {
   line-height: 1.6;
 }
+
+.completion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+.completion-actions .primary-button,
+.completion-actions .ghost-button {
+  flex: 1 1 auto;
+}
