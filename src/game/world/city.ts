@@ -257,6 +257,15 @@ export function buildCity() {
       return true;
     },
     target: () => position(currentRuinId(cleared), "archive"),
+    // The trail points at the amber of the ruin the player is standing in (once it is
+    // unlocked and built); off the grid or in a not-yet-built cell it falls back to the
+    // frontier amber so the guide always has somewhere to lead.
+    targetFor: (p: THREE.Vector3): THREE.Vector3 => {
+      const id = levelAt(p.x, p.z);
+      if (id && isUnlocked(id, cleared) && kits.has(id))
+        return position(id, "archive");
+      return position(currentRuinId(cleared), "archive");
+    },
     definition: (id: number): LevelDefinition => defFor(id),
     nearArchive: (p: THREE.Vector3): number | null => {
       const id = levelAt(p.x, p.z);

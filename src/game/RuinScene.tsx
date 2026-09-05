@@ -7,7 +7,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { buildCity } from "./world/city";
 import { currentRuinId, isUnlocked } from "./progression";
-import { levelAt, findRoute, type Point } from "./world/layout";
+import { levelAt } from "./world/layout";
 import { createCharacter } from "./character";
 import { createAmbience } from "./ambience";
 import { createGuideArrows } from "./guide";
@@ -215,10 +215,6 @@ export function RuinScene({
     const TILE = world.tile;
     const HALF = TILE / 2;
 
-    // Amber archive positions (one today; the array lets the guide point at the
-    // nearest as more ruins come online).
-    let route: Point[] = [];
-    let routeAt = -10;
     let lastProgress = progressRef.current;
     let lastTravel = travelRef.current;
     let lastLocation = 0;
@@ -292,7 +288,6 @@ export function RuinScene({
       if (lastProgress !== progressRef.current) {
         world.setProgress(progressRef.current);
         lastProgress = progressRef.current;
-        routeAt = -10;
       }
       if (lastTravel !== travelRef.current) {
         lastTravel = travelRef.current;
@@ -303,7 +298,6 @@ export function RuinScene({
           camera.position.add(shift);
           controls.target.add(shift);
           prevTarget.add(shift);
-          routeAt = -10;
         }
       }
       if (paused.current) keys.clear();
@@ -328,12 +322,14 @@ export function RuinScene({
         autoWalkRef.current &&
         !paused.current &&
         !world.nearArchive(character.object.position);
-      if (auto && route[0])
+      if (auto) {
+        const goal = world.targetFor(character.object.position);
         move.set(
-          route[0][0] - character.object.position.x,
+          goal.x - character.object.position.x,
           0,
-          route[0][1] - character.object.position.z,
+          goal.z - character.object.position.z,
         );
+      }
       const running = keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
       let speed01 = 0;
       if (move.lengthSq() > 0) {
@@ -406,27 +402,12 @@ export function RuinScene({
         lastDiscovery = discovery?.id ?? null;
         events.current.onDiscovery?.(discovery);
       }
-      if (!paused.current && elapsed - routeAt > 2) {
-        const target = world.target();
-        route = findRoute(
-          [position.x, position.z],
-          [target.x, target.z],
-          blocked,
-          3,
-          world.canWalk,
-        );
-        routeAt = elapsed;
-      }
-      while (
-        route.length > 1 &&
-        Math.hypot(position.x - route[0][0], position.z - route[0][1]) < 0.9
-      )
-        route.shift();
-      const waypoint = route[0];
-      const target = waypoint
-        ? new THREE.Vector3(waypoint[0], world.height(...waypoint), waypoint[1])
-        : world.target();
-      guide.update(position, target, elapsed, near || !waypoint);
+      // The trail is a compass to the amber of the ruin the player is in: it always points
+      // straight at that archive. Its tall beacon is visible, so the player rounds any prop
+      // (a bus, a column) themselves rather than being led sideways down a routed detour.
+      const amber = world.targetFor(position);
+      const amberDistance = Math.hypot(position.x - amber.x, position.z - amber.z);
+      guide.update(position, amber, elapsed, near, amberDistance);
       if (
         !paused.current &&
         speed01 > 0 &&

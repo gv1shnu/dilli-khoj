@@ -6,8 +6,19 @@ import * as THREE from "three";
 
 export interface GuideArrows {
   group: THREE.Group;
-  /** Point the trail from `from` toward `target`; `hidden` fades it out (e.g. when close). */
-  update: (from: THREE.Vector3, target: THREE.Vector3, elapsed: number, hidden: boolean) => void;
+  /**
+   * Point the trail from `from` toward `target`; `hidden` fades it out (e.g. when close).
+   * `target` sets the DIRECTION (usually the next route waypoint, which may be only a
+   * step ahead). `reachDistance` — the straight-line distance to the actual amber — sets
+   * how far the chevrons stream out, so a nearby waypoint never collapses the trail.
+   */
+  update: (
+    from: THREE.Vector3,
+    target: THREE.Vector3,
+    elapsed: number,
+    hidden: boolean,
+    reachDistance?: number,
+  ) => void;
   dispose: () => void;
 }
 
@@ -53,7 +64,13 @@ export function createGuideArrows(): GuideArrows {
   const dir = new THREE.Vector3();
   const flat = new THREE.Vector3();
 
-  const update = (from: THREE.Vector3, target: THREE.Vector3, elapsed: number, hidden: boolean) => {
+  const update = (
+    from: THREE.Vector3,
+    target: THREE.Vector3,
+    elapsed: number,
+    hidden: boolean,
+    reachDistance?: number,
+  ) => {
     dir.subVectors(target, from);
     dir.y = 0;
     const distance = dir.length();
@@ -66,8 +83,11 @@ export function createGuideArrows(): GuideArrows {
     flat.copy(dir).normalize();
     const yaw = Math.atan2(flat.x, flat.z);
 
-    // How far along the trail the chevrons reach (never past the archive itself).
-    const reach = Math.min(SPAN, Math.max(0.5, distance - 1.0));
+    // How far along the trail the chevrons reach. Measured against the real amber
+    // (reachDistance) — not the next waypoint — so the trail streams the full SPAN
+    // when the archive is far and only shortens as the player nears it (never past it).
+    const toAmber = reachDistance ?? distance;
+    const reach = Math.min(SPAN, Math.max(0.5, toAmber - 1.0));
     const march = (elapsed * 1.6) % 1; // 0..1 marching phase
 
     for (let i = 0; i < CHEVRON_COUNT; i += 1) {
