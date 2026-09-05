@@ -181,7 +181,6 @@ function GameShell({
   const progress = server?.progress.find((p) => p.ruin === question.id);
   const hints = offline ? devHints : (progress?.hints ?? []);
   const xp = server?.xp ?? null;
-  const topic = ruinById(currentRuinId(cleared))!;
   const [revisitDraft, setRevisitDraft] = useState("");
   const sql = revisitQuestion
     ? revisitDraft
@@ -190,6 +189,7 @@ function GameShell({
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [nearArchive, setNearArchive] = useState<number | null>(null);
   const [locationId, setLocationId] = useState(1);
+  const topic = ruinById(locationId)!;
   const [travel, setTravel] = useState<{ id: number; nonce: number } | null>(
     null,
   );
@@ -515,6 +515,11 @@ function GameShell({
         travel={travel}
         onArchiveNear={setNearArchive}
         onLocationChange={setLocationId}
+        onPortalEnter={(id) => {
+          setTerminalOpen(false);
+          setRevisit(null);
+          setSession((current) => ({ ...current, selectedId: id }));
+        }}
         onDiscovery={setDiscovery}
         inputPaused={terminalOpen || showIntro || showMap || Boolean(community)}
       />
@@ -622,8 +627,11 @@ function GameShell({
         </p>
         <h2>{topic.place}</h2>
         <p>
-          Follow the amber trail to this archive. Restore it to open the next
-          area. Restored places are available for travel on your map.
+          {cleared.includes(locationId)
+            ? locationId < 20
+              ? "This ruin is restored. Follow the amber trail through its open gate to enter the next ruin."
+              : "All twenty ruins are restored. This final archive remains open to revisit."
+            : "Follow the amber trail to this ruin's archive. Restore it to open the exit gate."}
         </p>
         <div className="mission-progress">
           <span>Ruins restored</span>

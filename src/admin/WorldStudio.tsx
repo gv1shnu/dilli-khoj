@@ -16,6 +16,9 @@ export function WorldStudio() {
     fps: number;
     calls: number;
     triangles: number;
+    x: number;
+    z: number;
+    location: number;
   } | null>(null);
   const level = LEVELS.find((l) => l.id === id)!;
   const cleared = Array.from(
@@ -30,6 +33,11 @@ export function WorldStudio() {
         autoWalk={walking}
         cleared={cleared}
         onProximityChange={setNear}
+        onPortalEnter={(next) => {
+          setId(next);
+          setRestored(false);
+          setWalking(false);
+        }}
         onDiscovery={setDiscovery}
         onFrameStats={setStats}
       />
@@ -57,7 +65,11 @@ export function WorldStudio() {
           ))}
         </div>
         <button className="ghost-button" onClick={() => setWalking((v) => !v)}>
-          {walking ? "Stop route check" : "Walk route to archive"}
+          {walking
+            ? "Stop route check"
+            : restored
+              ? "Walk route to exit gate"
+              : "Walk route to archive"}
         </button>
         <label>
           <input
@@ -73,9 +85,13 @@ export function WorldStudio() {
           WASD · move / Shift · run / Drag · orbit / M · mute
         </p>
         <p role="status">
-          {near ? "Archive reached" : "Explore toward the amber"}
+          {near
+            ? "Archive reached"
+            : restored
+              ? "Follow the trail to the open gate"
+              : "Explore toward the amber"}
           {stats &&
-            ` · ${stats.fps} FPS · ${stats.calls} draws · ${Math.round(stats.triangles / 1000)}k triangles`}
+            ` · ${stats.fps} FPS · ${stats.calls} draws · ${Math.round(stats.triangles / 1000)}k triangles · world ${stats.location} @ ${stats.x.toFixed(1)}, ${stats.z.toFixed(1)}`}
         </p>
         <a href="#">Return to game</a>
       </aside>

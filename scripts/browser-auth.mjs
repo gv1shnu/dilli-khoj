@@ -170,8 +170,8 @@ try {
       key: storageKey,
       auth: session(alice),
       positions: [alice, bob].map((id) => [
-        `${world.practiceStorageKey(id)}:position`,
-        world.positions[1],
+        `${world.practiceStorageKey(id)}:position-v3`,
+        { id: 1, position: world.positions[1] },
       ]),
     },
   );

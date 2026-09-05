@@ -22,8 +22,11 @@ try {
   for (const q of questions) {
     await page.evaluate(
       ({ key, position }) =>
-        localStorage.setItem(`${key}:position`, JSON.stringify(position)),
-      { key, position: world.positions[q.id] },
+        localStorage.setItem(
+          `${key}:position-v3`,
+          JSON.stringify({ id: position.id, position: position.value }),
+        ),
+      { key, position: { id: q.id, value: world.positions[q.id] } },
     );
     await page.reload();
     await openNearbyArchive(page);
@@ -71,7 +74,10 @@ try {
   assert.equal(await editor.count(), 0);
   await page.evaluate(
     ({ key, position }) =>
-      localStorage.setItem(`${key}:position`, JSON.stringify(position)),
+      localStorage.setItem(
+        `${key}:position-v3`,
+        JSON.stringify({ id: 1, position }),
+      ),
     { key, position: world.positions[1] },
   );
   await page.reload();

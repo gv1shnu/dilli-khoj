@@ -7,7 +7,6 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { buildCity } from "./world/city";
 import { currentRuinId, isUnlocked } from "./progression";
-import { levelAt } from "./world/layout";
 import { createCharacter } from "./character";
 import { createAmbience } from "./ambience";
 import { createGuideArrows } from "./guide";
@@ -22,11 +21,15 @@ interface RuinSceneProps {
     fps: number;
     calls: number;
     triangles: number;
+    x: number;
+    z: number;
+    location: number;
   }) => void;
   storageKey?: string;
   travel?: { id: number; nonce: number } | null;
   onArchiveNear?: (id: number | null) => void;
   onLocationChange?: (id: number) => void;
+  onPortalEnter?: (id: number) => void;
   onDiscovery?: (
     value: { id: number; title: string; text: string } | null,
   ) => void;
@@ -44,6 +47,7 @@ export function RuinScene({
   travel,
   onArchiveNear,
   onLocationChange,
+  onPortalEnter,
   onDiscovery,
   initialLocation,
   onFrameStats,
@@ -56,6 +60,7 @@ export function RuinScene({
   const events = useRef({
     onArchiveNear,
     onLocationChange,
+    onPortalEnter,
     onDiscovery,
     onFrameStats,
   });
@@ -64,6 +69,7 @@ export function RuinScene({
   events.current = {
     onArchiveNear,
     onLocationChange,
+    onPortalEnter,
     onDiscovery,
     onFrameStats,
   };
@@ -151,38 +157,41 @@ export function RuinScene({
 
     // ---- World & character --------------------------------------------------
     const world = buildCity();
+    const startingLocation =
+      initialLocation ?? currentRuinId(progressRef.current);
+    world.setLocation(startingLocation);
     world.setProgress(progressRef.current);
     scene.add(world.group);
 
     // The Soldier model's front is its -Z axis, so faced-direction yaw is offset by PI.
     const MODEL_YAW_OFFSET = Math.PI;
     const character = createCharacter();
-    character.object.position.copy(
-      world.position(
-        initialLocation ?? currentRuinId(progressRef.current),
-        "spawn",
-      ),
-    );
+    character.object.position.copy(world.position(startingLocation, "spawn"));
     try {
       const saved = JSON.parse(
-        localStorage.getItem(`${storageKey}:position`) ?? "null",
+        localStorage.getItem(`${storageKey}:position-v3`) ?? "null",
       );
       if (
         storageKey &&
-        Array.isArray(saved) &&
-        saved.length === 3 &&
-        saved.every(
+        saved &&
+        typeof saved === "object" &&
+        typeof saved.id === "number" &&
+        isUnlocked(saved.id, progressRef.current) &&
+        Array.isArray(saved.position) &&
+        saved.position.length === 3 &&
+        saved.position.every(
           (n: unknown) => typeof n === "number" && Number.isFinite(n),
         ) &&
-        Math.abs(saved[0]) < world.tile / 2 &&
-        Math.abs(saved[2]) < world.tile / 2 &&
-        !world.blocked(saved[0], saved[2])
+        Math.abs(saved.position[0]) < world.tile / 2 &&
+        Math.abs(saved.position[2]) < world.tile / 2
       ) {
-        character.object.position.set(
-          saved[0],
-          world.height(saved[0], saved[2]),
-          saved[2],
-        );
+        world.setLocation(saved.id);
+        if (!world.blocked(saved.position[0], saved.position[2]))
+          character.object.position.set(
+            saved.position[0],
+            world.height(saved.position[0], saved.position[2]),
+            saved.position[2],
+          );
       }
     } catch {
       /* Position persistence is optional. */
@@ -191,10 +200,7 @@ export function RuinScene({
       .copy(character.object.position)
       .add(new THREE.Vector3(0, 1.4, 0));
     const arrival = world
-      .position(
-        initialLocation ?? currentRuinId(progressRef.current),
-        "archive",
-      )
+      .position(world.location(), "archive")
       .sub(character.object.position);
     arrival.y = 0;
     arrival.normalize();
@@ -210,8 +216,8 @@ export function RuinScene({
     playerLamp.position.set(0, 1.6, 0);
     character.object.add(playerLamp);
 
-    // The amber archive (pedestal, glowing core, light) lives in the world now, tiled
-    // across the looping 3x3 grid. Gameplay still happens around the origin.
+    // The current ruin is mirrored across a looping 3x3 grid. Ordinary edges return
+    // to the same place; only an opened archive gate advances to another ruin.
     const TILE = world.tile;
     const HALF = TILE / 2;
 
@@ -281,6 +287,22 @@ export function RuinScene({
     const prevTarget = new THREE.Vector3().copy(controls.target);
     const desiredTarget = new THREE.Vector3();
     const blocked = (x: number, z: number): boolean => world.blocked(x, z);
+    const enterRuin = (id: number) => {
+      world.setLocation(id);
+      const destination = world.position(id, "spawn");
+      const shift = destination.clone().sub(character.object.position);
+      character.object.position.copy(destination);
+      camera.position.add(shift);
+      controls.target.add(shift);
+      prevTarget.add(shift);
+      lastLocation = 0;
+      lastArchive = null;
+      lastDiscovery = null;
+      wasNear = false;
+      proximityCallback.current(false);
+      events.current.onArchiveNear?.(null);
+      events.current.onDiscovery?.(null);
+    };
 
     const animate = () => {
       const delta = Math.min(clock.getDelta(), 0.05);
@@ -291,14 +313,8 @@ export function RuinScene({
       }
       if (lastTravel !== travelRef.current) {
         lastTravel = travelRef.current;
-        if (lastTravel && progressRef.current.includes(lastTravel.id)) {
-          const dest = world.position(lastTravel.id, "spawn");
-          const shift = dest.clone().sub(character.object.position);
-          character.object.position.copy(dest);
-          camera.position.add(shift);
-          controls.target.add(shift);
-          prevTarget.add(shift);
-        }
+        if (lastTravel && isUnlocked(lastTravel.id, progressRef.current))
+          enterRuin(lastTravel.id);
       }
       if (paused.current) keys.clear();
       ambience.setQuiet(paused.current);
@@ -317,17 +333,20 @@ export function RuinScene({
       if (keys.has("KeyD") || keys.has("ArrowRight")) move.add(right);
       if (keys.has("KeyA") || keys.has("ArrowLeft")) move.sub(right);
 
+      const autoTarget = world.walkTargetFor(character.object.position);
+      const autoStopDistance = progressRef.current.includes(world.location())
+        ? 0.5
+        : 4.6;
       const auto =
         import.meta.env.DEV &&
         autoWalkRef.current &&
         !paused.current &&
-        !world.nearArchive(character.object.position);
+        character.object.position.distanceTo(autoTarget) >= autoStopDistance;
       if (auto) {
-        const goal = world.targetFor(character.object.position);
         move.set(
-          goal.x - character.object.position.x,
+          autoTarget.x - character.object.position.x,
           0,
-          goal.z - character.object.position.z,
+          autoTarget.z - character.object.position.z,
         );
       }
       const running = keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
@@ -350,19 +369,26 @@ export function RuinScene({
         nextPos.set(nx, world.height(nx, nz), nz);
         pos.copy(nextPos);
 
-        // Toroidal wrap: keep the player in the central tile so the world loops.
-        // The camera and its target shift by the same amount, so it is seamless.
-        const wrapX = pos.x > HALF ? -TILE : pos.x < -HALF ? TILE : 0;
-        const wrapZ = pos.z > HALF ? -TILE : pos.z < -HALF ? TILE : 0;
-        if (wrapX !== 0 || wrapZ !== 0) {
-          pos.x += wrapX;
-          pos.z += wrapZ;
-          camera.position.x += wrapX;
-          camera.position.z += wrapZ;
-          controls.target.x += wrapX;
-          controls.target.z += wrapZ;
-          prevTarget.x += wrapX;
-          prevTarget.z += wrapZ;
+        const portal = world.portalDestination(pos);
+        if (portal && isUnlocked(portal, progressRef.current)) {
+          enterRuin(portal);
+          events.current.onPortalEnter?.(portal);
+        } else {
+          // Keep the player in the central copy. The same ruin continues on every
+          // side, so roaming never exposes a future level or an invisible wall.
+          const wrapX = pos.x > HALF ? -TILE : pos.x < -HALF ? TILE : 0;
+          const wrapZ = pos.z > HALF ? -TILE : pos.z < -HALF ? TILE : 0;
+          if (wrapX !== 0 || wrapZ !== 0) {
+            pos.x += wrapX;
+            pos.z += wrapZ;
+            pos.y = world.height(pos.x, pos.z);
+            camera.position.x += wrapX;
+            camera.position.z += wrapZ;
+            controls.target.x += wrapX;
+            controls.target.z += wrapZ;
+            prevTarget.x += wrapX;
+            prevTarget.z += wrapZ;
+          }
         }
         // Face travel direction, smoothly (accounting for the model's -Z front).
         const targetYaw = Math.atan2(move.x, move.z) + MODEL_YAW_OFFSET;
@@ -377,12 +403,8 @@ export function RuinScene({
       const position = character.object.position;
       world.update(elapsed, position);
       sky.position.copy(position);
-      const location = levelAt(position.x, position.z);
-      if (
-        location &&
-        location !== lastLocation &&
-        isUnlocked(location, progressRef.current)
-      ) {
+      const location = world.location();
+      if (location !== lastLocation) {
         lastLocation = location;
         ambience.setProfile(world.definition(location).sound);
         events.current.onLocationChange?.(location);
@@ -402,12 +424,20 @@ export function RuinScene({
         lastDiscovery = discovery?.id ?? null;
         events.current.onDiscovery?.(discovery);
       }
-      // The trail is a compass to the amber of the ruin the player is in: it always points
-      // straight at that archive. Its tall beacon is visible, so the player rounds any prop
-      // (a bus, a column) themselves rather than being led sideways down a routed detour.
-      const amber = world.targetFor(position);
-      const amberDistance = Math.hypot(position.x - amber.x, position.z - amber.z);
-      guide.update(position, amber, elapsed, near, amberDistance);
+      // Before restoration the trail identifies only this ruin's nearest repeated
+      // amber. Once restored it switches to the physical exit gate.
+      const guideTarget = world.targetFor(position);
+      const guideDistance = Math.hypot(
+        position.x - guideTarget.x,
+        position.z - guideTarget.z,
+      );
+      guide.update(
+        position,
+        guideTarget,
+        elapsed,
+        guideDistance < 4.6,
+        guideDistance,
+      );
       if (
         !paused.current &&
         speed01 > 0 &&
@@ -419,8 +449,11 @@ export function RuinScene({
       if (storageKey && elapsed - lastSave > 2) {
         try {
           localStorage.setItem(
-            `${storageKey}:position`,
-            JSON.stringify(position.toArray()),
+            `${storageKey}:position-v3`,
+            JSON.stringify({
+              id: world.location(),
+              position: position.toArray(),
+            }),
           );
         } catch {
           /* Storage is optional. */
@@ -456,6 +489,9 @@ export function RuinScene({
           fps: Math.round(statsFrames / (elapsed - statsAt)),
           calls: renderer.info.render.calls,
           triangles: renderer.info.render.triangles,
+          x: character.object.position.x,
+          z: character.object.position.z,
+          location: world.location(),
         });
         statsFrames = 0;
         statsAt = elapsed;
@@ -496,7 +532,7 @@ export function RuinScene({
     <div
       ref={hostRef}
       className="ruin-scene"
-      aria-label="Explorable Delhi city with twenty archive locations"
+      aria-label="Explorable repeating ruin with an archive and exit gate"
     />
   );
 }

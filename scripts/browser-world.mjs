@@ -10,7 +10,6 @@ export async function loadBrowserWorld() {
       "/src/game/world/levels/index.ts",
     );
     const { LevelKit } = await server.ssrLoadModule("/src/game/world/kit.ts");
-    const { toWorld } = await server.ssrLoadModule("/src/game/world/layout.ts");
     const { practiceStorageKey } = await server.ssrLoadModule(
       "/src/game/practice-session.ts",
     );
@@ -18,8 +17,11 @@ export async function loadBrowserWorld() {
     for (const level of LEVELS) {
       const kit = new LevelKit(level);
       level.build(kit);
-      const [x, z] = toWorld(level.id, level.archive);
-      positions[level.id] = [x, kit.height(...level.archive), z];
+      positions[level.id] = [
+        level.archive[0],
+        kit.height(...level.archive),
+        level.archive[1],
+      ];
       kit.dispose();
     }
     return { positions, practiceStorageKey };

@@ -1,45 +1,53 @@
-import { isUnlocked } from "../progression";
-
 export const CELL = 120;
-export const CITY_TILE = 720;
 export const LEVEL_COUNT = 20;
 export type Point = readonly [number, number];
 
-/** A winding, connected city: five places per row, four rows. */
-export function levelCenter(id: number): Point {
-  const row = Math.floor((id - 1) / 5);
-  const column = row % 2 ? 4 - ((id - 1) % 5) : (id - 1) % 5;
-  return [(column - 2) * CELL, (row - 1.5) * CELL];
+export interface RuinGate {
+  at: Point;
+  axis: "x" | "z";
+  direction: -1 | 1;
+  rotation: number;
 }
-export function wrapCoordinate(value: number): number {
+
+/**
+ * Each ruin repeats at its own edge. The exit sits behind the arrival point so
+ * entering a ruin naturally sends the player inward toward its archive first.
+ */
+export function ruinGate(spawn: Point): RuinGate {
+  const axis = Math.abs(spawn[0]) > Math.abs(spawn[1]) ? "x" : "z";
+  const source = axis === "x" ? spawn[0] : spawn[1];
+  const direction: -1 | 1 = source < 0 ? -1 : 1;
+  const edge = direction * (CELL / 2 - 5);
+  return {
+    at: axis === "x" ? [edge, spawn[1]] : [spawn[0], edge],
+    axis,
+    direction,
+    rotation: axis === "x" ? Math.PI / 2 : 0,
+  };
+}
+
+/** Wrap one coordinate into the central copy of a single repeating ruin. */
+export function wrapRuinCoordinate(value: number): number {
+  return ((((value + CELL / 2) % CELL) + CELL) % CELL) - CELL / 2;
+}
+
+/** Return the closest repeated copy of a landmark to the player. */
+export function nearestRuinCopy(point: Point, from: Point): Point {
+  return [
+    point[0] + Math.round((from[0] - point[0]) / CELL) * CELL,
+    point[1] + Math.round((from[1] - point[1]) / CELL) * CELL,
+  ];
+}
+
+/** True once the player has crossed the outer edge inside the gate opening. */
+export function crossedRuinGate(point: Point, gate: RuinGate): boolean {
+  const normal = gate.axis === "x" ? point[0] : point[1];
+  const across = gate.axis === "x" ? point[1] : point[0];
+  const gateAcross = gate.axis === "x" ? gate.at[1] : gate.at[0];
   return (
-    ((((value + CITY_TILE / 2) % CITY_TILE) + CITY_TILE) % CITY_TILE) -
-    CITY_TILE / 2
+    normal * gate.direction > CELL / 2 - 0.5 &&
+    Math.abs(across - gateAcross) < 7.5
   );
-}
-export function levelAt(x: number, z: number): number | null {
-  const column = Math.floor((wrapCoordinate(x) + 300) / CELL);
-  const row = Math.floor((wrapCoordinate(z) + 240) / CELL);
-  if (column < 0 || column > 4 || row < 0 || row > 3) return null;
-  return row * 5 + (row % 2 ? 5 - column : column + 1);
-}
-export function canEnter(
-  x: number,
-  z: number,
-  cleared: readonly number[],
-): boolean {
-  const id = levelAt(x, z);
-  // The peripheral green belt remains continuous across the world seam.
-  return id === null || isUnlocked(id, cleared);
-}
-export function toWorld(id: number, point: Point): Point {
-  const [x, z] = levelCenter(id);
-  return [x + point[0], z + point[1]];
-}
-export function gatePoint(from: number, to: number): Point {
-  const a = levelCenter(from),
-    b = levelCenter(to);
-  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 }
 
 /** Grid route follows walkable ground instead of pointing through architecture. */
@@ -50,8 +58,8 @@ export function findRoute(
   step = 3,
   canWalk: (from: Point, to: Point) => boolean = () => true,
 ): Point[] {
-  const size = Math.ceil(CITY_TILE / step),
-    half = CITY_TILE / 2;
+  const size = Math.ceil(CELL / step),
+    half = CELL / 2;
   const index = (p: Point) =>
     Math.max(0, Math.min(size - 1, Math.round((p[1] + half) / step))) * size +
     Math.max(0, Math.min(size - 1, Math.round((p[0] + half) / step)));
