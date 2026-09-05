@@ -126,7 +126,7 @@ Compared with the preceding fullscreen build, the geographic atlas update adds a
 | Visibility-aware progress polling            | Focus and visible-tab refresh preserve cross-device recovery; hidden tabs stop polling and a 0–5 second jitter spreads requests | Up to roughly 86–100 RPCs/s if all 3,000 tabs remain visible; hosted measurement may still require a longer interval or push-based synchronization |
 | Shared SVG atlas                             | Small code-defined artwork; no tile service, external image fetch, extra WebGL context or animation loop                        | CSS animation still uses rendering resources; all public geographic metadata ships to the browser; fog is presentation only                        |
 | Cleared-only map rendering                   | Only visible region controls/parcels are rendered; up to 20 regions, with precomputed parcel geometry                           | The static terrain drawing is still present under the SVG clip; this is not lazy loading geographic data                                           |
-| Overlay-aware rendering                      | Terminals, maps and dialogs reduce the 3D render loop to 12 FPS while retaining an immediately available scene                  | Active exploration still renders shadows, bloom and up to 2× device pixel ratio; baseline hardware remains to be tested                            |
+| Overlay-aware rendering                      | Terminals, maps and dialogs reduce the 3D render loop to 12 FPS while retaining an immediately available scene                  | Active exploration still renders shadows, bloom and up to 2× device pixel ratio; oldest physical classroom hardware remains to be tested           |
 | Lazy ruin construction                       | Only the active ruin and its 3×3 visual field are built at startup; visited ruins remain cached for instant map revisits        | A complete 20-ruin session eventually caches every environment; long-session memory still needs measurement                                        |
 | Static hosting and immutable assets          | Cacheable delivery fits the zero-cost goal; no web server per player                                                            | First cohort download can saturate campus Wi-Fi; actual transfer/caching behavior remains unmeasured                                               |
 
@@ -143,10 +143,12 @@ Compared with the preceding fullscreen build, the geographic atlas update adds a
    the full animation rate, and ruins are constructed only on first entry. A local
    1440×900 Chromium sample held 60 FPS; initial JavaScript heap fell from about 122 MB
    to 42 MB and main-thread task time fell about 36% while the world map was open.
-   These are single-machine development samples, not classroom guarantees. Profile
-   adaptive pixel ratio, shadow quality, long-session caching and fullscreen on the
-   lowest-spec target laptop. Run `pnpm test:browser:performance` beside the local
-   development server to repeat the 1440×900 guardrail.
+   The [MacBook matrix](macbook-compatibility.md) also held 60 FPS across six Retina
+   Air/Pro viewport profiles in Chrome and WebKit; Chrome Air profiles used four-times
+   CPU slowdown. These remain single-machine development samples. Profile long-session
+   caching, thermals and fullscreen on the oldest physical target laptop. Run
+   `pnpm test:browser:performance` for the 1440×900 guardrail and
+   `pnpm test:browser:macbook` for the device matrix.
 5. **First download and startup.** The current build contains roughly 10.1MB PGlite WASM, 6.3MB PostgreSQL data, 1.21MB main JS and a 2.16MB Soldier GLB before compression. Local gzip estimates for these four files total about 7.3MB, excluding the worker/other assets; actual hosted encoding/cache behavior is unmeasured. At cohort scale this can bottleneck campus Wi-Fi. Measure actual transferred bytes/cache hits and preload before the start; keep PostgreSQL work off the main thread.
 6. **Costly SQL/result growth.** Statement and row limits are supplemented by 64 KiB
    result ceilings in local practice and the judge; practice also refuses to render

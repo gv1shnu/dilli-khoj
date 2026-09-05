@@ -26,18 +26,22 @@ for verification evidence and [setup](setup.md) to reproduce it.
 - The slow physical walkthrough now covers Ruins 01–20, all nineteen sequential gates,
   the final state and completed-map revisits. See
   [walkthrough notes](walkthrough-notes.md).
+- Six common MacBook Air/Pro Retina profiles pass in Chrome and WebKit at 60 FPS. The
+  two Chrome Air profiles use four-times CPU slowdown; see the
+  [MacBook compatibility report](macbook-compatibility.md).
 
 ## Remaining work, in order
 
-1. **Measure the remaining classroom performance risks.** Run long-session memory and
-   fullscreen GPU checks on the lowest-spec classroom laptop, then measure the hosted
-   backend and real campus-network cache/preload behavior. Local Chromium currently
-   holds 60 FPS at 1440×900; initial heap and covered-scene work have been reduced.
-2. **Finish browser, device and accessibility QA.** The full Chromium interaction
-   smoke passes and Firefox renders the entry flow correctly. Complete native Safari
-   and Firefox interaction passes after the owner enables automation or supervises
-   them; cover keyboard-only play, fullscreen, reduced motion, audio recovery, focus,
-   compact layouts and refresh recovery.
+1. **Measure the remaining classroom performance risks.** The automated Retina matrix
+   passes Air and Pro viewports, including throttled Air CPU profiles. Run long-session
+   memory, thermals and fullscreen GPU checks on the oldest physical classroom
+   MacBook, then measure the hosted backend and real campus-network cache/preload
+   behavior.
+2. **Finish browser, device and accessibility QA.** Full Chrome and WebKit interaction
+   smoke passes; the MacBook matrix covers Retina layout, fullscreen, reduced motion,
+   map focus, movement keys, audio startup and the smallest terminal layout. Complete
+   installed Safari and Firefox passes after the owner enables automation or
+   supervises them, including audible sound and refresh recovery.
 3. **Run full local Supabase integration.** Exercise Auth, PostgREST, signup hooks,
    row-level security, RPC grants, denied and revoked admin access, retries, concurrent
    purchases and judge isolation on a disposable stack. This requires the owner to

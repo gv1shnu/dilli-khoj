@@ -636,7 +636,12 @@ function GameShell({
           <FullscreenButton />
           <button
             className="ghost-button compact-map-button"
-            onClick={() => setShowMap(true)}
+            onClick={(event) => {
+              // Safari does not focus buttons on pointer click by default. Keep a
+              // concrete opener so the map can restore focus when it closes.
+              event.currentTarget.focus();
+              setShowMap(true);
+            }}
           >
             World map
           </button>
@@ -729,7 +734,10 @@ function GameShell({
           </button>
           <button
             className="ghost-button archive-open"
-            onClick={() => setShowMap(true)}
+            onClick={(event) => {
+              event.currentTarget.focus();
+              setShowMap(true);
+            }}
           >
             World map
           </button>

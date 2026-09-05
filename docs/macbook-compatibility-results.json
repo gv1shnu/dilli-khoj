@@ -1,0 +1,89 @@
+{
+  "testedAt": "2026-09-05T13:56:31.173Z",
+  "method": "Headless compatibility matrix on Apple silicon. Air Chromium profiles use 4x CPU throttling; all profiles use DPR 2 and reduced motion.",
+  "caveats": [
+    "WebKit is an automated Safari-engine proxy; a final pass in installed Safari remains required.",
+    "GPU performance is measured on the host GPU and cannot emulate an older MacBook Air GPU.",
+    "Audio controls and Web Audio startup are automated; audible quality requires human listening."
+  ],
+  "results": [
+    {
+      "profile": "MacBook Air 13-inch / older baseline",
+      "engine": "Google Chrome",
+      "viewport": "1280x800",
+      "deviceScaleFactor": 2,
+      "cpuThrottle": 4,
+      "readyMs": 1418,
+      "fps": 60,
+      "drawingBuffer": "2560x1600",
+      "renderer": "WebKit WebGL",
+      "fullscreenSupported": true,
+      "status": "pass"
+    },
+    {
+      "profile": "MacBook Air 13.6-inch",
+      "engine": "Google Chrome",
+      "viewport": "1470x956",
+      "deviceScaleFactor": 2,
+      "cpuThrottle": 4,
+      "readyMs": 1418,
+      "fps": 60,
+      "drawingBuffer": "2940x1912",
+      "renderer": "WebKit WebGL",
+      "fullscreenSupported": true,
+      "status": "pass"
+    },
+    {
+      "profile": "MacBook Pro 14-inch",
+      "engine": "Google Chrome",
+      "viewport": "1512x982",
+      "deviceScaleFactor": 2,
+      "cpuThrottle": 1,
+      "readyMs": 845,
+      "fps": 60,
+      "drawingBuffer": "3024x1964",
+      "renderer": "WebKit WebGL",
+      "fullscreenSupported": true,
+      "status": "pass"
+    },
+    {
+      "profile": "MacBook Pro 16-inch",
+      "engine": "Google Chrome",
+      "viewport": "1728x1117",
+      "deviceScaleFactor": 2,
+      "cpuThrottle": 1,
+      "readyMs": 841,
+      "fps": 60,
+      "drawingBuffer": "3456x2234",
+      "renderer": "WebKit WebGL",
+      "fullscreenSupported": true,
+      "status": "pass"
+    },
+    {
+      "profile": "MacBook Air 13-inch / WebKit",
+      "engine": "Playwright WebKit 26.0",
+      "viewport": "1280x800",
+      "deviceScaleFactor": 2,
+      "cpuThrottle": 1,
+      "readyMs": 980,
+      "fps": 60,
+      "drawingBuffer": "2560x1600",
+      "renderer": "WebKit WebGL",
+      "fullscreenSupported": true,
+      "status": "pass"
+    },
+    {
+      "profile": "MacBook Pro 14-inch / WebKit",
+      "engine": "Playwright WebKit 26.0",
+      "viewport": "1512x982",
+      "deviceScaleFactor": 2,
+      "cpuThrottle": 1,
+      "readyMs": 959,
+      "fps": 60,
+      "drawingBuffer": "3024x1964",
+      "renderer": "WebKit WebGL",
+      "fullscreenSupported": true,
+      "status": "pass"
+    }
+  ]
+}

@@ -399,15 +399,19 @@ The 152-test automated suite, typecheck, production build, browser smoke tests a
 mocked authentication contracts pass in the development preview. The slow physical
 walkthrough covers all twenty archives, nineteen sequential gates, map revisits and
 the final state. Ruins are constructed on first entry, covered scenes render at 12 FPS,
-and hidden signed-in tabs stop polling the backend.
+and hidden signed-in tabs stop polling the backend. Six common MacBook Air/Pro Retina
+profiles pass at 60 FPS in Chrome and WebKit, including four-times CPU-throttled Air
+profiles; installed Safari and the oldest physical classroom laptop remain final
+release checks.
 
 ---
 
 ## 19. Completion plan
 
-1. **Establish the target performance envelope.** Profile long sessions and fullscreen
-   on baseline classroom hardware, then measure the authorized hosted backend and real
-   campus-network download/cache behavior.
+1. **Establish the target performance envelope.** The automated Air/Pro Retina matrix
+   passes. Profile long sessions and fullscreen on the oldest physical classroom
+   MacBook, then measure the authorized hosted backend and real campus-network
+   download/cache behavior.
 2. **Finish native-browser and accessibility QA.** Complete Safari and Firefox
    interaction passes, keyboard-only play, reduced motion, audio recovery, focus and
    refresh boundaries after the owner enables the required macOS controls.

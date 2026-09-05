@@ -52,6 +52,10 @@ release is blocked.** Local implementation does not imply deployment.
   revisits and the final state. A local 1440×900 Chromium sample held 60 FPS; initial
   heap fell from about 122 MB to 42 MB after lazy ruin construction, and world-map
   main-thread work fell about 36% after covered-scene throttling.
+- The automated [MacBook compatibility matrix](macbook-compatibility.md) passes six
+  Retina profiles from 1280×800 through 1728×1117 in Chrome and WebKit. Both throttled
+  Air profiles held 60 FPS and started in 1,418ms. Full WebKit gameplay smoke also
+  passes all twenty archives. The pass found and fixed WebKit map focus restoration.
 
 ## Limitations and release blockers
 
@@ -59,9 +63,10 @@ release is blocked.** Local implementation does not imply deployment.
 - Full Supabase Auth/PostgREST/hook/pooler integration and real multi-device sessions remain unverified. Minimal Auth tables in local tests do not replace that gate.
 - Sustained mixed-query load, hosted free-tier compute and campus download capacity remain unproven. Clean local results do not remove those release gates.
 - Question review has started: wrong-condition probes can pass all three fixtures for 01, 06 and 19; see [review ledger](question-review.md). Each question has a canonical query plus two variants, but many variants are cosmetic and do not establish the required structural diversity. Blind human review and stronger acceptance cases remain required.
-- Firefox renders the entry flow correctly. Native Safari/Firefox interaction and
-  baseline classroom hardware coverage remain required; Safari remote automation and
-  macOS Computer Use permission are currently disabled.
+- Chrome and Playwright WebKit pass the automated MacBook matrix, and Firefox renders
+  the entry flow correctly. Installed Safari/Firefox interaction and an extended run
+  on the oldest physical classroom MacBook remain required; Safari remote automation
+  and macOS Computer Use permission are currently disabled.
 - A 64 KiB result-byte ceiling is implemented. No planner-cost ceiling is implemented;
   statement/lock timeouts, AST policy, read-only grants and row limits provide the
   remaining resource controls.

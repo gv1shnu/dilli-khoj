@@ -12,9 +12,10 @@ repository remains with development.
    approved institutions available for end-to-end testing. Confirm that the existing
    Supabase and Google OAuth configuration may be used for this test. No passwords or
    recovery codes should be committed or copied into project documents.
-3. **Arrange the classroom performance check.** Identify the lowest-spec student
-   laptop and the real campus network where the class will play. Schedule a test with
-   an expected class size and confirm the acceptable load-time and frame-rate budget.
+3. **Arrange the final physical classroom check.** The automated Air/Pro Retina matrix
+   passes, including four-times CPU-throttled Air profiles. Identify the oldest student
+   MacBook model, year and RAM, and provide the real campus network. Schedule an
+   extended fullscreen test and confirm the acceptable load-time and frame-rate budget.
 4. **Enable native-browser automation or supervise the manual pass.** Safari currently
    has **Allow remote automation** disabled, and macOS Computer Use
    permission for native-app control. Enable those settings for repeatable Safari and
@@ -27,7 +28,8 @@ repository remains with development.
    migration list, monitoring plan and rollback steps, approve or reject the live
    rollout. Production order remains migrations, judge, then web.
 
-Until items 1–4 are available, local browser and mocked-auth evidence can reduce risk
-but cannot prove Supabase integration, classroom capacity or native-browser behavior.
+Until items 1–4 are available, local browser, WebKit and mocked-auth evidence can
+reduce risk but cannot prove Supabase integration, classroom capacity or installed
+native-browser behavior.
 Item 6 is the final
 production authorization boundary.
