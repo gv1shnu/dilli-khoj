@@ -2,6 +2,9 @@ import { withSupabase } from "@supabase/server";
 import postgres from "postgres";
 import { inspectJudgeQuery } from "../_shared/query-policy.ts";
 import { compareResult } from "../_shared/result-compare.ts";
+import { resultByteLength } from "../_shared/result-size.ts";
+
+const MAX_RESULT_BYTES = 64 * 1024;
 
 interface SubmissionBody {
   submission_id: string;
@@ -208,7 +211,11 @@ export default {
         if (matches) casesPassed += 1;
       }
     } catch (error) {
-      verdictCode = isTimeout(error) ? "timeout" : "sql_error";
+      verdictCode = isTimeout(error)
+        ? "timeout"
+        : error instanceof ResultTooLargeError
+          ? "result_too_large"
+          : "sql_error";
     }
 
     const correct =
@@ -225,7 +232,14 @@ export default {
         casesTotal: manifest.cases.length,
         latencyMs: Math.round(performance.now() - startedAt),
       });
-      return Response.json(verdict);
+      return Response.json(
+        verdictCode === "result_too_large"
+          ? {
+              ...verdict,
+              message: "Return fewer rows or smaller values and try again.",
+            }
+          : verdict,
+      );
     } catch (error) {
       await releaseLease(progress, player.id, body.submission_id);
       console.error("Failed to record judge verdict", getErrorMessage(error));
@@ -334,11 +348,19 @@ async function executeCase(
     columns = description.columns.map((column) => column.name);
     columnTypes = description.columns.map((column) => column.type);
     for await (const batch of query.cursor(maxRows + 1)) {
+      if (resultByteLength(columns, [...rows, ...batch]) > MAX_RESULT_BYTES)
+        throw new ResultTooLargeError();
       rows.push(...batch);
       if (rows.length > maxRows) break;
     }
     return { columns, columnTypes, rows };
   });
+}
+
+class ResultTooLargeError extends Error {
+  constructor() {
+    super("Query result exceeded the grading byte limit.");
+  }
 }
 
 function validateBody(value: unknown): SubmissionBody {
