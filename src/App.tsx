@@ -152,17 +152,36 @@ function GameShell({
   }, [offline]);
   useEffect(() => {
     if (offline) return;
+    let timer = 0;
+    let lastRequestedAt = 0;
+    const schedule = () => {
+      window.clearTimeout(timer);
+      // Jitter prevents a classroom of tabs opened together from polling in bursts.
+      timer = window.setTimeout(update, 30_000 + Math.random() * 5_000);
+    };
     const update = () => {
+      if (document.hidden) {
+        schedule();
+        return;
+      }
+      const now = Date.now();
+      if (now - lastRequestedAt < 1_000) return;
+      lastRequestedAt = now;
       void refresh().catch((e) => {
         if (alive.current) setServerError(e.message);
       });
+      schedule();
+    };
+    const onVisible = () => {
+      if (!document.hidden) update();
     };
     update();
     window.addEventListener("focus", update);
-    const timer = window.setInterval(update, 30000);
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       window.removeEventListener("focus", update);
-      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearTimeout(timer);
     };
   }, [offline, refresh]);
   const [session, setSession] = useState(() => {

@@ -43,6 +43,7 @@ interface RuinSceneProps {
 const EMPTY_PROGRESS: readonly number[] = [];
 const WALK_SPEED = 4.2;
 const RUN_SPEED = 8.4;
+const PAUSED_FRAME_INTERVAL = 1000 / 12;
 
 export function RuinScene({
   onProximityChange,
@@ -292,6 +293,7 @@ export function RuinScene({
     // ---- Frame loop ---------------------------------------------------------
     const clock = new THREE.Clock();
     let frame = 0;
+    let lastPausedFrame = -Infinity;
     let wasNear = false;
     const forward = new THREE.Vector3();
     const right = new THREE.Vector3();
@@ -299,6 +301,8 @@ export function RuinScene({
     const nextPos = new THREE.Vector3();
     const prevTarget = new THREE.Vector3().copy(controls.target);
     const desiredTarget = new THREE.Vector3();
+    const cameraShift = new THREE.Vector3();
+    const xpHead = new THREE.Vector3();
     const blocked = (x: number, z: number): boolean => world.blocked(x, z);
     const enterRuin = (id: number) => {
       world.setLocation(id);
@@ -334,6 +338,14 @@ export function RuinScene({
       if (paused.current) keys.clear();
       ambience.setQuiet(paused.current);
       controls.enabled = !paused.current;
+      if (
+        paused.current &&
+        performance.now() - lastPausedFrame < PAUSED_FRAME_INTERVAL
+      ) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
+      if (paused.current) lastPausedFrame = performance.now();
 
       // Camera-relative movement basis (flattened to ground plane).
       camera.getWorldDirection(forward);
@@ -521,9 +533,9 @@ export function RuinScene({
         character.object.position.y + 1.5,
         character.object.position.z,
       );
-      const shift = desiredTarget.clone().sub(prevTarget);
-      camera.position.add(shift);
-      controls.target.add(shift);
+      cameraShift.copy(desiredTarget).sub(prevTarget);
+      camera.position.add(cameraShift);
+      controls.target.add(cameraShift);
       prevTarget.copy(controls.target);
       controls.update();
 
@@ -531,12 +543,12 @@ export function RuinScene({
       // player rotates or zooms the camera.
       const xpElement = xpAnchor?.current;
       if (xpElement) {
-        const head = character.object.position
-          .clone()
-          .add(new THREE.Vector3(0, 2.35, 0))
+        xpHead
+          .copy(character.object.position)
+          .setY(character.object.position.y + 2.35)
           .project(camera);
-        xpElement.style.left = `${(head.x * 0.5 + 0.5) * host.clientWidth}px`;
-        xpElement.style.top = `${(-head.y * 0.5 + 0.5) * host.clientHeight}px`;
+        xpElement.style.left = `${(xpHead.x * 0.5 + 0.5) * host.clientWidth}px`;
+        xpElement.style.top = `${(-xpHead.y * 0.5 + 0.5) * host.clientHeight}px`;
       }
 
       renderer.info.reset();

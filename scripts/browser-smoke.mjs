@@ -2,12 +2,10 @@
 import assert from "node:assert/strict";
 import { loadAuthoringCatalog } from "./practice-content.mjs";
 import { loadBrowserWorld, openNearbyArchive } from "./browser-world.mjs";
-const { chromium } = await import(
-  process.env.PLAYWRIGHT_MODULE ?? "@playwright/test"
-);
+import { browserEngine, launchTestBrowser } from "./test-browser.mjs";
 const questions = await loadAuthoringCatalog(),
   world = await loadBrowserWorld();
-const browser = await chromium.launch({ headless: true, channel: "chrome" });
+const browser = await launchTestBrowser();
 try {
   const page = await browser.newPage({
       viewport: { width: 1440, height: 900 },
@@ -126,11 +124,19 @@ try {
   );
   await run.click();
   await page.locator(".status-error").waitFor();
+  await editor.fill(
+    "WITH RECURSIVE n(value) AS (VALUES (1) UNION ALL SELECT value + 1 FROM n WHERE value < 101) SELECT value FROM n",
+  );
+  await run.click();
+  await page
+    .locator(".status-error")
+    .filter({ hasText: "Visible result is too large" })
+    .waitFor();
   if (process.env.SMOKE_SCREENSHOT)
     await page.screenshot({ path: process.env.SMOKE_SCREENSHOT });
   assert.deepEqual(errors, []);
   console.log(
-    "Browser smoke passed: 20 physical archives, player-directed amber trail, practice XP feedback, sequential practice, blank editors, saved drafts, map travel, fresh revisits and write rejection.",
+    `Browser smoke passed (${browserEngine}): 20 physical archives, player-directed amber trail, practice XP feedback, sequential practice, blank editors, saved drafts, map travel, fresh revisits, write rejection and result caps.`,
   );
 } finally {
   await browser.close();

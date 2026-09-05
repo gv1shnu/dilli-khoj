@@ -1,8 +1,8 @@
 // UI contract tests: mock every Supabase request; never contact the live project.
 import assert from "node:assert/strict";
-import { chromium } from "@playwright/test";
 import { loadEnv } from "vite";
 import { loadBrowserWorld, openNearbyArchive } from "./browser-world.mjs";
+import { browserEngine, launchTestBrowser } from "./test-browser.mjs";
 const world = await loadBrowserWorld();
 const config = loadEnv("development", process.cwd(), "VITE_");
 const project = new URL(config.VITE_SUPABASE_URL).hostname.split(".")[0];
@@ -51,7 +51,7 @@ const states = new Map([
   [alice, blank(alice)],
   [bob, blank(bob)],
 ]);
-const browser = await chromium.launch({ headless: true, channel: "chrome" });
+const browser = await launchTestBrowser();
 try {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
@@ -326,7 +326,7 @@ try {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "Authenticated UI contracts passed: server-only unlocks, paid help, leaderboard, account-switch isolation, sequential city maps, compact map access, full admin maps and revocation. Supabase network fully mocked.",
+    `Authenticated UI contracts passed (${browserEngine}): server-only unlocks, paid help, leaderboard, account-switch isolation, sequential city maps, compact map access, full admin maps and revocation. Supabase network fully mocked.`,
   );
 } finally {
   await browser.close();

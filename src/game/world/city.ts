@@ -46,7 +46,7 @@ export function buildCity() {
   const heightFor = (id: number, x: number, z: number) =>
     kits.get(id)?.height(wrapRuinCoordinate(x), wrapRuinCoordinate(z)) ?? 0;
 
-  for (const def of LEVELS) {
+  const buildWorld = (def: LevelDefinition) => {
     const kit = new LevelKit(def, stone, ground);
     kit.group.name = copyName("geometry", def.id);
 
@@ -195,11 +195,20 @@ export function buildCity() {
     worlds.set(def.id, ruinWorld);
     archives.set(def.id, archiveCopies);
     group.add(ruinWorld);
-  }
+  };
+
+  const ensureWorld = (id: number) => {
+    const def = defFor(id);
+    if (!worlds.has(def.id)) buildWorld(def);
+  };
 
   const setLocation = (id: number) => {
     activeId = defFor(id).id;
+    // Construct a ruin only when the player first enters it. Previously all twenty
+    // 3x3 worlds were built at startup even though nineteen were invisible.
+    ensureWorld(activeId);
     for (const [worldId, world] of worlds) world.visible = worldId === activeId;
+    updateGateState(activeId);
   };
 
   const updateGateState = (id: number) => {
@@ -213,13 +222,12 @@ export function buildCity() {
 
   const setProgress = (next: readonly number[]) => {
     cleared = next;
-    for (const def of LEVELS) {
-      const done = cleared.includes(def.id);
-      const material = cores.get(def.id)!;
+    for (const [id, material] of cores) {
+      const done = cleared.includes(id);
       material.color.setHex(done ? 0x80d9bc : 0xffb34c);
       material.emissive.copy(material.color);
       material.emissiveIntensity = 2;
-      updateGateState(def.id);
+      updateGateState(id);
     }
   };
 
