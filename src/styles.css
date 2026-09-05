@@ -1836,6 +1836,19 @@ button.admin-link {
   color: #f0d6a0;
   border-radius: 4px;
 }
+.city-map-buttons .city-map-button--sealed {
+  background: #303837;
+  border-color: #59625f;
+  color: #9ba3a0;
+}
+.city-map-buttons .city-map-button--frontier {
+  background: #655039;
+  border-color: #b48a53;
+}
+.city-map-buttons .city-map-button--restored {
+  background: #325f50;
+  border-color: #75a992;
+}
 .city-map-buttons button[aria-pressed="true"] {
   outline: 2px solid var(--amber);
 }

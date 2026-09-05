@@ -1,9 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { GeographicMap } from "./GeographicMap";
+import { atlasPoint, WorldAtlas } from "./world/WorldAtlas";
 import { LANDMARKS, REGIONS } from "./geography";
 
 describe("geographic map visibility", () => {
+  it("draws the player journey from ruin one at the bottom to ruin twenty at the top", () => {
+    expect(atlasPoint(1)[1]).toBeGreaterThan(atlasPoint(20)[1]);
+    expect(atlasPoint(1)[0]).toBeLessThan(atlasPoint(5)[0]);
+    expect(atlasPoint(6)[0]).toBeGreaterThan(atlasPoint(10)[0]);
+    expect(atlasPoint(11)[0]).toBeLessThan(atlasPoint(15)[0]);
+    expect(atlasPoint(16)[0]).toBeGreaterThan(atlasPoint(20)[0]);
+
+    const html = renderToStaticMarkup(
+      <WorldAtlas cleared={[1, 2]} currentLocation={3} onSelect={() => {}} />,
+    );
+    expect(html).toContain(
+      'points="70,475 185,475 300,475 415,475 530,475 530,345',
+    );
+    expect(html.match(/city-map-button--sealed/g)).toHaveLength(17);
+    expect(html).toContain(
+      "Current ruin. Restore its archive to open the next gate.",
+    );
+  });
   it("shows all regions with the frontier open and future regions locked", () => {
     const html = renderToStaticMarkup(
       <GeographicMap cleared={[1, 2, 3]} onSelect={() => {}} />,
@@ -26,7 +45,9 @@ describe("geographic map visibility", () => {
     );
     const markers = html.match(/<button class="geo-marker [^>]*>/g)!;
     expect(markers).toHaveLength(20);
-    expect(markers[0]).toContain("Purana Qila quarantine gate · Current archive");
+    expect(markers[0]).toContain(
+      "Purana Qila quarantine gate · Current archive",
+    );
     expect(markers[0]).not.toContain("geo-marker--locked");
     for (const marker of markers.slice(1)) {
       expect(marker).toContain("geo-marker--locked");
