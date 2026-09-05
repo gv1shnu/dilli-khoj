@@ -110,13 +110,22 @@ that unlock in sequence. Each district holds one band of the curriculum:
    records you can't see. A wrong answer costs nothing.
 6. **Restore** on success: the ruin wakes, its lights return, the region is revealed
    on your map, and its exit gate opens. A green `+20 XP` change rises over the
-   player's screen position and the trail defaults to the gate.
+   player's screen position, a ruin-specific restoration event unfolds in the 3D
+   world, and the trail defaults to the gate.
 7. **Cross** the open gate to enter the next ruin. The trail then turns toward the
    new ruin's amber. The world map remains available for revisiting restored places.
 
-Optional at any archive: **open a hint** (small XP cost) or, once all hints are
-opened, **reveal the full solution** (larger XP cost). Both are opt-in shortcuts.
-Their deductions rise over the player in red; gains use green.
+Optional at any archive: open the first **clue** for free, then a deeper clue for a
+small XP cost where available. Once all clues are open, the player may reveal the
+full solution for a larger cost. Deductions rise over the player in red; gains use
+green.
+
+Every restoration has its own physical payoff: watchfires, a working departure
+signal, river ripples, ordered pages, vault rings, market lanterns, courtyard lamps,
+brass machinery, a jewel constellation, clocks, a hearth, pumps, a rail signal,
+harvest baskets, a living tree, a sorting line, luminous interchange routes, a ridge
+transmission, rising stepwell water, and the final bridge lights. These set pieces use
+merged procedural geometry and are built lazily with their ruin.
 
 ---
 
@@ -211,23 +220,26 @@ Scoring lives in `src/game/scoring.ts`. The economy is a single, closing budget:
 | Starting balance           | **100** |
 | First completion of a ruin | **+20** |
 | First survey of a ruin     |  **+5** |
-| Open a hint                | **−10** |
-| Reveal the full solution   | **−20** |
+| Open the first clue        |   **0** |
+| Open a deeper clue         |  **−5** |
+| Reveal the full solution   | **−15** |
 | Wrong submission           |       0 |
 | Revisit practice           |       0 |
 
 Design consequences, by intent:
 
 - **A no-help run tops out at `MAX_XP` = 600.** (100 start + 20×20 solves + surveys.)
-- **Help is a purchase gated by balance.** You cannot open a hint or reveal you
-  can't afford. A player taking maximum help on every level runs out of affordable
-  help around **level 13 of 20** (`EXHAUSTS_AROUND`) and must solve the rest unaided
-  — there is no way to buy your way to the finish.
+- **Help is staged rather than punitive.** The first clue is free. Stronger help
+  remains a score tradeoff, and taking every clue and reveal produces a final balance
+  of `FULL_HELP_END_XP` = 250.
 - **Solving is always free and always available.** Debt never blocks _learning_;
   only _shortcuts_ are rationed.
 - **A reveal solves nothing automatically.** Even after revealing, the learner must
   submit a passing query themselves. There is no path to the end without solving.
 - **Wrong answers are free**, so _Submit_ is safe to use as a probe.
+- **Wrong-result feedback is diagnostic.** It identifies output shape, missing or
+  extra records, repeated records, ordering, or value mismatches without exposing
+  hidden expected values.
 - **Feedback is spatial.** Positive XP changes animate in green and deductions in
   red at the avatar's projected screen position. The development practice preview
   can replay the green solve animation for review, but never changes official XP.

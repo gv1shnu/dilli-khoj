@@ -172,7 +172,7 @@ export function WorldMap() {
         browser; use <strong>Export JSON</strong> to save them and commit into the
         catalog. Level / district / topic come from the authoritative{" "}
         <code>ruins.ts</code> sequence. XP: start {XP.START}, survey +{XP.SURVEY}, solve
-        +{XP.SOLVE}, hint {XP.HINT}, reveal {XP.REVEAL} · max {MAX_XP} · {TOTAL_HINTS} hints total.
+        +{XP.SOLVE}, first clue {XP.HINT_FIRST}, deeper clue {XP.HINT_DEEP}, reveal {XP.REVEAL} · max {MAX_XP} · {TOTAL_HINTS} clues total.
       </p>
 
       <div className="admin-legend">

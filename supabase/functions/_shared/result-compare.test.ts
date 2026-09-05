@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareResult } from "./result-compare";
+import { compareResult, diagnoseResult } from "./result-compare";
 
 const expected = {
   columns: ["stall_id"],
@@ -27,6 +27,12 @@ describe("server result comparison", () => {
         expected,
       ),
     ).toBe(false);
+    expect(
+      diagnoseResult(
+        { columns: ["stall_id"], rows: [{ stall_id: 107 }, { stall_id: 102 }] },
+        expected,
+      ),
+    ).toBe("order");
   });
 
   it("preserves duplicates while ignoring order for unordered questions", () => {
@@ -43,6 +49,27 @@ describe("server result comparison", () => {
         },
       ),
     ).toBe(true);
+  });
+
+  it("classifies safe mismatch shapes", () => {
+    expect(
+      diagnoseResult({ columns: ["wrong"], rows: [{ wrong: 102 }] }, expected),
+    ).toBe("columns");
+    expect(
+      diagnoseResult(
+        { columns: ["stall_id"], rows: [{ stall_id: 102 }] },
+        expected,
+      ),
+    ).toBe("missing_rows");
+    expect(
+      diagnoseResult(
+        {
+          columns: ["stall_id"],
+          rows: [{ stall_id: 102 }, { stall_id: 102 }, { stall_id: 107 }],
+        },
+        expected,
+      ),
+    ).toBe("duplicate_rows");
   });
 });
 

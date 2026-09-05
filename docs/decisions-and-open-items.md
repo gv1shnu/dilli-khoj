@@ -18,7 +18,7 @@
 | Districts | Seven, contiguous ruin ranges, named in `ruins.ts` (Yamuna Gates → Deep Foundations) |
 | Sign-in | Google sign-in is **required** before play, right after the how-to-play explanation (reduce traffic, legitimate users only, admin progress access) |
 | Sequential passage | Ruins play strictly in order (1→20); no jumping ahead. Difficulty rises with the module sequence |
-| XP economy | `scoring.ts`: start 100, survey +5, solve +20, hint −10, reveal −20. Help is affordability-gated (anti-bypass); solving is always free. Full-help exhausts ~level 13/20; max 600 |
+| XP economy | `scoring.ts`: start 100, survey +5, solve +20, first clue free, deeper clue −5, reveal −15. Full-help completion ends at 250; no-help maximum is 600 |
 | Access control | Admin + question pages restricted to owner-supplied admin emails; solutions never ship to students |
 | Worker/project name | Cloudflare Worker `dilli-khoj`; URL `dilli-khoj.example.workers.dev` |
 | Question authoring | Dev-only Question Studio at `#admin`; canonical solutions excluded from production builds |
@@ -45,7 +45,7 @@
 
 | Area | Default |
 | --- | --- |
-| XP | Start 100; solve +20; survey +5; hint -10; reveal -20; wrong 0; help affordability-gated |
+| XP | Start 100; solve +20; survey +5; first clue free; deeper clue -5; reveal -15; wrong 0 |
 | Leaderboard order | Completers only, then XP descending and completion time ascending; server-recorded sign-up-to-completion wall time |
 | Data collection | Minimum identity, progress, submissions, verdicts, latency and hint usage |
 | Retention | Delete raw SQL and detailed attempts after 90 days; retain anonymous aggregates |

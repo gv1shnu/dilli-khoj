@@ -10,6 +10,7 @@ import {
 } from "./layout";
 import { LEVELS } from "./levels";
 import { LevelKit } from "./kit";
+import { buildRestorationFeature } from "./restorations";
 import type { LevelDefinition } from "./types";
 
 const copyName = (kind: string, id: number) =>
@@ -29,8 +30,10 @@ export function buildCity() {
   const archives = new Map<number, THREE.Group[]>();
   const cores = new Map<number, THREE.MeshStandardMaterial>();
   const gates = new Map<number, ReturnType<typeof ruinGate>>();
+  const restorationStartedAt = new Map<number, number>();
   let cleared: readonly number[] = [];
   let activeId = 1;
+  let lastElapsed = 0;
 
   const ringGeo = new THREE.TorusGeometry(2, 0.08, 6, 40);
   const coreGeo = new THREE.OctahedronGeometry(0.85);
@@ -178,6 +181,8 @@ export function buildCity() {
     beacon.position.y = 8;
     archive.add(beacon);
 
+    buildRestorationFeature(def, kit);
+
     const source = new THREE.Group();
     source.add(kit.group, archive);
     const ruinWorld = new THREE.Group();
@@ -217,13 +222,17 @@ export function buildCity() {
       if (object.name === copyName("gate-seal", id)) object.visible = !open;
       if (object.name === copyName("gate-portal", id)) object.visible = open;
       if (object.name === copyName("regrowth", id)) object.visible = open;
+      if (object.name === copyName("restoration", id)) object.visible = open;
     });
   };
 
   const setProgress = (next: readonly number[]) => {
+    const previous = cleared;
     cleared = next;
     for (const [id, material] of cores) {
       const done = cleared.includes(id);
+      if (done && !previous.includes(id))
+        restorationStartedAt.set(id, lastElapsed);
       material.color.setHex(done ? 0x80d9bc : 0xffb34c);
       material.emissive.copy(material.color);
       material.emissiveIntensity = 2;
@@ -343,6 +352,7 @@ export function buildCity() {
         : null;
     },
     update: (elapsed: number, point: THREE.Vector3) => {
+      lastElapsed = elapsed;
       const kit = kits.get(activeId)!;
       for (const asset of kit.assets)
         if (asset.userData.roof)
@@ -353,6 +363,23 @@ export function buildCity() {
         archive.children[1].rotation.y = elapsed * 0.5;
         archive.children[1].position.y = 2 + Math.sin(elapsed * 1.6) * 0.15;
       }
+      const started = restorationStartedAt.get(activeId);
+      const progress =
+        started === undefined ? 1 : Math.min(1, (elapsed - started) / 2.4);
+      const eased = 1 - Math.pow(1 - Math.max(0, progress), 3);
+      worlds.get(activeId)?.traverse((object) => {
+        if (object.name === copyName("restoration", activeId))
+          object.scale.setScalar(Math.max(0.001, eased));
+        if (object.userData.restorationPart !== undefined) {
+          object.userData.restorationBaseY ??= object.position.y;
+          object.position.y =
+            object.userData.restorationBaseY +
+            Math.sin(elapsed * 1.7 + object.userData.restorationPart) *
+              0.06 *
+              eased;
+        }
+      });
+      if (progress >= 1) restorationStartedAt.delete(activeId);
     },
     dispose: () => {
       kits.forEach((kit) => kit.dispose());

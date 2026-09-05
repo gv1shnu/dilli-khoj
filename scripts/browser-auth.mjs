@@ -109,12 +109,11 @@ try {
       if (payload.action === "hint" && !p.hintsOpened) {
         p.hintsOpened = 1;
         p.hints = ["Server-purchased hint"];
-        state.xp -= 10;
       }
       if (payload.action === "reveal" && !p.revealed) {
         p.revealed = true;
         p.solution = "Server-purchased solution";
-        state.xp -= 20;
+        state.xp -= 15;
       }
       return route.fulfill({ json: {} });
     }
@@ -207,27 +206,22 @@ try {
   await page.getByRole("button", { name: "Close map", exact: true }).click();
   assert.match(await page.locator(".mission-progress").innerText(), /0 \/ 20/);
   await page
-    .getByRole("button", { name: "Hint 1 · 10 XP", exact: true })
+    .getByRole("button", { name: "Clue 1 · free", exact: true })
     .click();
   await page
-    .getByText("Hint 1: Server-purchased hint", { exact: true })
+    .getByText("Clue 1: Server-purchased hint", { exact: true })
     .waitFor();
-  await page.getByText("−10 XP", { exact: true }).waitFor();
-  assert.equal(
-    await page.getByText("−10 XP", { exact: true }).getAttribute("class"),
-    "xp-float xp-float--loss",
-  );
-  await page.getByText("95 XP", { exact: true }).waitFor();
+  await page.getByText("105 XP", { exact: true }).waitFor();
   await page
-    .getByRole("button", { name: "Reveal · 20 XP", exact: true })
+    .getByRole("button", { name: "Reveal · 15 XP", exact: true })
     .click();
   await page.getByText("Server-purchased solution", { exact: true }).waitFor();
-  await page.getByText("−20 XP", { exact: true }).waitFor();
-  await page.getByText("75 XP", { exact: true }).waitFor();
+  await page.getByText("−15 XP", { exact: true }).waitFor();
+  await page.getByText("90 XP", { exact: true }).waitFor();
   await page.getByRole("button", { name: "Submit", exact: true }).click();
   await page
-    .getByRole("status")
-    .filter({ hasText: "3/3 cases passed" })
+    .locator(".restoration-toast")
+    .filter({ hasText: "The watch returns" })
     .waitFor();
   await page.getByText("+20 XP", { exact: true }).waitFor();
   assert.equal(

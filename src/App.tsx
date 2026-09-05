@@ -40,7 +40,9 @@ import {
 import { submitToJudge } from "./lib/judge";
 import { supabase } from "./lib/supabase";
 import { practiceQuestion } from "./questions/practice";
-import { matchesOrderedResult, type TabularResult } from "./sql/result-policy";
+import { diagnoseOrderedResult, type TabularResult } from "./sql/result-policy";
+import { hintCost, REVEAL_COST } from "./game/scoring";
+import { restorationFor } from "./game/world/restorations";
 
 // Solutions belong to authoring, never the student production bundle.
 const WorldMap = import.meta.env.DEV
@@ -240,14 +242,26 @@ function GameShell({
   const [showIntro, setShowIntro] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [restorationMoment, setRestorationMoment] = useState<{
+    id: number;
+    nonce: number;
+  } | null>(null);
   // Fire the completion overlay when the final ruin is restored — not on every reload
   // of an already-finished game.
   const wasAllCleared = useRef(allCleared(cleared));
   useEffect(() => {
     const finished = allCleared(cleared);
-    if (finished && !wasAllCleared.current) setShowCompletion(true);
+    let timer = 0;
+    if (finished && !wasAllCleared.current)
+      timer = window.setTimeout(() => setShowCompletion(true), 6500);
     wasAllCleared.current = finished;
+    return () => window.clearTimeout(timer);
   }, [cleared.length]);
+  useEffect(() => {
+    if (!restorationMoment) return;
+    const timer = window.setTimeout(() => setRestorationMoment(null), 6200);
+    return () => window.clearTimeout(timer);
+  }, [restorationMoment]);
   const [xpFloats, setXpFloats] = useState<{ id: number; delta: number }[]>([]);
   const operation = useRef(0);
   const busy = useRef(false);
@@ -466,7 +480,8 @@ function GameShell({
       const nextResult = await runPracticeQuery(sql, question.id);
       if (operation.current !== request) return;
       setResult(nextResult);
-      const passed = matchesOrderedResult(nextResult, question.expected);
+      const diagnosis = diagnoseOrderedResult(nextResult, question.expected);
+      const passed = diagnosis.code === "correct";
       const firstPracticePass =
         passed && offline && !revisitQuestion && !cleared.includes(question.id);
       if (firstPracticePass) {
@@ -474,6 +489,9 @@ function GameShell({
           ...current,
           passed: [...new Set([...current.passed, question.id])],
         }));
+        setRestorationMoment({ id: question.id, nonce: Date.now() });
+        setTrailTarget("gate");
+        setTerminalOpen(false);
       }
       // Local preview has no saved score, but mirrors the live solve feedback
       // on every correct run so the avatar animation can be reviewed repeatedly.
@@ -490,8 +508,7 @@ function GameShell({
             }
           : {
               kind: "fail",
-              message:
-                "Not quite. Check the columns, rows and sorting. Wrong runs cost nothing.",
+              message: `Not quite. ${diagnosis.message} Wrong runs cost nothing.`,
             },
       );
     } catch (error) {
@@ -514,11 +531,21 @@ function GameShell({
     });
     try {
       const xpBefore = server?.xp ?? null;
+      const alreadyRestored = cleared.includes(question.id);
       const verdict = await submitToJudge(sql, question.id);
       if (operation.current !== request) return;
       const refreshed = await refresh();
       if (xpBefore !== null)
         showXpChange((refreshed?.xp ?? verdict.xp) - xpBefore);
+      if (
+        verdict.correct &&
+        !alreadyRestored &&
+        refreshed?.cleared.includes(question.id)
+      ) {
+        setRestorationMoment({ id: question.id, nonce: Date.now() });
+        setTrailTarget("gate");
+        setTerminalOpen(false);
+      }
       setStatus({
         kind: verdict.correct ? "pass" : "fail",
         message: `${verdict.message} ${verdict.casesPassed}/${verdict.casesTotal} cases passed.`,
@@ -556,6 +583,8 @@ function GameShell({
       busy.current = false;
     }
   };
+  const nextHint = (progress?.hintsOpened ?? 0) + 1;
+  const nextHintCost = hintCost(nextHint);
   if (!offline && (!server || serverError))
     return (
       <main className="gate-backdrop">
@@ -602,6 +631,7 @@ function GameShell({
         }
         autoWalk={walkthrough}
         trailTarget={trailTarget}
+        restorationSignal={restorationMoment}
         xpAnchor={xpAnchorRef}
       />
       {xpFloats.length > 0 && (
@@ -627,6 +657,21 @@ function GameShell({
             </span>
           ))}
         </div>
+      )}
+      {restorationMoment && (
+        <aside className="restoration-toast" role="status" aria-live="polite">
+          <span>
+            RESTORATION {String(restorationMoment.id).padStart(2, "0")}
+          </span>
+          <h2>{restorationFor(restorationMoment.id).title}</h2>
+          <p>{restorationFor(restorationMoment.id).detail}</p>
+          <button
+            className="ghost-button"
+            onClick={() => setRestorationMoment(null)}
+          >
+            Follow the trail
+          </button>
+        </aside>
       )}
       {showIntro && <IntroOverlay onClose={dismissIntro} />}
       {showCompletion && (
@@ -937,7 +982,7 @@ function GameShell({
                   (offline
                     ? hintsShown >= question.hintCount
                     : (progress?.hintsOpened ?? 0) >= question.hintCount ||
-                      (xp ?? 0) < 10 ||
+                      (xp ?? 0) < nextHintCost ||
                       Boolean(server?.completedAt))
                 }
                 onClick={() =>
@@ -945,8 +990,10 @@ function GameShell({
                 }
               >
                 {offline
-                  ? `Hint ${hintsShown + 1} · free practice`
-                  : `Hint ${(progress?.hintsOpened ?? 0) + 1} · 10 XP`}
+                  ? `Clue ${hintsShown + 1} · free practice`
+                  : nextHintCost === 0
+                    ? `Clue ${nextHint} · free`
+                    : `Clue ${nextHint} · ${nextHintCost} XP`}
               </button>
             )}
             {!offline && !revisitQuestion && (
@@ -956,12 +1003,12 @@ function GameShell({
                   loading ||
                   Boolean(progress?.revealed) ||
                   (progress?.hintsOpened ?? 0) < question.hintCount ||
-                  (xp ?? 0) < 20 ||
+                  (xp ?? 0) < REVEAL_COST ||
                   Boolean(server?.completedAt)
                 }
                 onClick={() => void purchase("reveal")}
               >
-                Reveal · 20 XP
+                Reveal · {REVEAL_COST} XP
               </button>
             )}
             <div>
@@ -986,7 +1033,7 @@ function GameShell({
             (offline ? hints.slice(0, hintsShown) : hints).map(
               (hint, index) => (
                 <p className="hint-copy" key={hint}>
-                  Hint {index + 1}: {hint}
+                  Clue {index + 1}: {hint}
                 </p>
               ),
             )}

@@ -65,17 +65,20 @@ Implemented in `src/game/scoring.ts`:
 | Starting balance | 100 |
 | First completion of a ruin | +20 |
 | First survey of a ruin | +5 |
-| Hint | -10 |
-| Full solution reveal | -20 |
+| First clue in a ruin | 0 |
+| Second clue in ruins 11–20 | -5 |
+| Full solution reveal | -15 |
 | Wrong submission | 0 |
 | Revisit practice | 0 |
 
-- Ruins 1–10 have one hint; ruins 11–20 have two.
-- The full solution becomes available only after all hints for that question have been opened.
-- **Help is a purchase, gated by balance (anti-bypass rule).** You cannot open a hint or reveal you cannot afford. **Solving is always free and always available**, so debt never blocks *learning* — only *shortcuts* are rationed.
-- **No reveal-bypass:** a player who takes maximum help (all hints + reveal) on every level runs out of affordable help at about **level 13 of 20 (~two-thirds)** and must solve the rest unaided. A no-help run tops out at **600 XP** (`MAX_XP`); the exhaustion level is computed as `EXHAUSTS_AROUND`.
+- Ruins 1–10 have one free clue; ruins 11–20 add a deeper clue for 5 XP.
+- The full solution becomes available only after every clue for that question has been opened and costs 15 XP.
+- **Help is staged.** Free result diagnostics identify the kind of mismatch, the first clue removes the fear of asking for help, and stronger assistance affects leaderboard XP.
+- A no-help run tops out at **600 XP** (`MAX_XP`). A player using every clue and reveal finishes with **250 XP** (`FULL_HELP_END_XP`), so assistance remains visible in the final score without stopping progress.
 - A reveal solves nothing automatically. The learner must still submit a passing query — there is no way to reach the end without solving.
 - XP, solved state, survey state and unlocks are server-authoritative in production.
+- Practice and authoritative checks report column shape, missing or extra records,
+  repeated records, ordering, or value mismatches without returning hidden rows.
 
 ## Revisit mode and the player world map
 

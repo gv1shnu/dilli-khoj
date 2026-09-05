@@ -21,6 +21,7 @@ interface RuinSceneProps {
   initialLocation?: number;
   autoWalk?: boolean;
   trailTarget?: TrailTarget;
+  restorationSignal?: { id: number; nonce: number } | null;
   xpAnchor?: RefObject<HTMLDivElement | null>;
   onFrameStats?: (stats: {
     fps: number;
@@ -59,6 +60,7 @@ export function RuinScene({
   onFrameStats,
   autoWalk = false,
   trailTarget = "archive",
+  restorationSignal = null,
   xpAnchor,
 }: RuinSceneProps) {
   const autoWalkRef = useRef(autoWalk);
@@ -66,6 +68,7 @@ export function RuinScene({
   const trailTargetRef = useRef(trailTarget);
   trailTargetRef.current = trailTarget;
   const progressRef = useRef(cleared);
+  const restorationSignalRef = useRef(restorationSignal);
   const travelRef = useRef(travel);
   const events = useRef({
     onArchiveNear,
@@ -75,6 +78,7 @@ export function RuinScene({
     onFrameStats,
   });
   progressRef.current = cleared;
+  restorationSignalRef.current = restorationSignal;
   travelRef.current = travel;
   events.current = {
     onArchiveNear,
@@ -232,6 +236,7 @@ export function RuinScene({
     const HALF = TILE / 2;
 
     let lastProgress = progressRef.current;
+    let lastRestorationNonce = restorationSignalRef.current?.nonce ?? 0;
     let lastTravel = travelRef.current;
     let lastLocation = 0;
     let lastArchive: number | null = null;
@@ -329,6 +334,14 @@ export function RuinScene({
       if (lastProgress !== progressRef.current) {
         world.setProgress(progressRef.current);
         lastProgress = progressRef.current;
+      }
+      if (
+        restorationSignalRef.current &&
+        restorationSignalRef.current.nonce !== lastRestorationNonce
+      ) {
+        lastRestorationNonce = restorationSignalRef.current.nonce;
+        if (restorationSignalRef.current.id === world.location())
+          ambience.restore();
       }
       if (lastTravel !== travelRef.current) {
         lastTravel = travelRef.current;

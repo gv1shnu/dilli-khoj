@@ -1,6 +1,6 @@
 # Performance statistics
 
-Last consolidated 5 September 2026 from branch `open-world`. This is the canonical
+Last consolidated 5 September 2026. This is the canonical
 index for current performance evidence. Raw benchmark output remains in the linked
 JSON files so later runs can replace measurements without rewriting their meaning.
 
@@ -32,6 +32,12 @@ Lazy construction reduced the sampled initial heap by about 70%. Keeping the 3D 
 available at 12 FPS beneath overlays reduced sampled main-thread task time by about
 40% in the current run. Ready time varies between runs; the most recent earlier sample
 was 840 ms with 41.1 MB heap and 179/109 ms active/covered task time.
+
+A separate 1440×900 Chrome sample taken after restoring Ruin 01 held **60 FPS** while
+the new physical set piece, solve toast and XP animation were active. Each of the
+twenty restoration motifs is merged to at most five rendered meshes before the 3×3
+world copy is made. This is a short local guardrail on the host GPU, not an oldest-Air
+GPU measurement.
 
 ## MacBook display and engine matrix
 
@@ -106,14 +112,14 @@ may differ slightly from the hosting provider.
 
 | Asset                                |       Raw |     Gzip |
 | ------------------------------------ | --------: | -------: |
-| Main application JavaScript          |  1.265 MB | 0.343 MB |
-| Application CSS                      |  0.027 MB | 0.007 MB |
+| Main application JavaScript          |  1.278 MB | 0.352 MB |
+| Application CSS                      |  0.028 MB | 0.007 MB |
 | PGlite main WebAssembly              | 10.088 MB | 3.390 MB |
 | PGlite PostgreSQL data               |  6.295 MB | 1.860 MB |
 | PGlite worker JavaScript             |  0.611 MB | 0.140 MB |
 | PGlite initialization WebAssembly    |  0.395 MB | 0.145 MB |
 | Soldier model                        |  2.160 MB | 1.365 MB |
-| All listed build assets plus Soldier | 20.854 MB | 7.252 MB |
+| All listed build assets plus Soldier | 20.868 MB | 7.261 MB |
 
 The current compressed asset set exceeds the aspirational 5 MB initial-payload target.
 The development browser observed 17.3 MB transferred. Hosted compression, cache hits,
@@ -144,8 +150,8 @@ and campus-network behavior remain release gates.
 
 ## Development command timings
 
-The latest local verification snapshot completed 152 tests in 3.47 seconds and the
-Vite production bundle in 287 ms. The six-profile MacBook matrix took about 44 seconds;
+The latest local verification snapshot completed 157 tests in 3.24 seconds and the
+Vite production bundle in 275 ms. The six-profile MacBook matrix took about 44 seconds;
 the complete twenty-archive WebKit smoke took about 104 seconds. These timings describe
 the development harness and are not player-facing performance targets.
 

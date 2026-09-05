@@ -3,6 +3,7 @@ import { LEVELS } from "./levels";
 import { LevelKit } from "./kit";
 import { findRoute } from "./layout";
 import { soundscapeSignature } from "../ambience";
+import { buildRestorationFeature, RESTORATIONS } from "./restorations";
 
 describe("authored physical locations", () => {
   it("gives every ruin a distinct audible environment", () => {
@@ -11,6 +12,28 @@ describe("authored physical locations", () => {
     expect(
       new Set(LEVELS.map((level) => soundscapeSignature(level.sound))).size,
     ).toBe(20);
+  });
+  it("gives every ruin a distinct physical restoration payoff", () => {
+    expect(RESTORATIONS).toHaveLength(20);
+    expect(RESTORATIONS.map((entry) => entry.id)).toEqual(
+      Array.from({ length: 20 }, (_, index) => index + 1),
+    );
+    expect(new Set(RESTORATIONS.map((entry) => entry.motif)).size).toBe(20);
+    expect(new Set(RESTORATIONS.map((entry) => entry.title)).size).toBe(20);
+    for (const level of LEVELS) {
+      const kit = new LevelKit(level);
+      const feature = buildRestorationFeature(level, kit);
+      try {
+        expect(feature.userData.parts).toBeGreaterThan(2);
+        expect(feature.children.length).toBeGreaterThan(0);
+        expect(feature.children.length).toBeLessThanOrEqual(5);
+        expect(feature.visible).toBe(false);
+        expect(feature.userData.restoration).toBeTruthy();
+        expect(kit.blocked(...level.archive)).toBe(false);
+      } finally {
+        kit.dispose();
+      }
+    }
   });
   for (const level of LEVELS)
     it(`level ${level.id}: entrance, archive and discovery are reachable`, () => {

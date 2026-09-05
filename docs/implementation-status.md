@@ -1,6 +1,6 @@
 # Implementation status
 
-Reviewed 5 September 2026. Branch: `open-world`. **Development preview; classroom
+Reviewed 5 September 2026. **Development preview; classroom
 release is blocked.** Local implementation does not imply deployment.
 
 ## Implemented on this branch
@@ -9,11 +9,12 @@ release is blocked.** Local implementation does not imply deployment.
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | World              | Twenty physically distinct 120-unit ruin environments constructed on first entry, repeating visual fields, wrapped player/camera, sequential gates, animated Soldier, run-first movement, intro and browser fullscreen |
 | Guidance and map   | Player-selectable trail to current archive or unlocked next gate; illustrated bottom-to-top journey map with uneven spacing, gray zig-zag paths and distinct icons; pause/reduced motion and compact-screen access     |
-| Feedback and audio | Twenty procedural ambience profiles; player-anchored green XP gains and red help deductions; M toggles audio and Shift changes running to walking                                                                      |
+| Feedback and audio | Twenty procedural ambience profiles and distinct solve stings; safe mismatch diagnostics; player-anchored green XP gains and red help deductions; M toggles audio and Shift changes running to walking                          |
 | Content            | 20 curriculum-ordered first-pass questions; 60 generated server datasets; visible-only browser fixtures                                                                                                                |
 | Identity           | Shared three-domain/admin policy; confirmed, non-anonymous Google accounts required; current server records checked                                                                                                    |
 | Grading            | All 20 ruins supported; JWT validation, AST policy, read-only restricted role, bounded row fetch, timeouts and three-case comparison                                                                                   |
-| Progress           | Server prerequisites, survey +5, first solve +20, hints −10, reveal −20; start 100, maximum 600; wrong answers free                                                                                                    |
+| Progress           | Server prerequisites, survey +5, first solve +20, first clue free, deeper clue −5, reveal −15; start 100, maximum 600; wrong answers free                                                                               |
+| Restoration        | Every solve closes the archive and reveals one of twenty named, physically distinct, lazily built restoration set pieces before the player follows the newly opened gate                                                |
 | Consistency        | Profile-row locking and idempotent requests prevent repeated awards/purchases; completion timestamp recorded once                                                                                                      |
 | Browser state      | Signed-in progression comes from server; hidden tabs stop polling and visible polls use jitter; drafts/retry IDs are keyed by UUID; account changes remount the game; DEV preview is separate                          |
 | Help               | Only purchased hints/solutions returned to a student; answers and hints excluded from production content                                                                                                               |
@@ -24,7 +25,7 @@ release is blocked.** Local implementation does not imply deployment.
 ## Verification
 
 - Laptop baseline: Node 22.23.2, pnpm 11.19.0, frozen install, typecheck, 39 original tests, build and `dist/models/soldier.glb` verified.
-- Current unit/integration suite: **152 tests pass**, including migration reproduction,
+- Current unit/integration suite: **157 tests pass**, including migration reproduction,
   all-ruin fixtures, authorization, grants, transactional gameplay, revisits,
   leaderboard, admin, retry isolation, trail targeting, map progression, movement,
   sound profiles and avatar-anchored feedback.

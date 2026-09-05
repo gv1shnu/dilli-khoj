@@ -632,6 +632,61 @@ button:disabled {
   }
 }
 
+.restoration-toast {
+  position: absolute;
+  bottom: 74px;
+  left: 50%;
+  z-index: 9;
+  width: min(440px, calc(100vw - 32px));
+  padding: 18px 20px;
+  border: 1px solid rgba(101, 225, 189, 0.55);
+  border-top: 3px solid var(--mint);
+  background: linear-gradient(
+    135deg,
+    rgba(11, 25, 21, 0.96),
+    rgba(15, 17, 15, 0.92)
+  );
+  box-shadow:
+    0 18px 70px rgba(0, 0, 0, 0.55),
+    0 0 34px rgba(101, 225, 189, 0.12);
+  translate: -50%;
+  animation: restoration-arrive 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.restoration-toast > span {
+  color: var(--mint);
+  font:
+    700 0.62rem/1 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.16em;
+}
+
+.restoration-toast h2 {
+  margin: 7px 0 5px;
+  color: #f4eedf;
+  font-size: 1.25rem;
+}
+
+.restoration-toast p {
+  margin: 0 0 13px;
+  color: #c9c8bd;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+@keyframes restoration-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .result-scroll {
   max-height: 150px;
   overflow: auto;

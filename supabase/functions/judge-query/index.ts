@@ -1,7 +1,10 @@
 import { withSupabase } from "@supabase/server";
 import postgres from "postgres";
 import { inspectJudgeQuery } from "../_shared/query-policy.ts";
-import { compareResult } from "../_shared/result-compare.ts";
+import {
+  diagnoseResult,
+  type ResultDiagnosisCode,
+} from "../_shared/result-compare.ts";
 import { resultByteLength } from "../_shared/result-size.ts";
 
 const MAX_RESULT_BYTES = 64 * 1024;
@@ -139,7 +142,7 @@ export default {
 
     const lease = preparation.lease;
     if (lease.status === "cached" && lease.verdict)
-      return Response.json(lease.verdict);
+      return Response.json(withDiagnosticMessage(lease.verdict));
     if (lease.status === "locked") {
       return Response.json(
         { message: "One submission is already being checked." },
@@ -182,6 +185,7 @@ export default {
 
     let casesPassed = 0;
     let verdictCode = "wrong_result";
+    let resultDiagnosis: ResultDiagnosisCode | null = null;
 
     try {
       for (const testCase of manifest.cases) {
@@ -193,22 +197,24 @@ export default {
           manifest.maxResultRows,
         );
 
-        const matches =
-          result.rows.length <= manifest.maxResultRows &&
-          compareResult(
-            {
-              columns: result.columns,
-              rows: result.rows,
-              columnTypes: result.columnTypes,
-            },
-            {
-              columns: testCase.expectedColumns,
-              columnTypes: testCase.expectedTypes,
-              rows: testCase.expectedRows,
-              comparison: testCase.comparison,
-            },
-          );
-        if (matches) casesPassed += 1;
+        const diagnosis =
+          result.rows.length > manifest.maxResultRows
+            ? "extra_rows"
+            : diagnoseResult(
+                {
+                  columns: result.columns,
+                  rows: result.rows,
+                  columnTypes: result.columnTypes,
+                },
+                {
+                  columns: testCase.expectedColumns,
+                  columnTypes: testCase.expectedTypes,
+                  rows: testCase.expectedRows,
+                  comparison: testCase.comparison,
+                },
+              );
+        if (diagnosis === "correct") casesPassed += 1;
+        else resultDiagnosis ??= diagnosis;
       }
     } catch (error) {
       verdictCode = isTimeout(error)
@@ -221,6 +227,8 @@ export default {
     const correct =
       verdictCode === "wrong_result" && casesPassed === manifest.cases.length;
     if (correct) verdictCode = "ok";
+    else if (verdictCode === "wrong_result" && resultDiagnosis)
+      verdictCode = `result_${resultDiagnosis}`;
 
     try {
       const verdict = await recordVerdict(progress, {
@@ -232,14 +240,7 @@ export default {
         casesTotal: manifest.cases.length,
         latencyMs: Math.round(performance.now() - startedAt),
       });
-      return Response.json(
-        verdictCode === "result_too_large"
-          ? {
-              ...verdict,
-              message: "Return fewer rows or smaller values and try again.",
-            }
-          : verdict,
-      );
+      return Response.json(withDiagnosticMessage(verdict));
     } catch (error) {
       await releaseLease(progress, player.id, body.submission_id);
       console.error("Failed to record judge verdict", getErrorMessage(error));
@@ -267,6 +268,32 @@ function getConnections(): Connections {
     }),
   };
   return connections;
+}
+
+function withDiagnosticMessage(verdict: JudgeVerdict): JudgeVerdict {
+  const messages: Record<string, string> = {
+    result_column_count:
+      "Check how many columns you return and compare them with the sample shape.",
+    result_columns:
+      "Check the requested column names and return them in the shown order.",
+    result_missing_rows:
+      "At least one check is missing qualifying records. Revisit every condition and empty value.",
+    result_extra_rows:
+      "At least one check includes records outside the request. Tighten the conditions.",
+    result_duplicate_rows:
+      "At least one check contains repeated records. Decide whether each record should appear once.",
+    result_order:
+      "The right records appear in a different order in at least one check.",
+    result_values:
+      "The output shape is right, but one or more values differ. Recheck calculations and conditions.",
+    result_too_large: "Return fewer rows or smaller values and try again.",
+    timeout: "The check took too long. Simplify the work and try again.",
+    sql_error:
+      "The archive could not run this attempt. Check the query structure and names.",
+  };
+  return messages[verdict.code]
+    ? { ...verdict, message: messages[verdict.code] }
+    : verdict;
 }
 
 async function releaseLease(

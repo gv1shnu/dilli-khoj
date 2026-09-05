@@ -37,6 +37,7 @@ export interface Ambience {
   setProfile: (profile: Soundscape) => void;
   setQuiet: (quiet: boolean) => void;
   footstep: (stone: boolean) => void;
+  restore: () => void;
   dispose: () => void;
 }
 /** Original procedural environmental audio. No recording downloads or external licenses. */
@@ -321,6 +322,16 @@ export function createAmbience(): Ambience {
     footstep: (stone) => {
       if (on && !quiet && ctx?.state === "running")
         note(stone ? 95 : 65, 0.07, 0.025, "triangle", 35);
+    },
+    restore: () => {
+      resume();
+      if (!on || ctx?.state !== "running") return;
+      const root = Math.max(90, profile.tone);
+      const colour = 1 + (soundscapeSeed(profile) % 7) / 24;
+      note(root * colour, 1.3, 0.09, "triangle", root * colour * 1.5);
+      note(root * colour * 1.25, 1.6, 0.075, "sine", root * colour * 1.9, 0.22);
+      note(root * colour * 1.5, 2.1, 0.065, "sine", root * colour * 2, 0.48);
+      noiseHit(520 + (soundscapeSeed(profile) % 900), 1.1, 0.035, 0.08, 0.7);
     },
     dispose: () => {
       disposed = true;

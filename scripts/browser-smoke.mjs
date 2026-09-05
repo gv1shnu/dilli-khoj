@@ -51,8 +51,8 @@ try {
     await editor.fill(q.canonicalSolution);
     await run.click();
     await page
-      .getByRole("status")
-      .filter({ hasText: "Visible case passed!" })
+      .locator(".restoration-toast")
+      .filter({ hasText: "RESTORATION" })
       .waitFor();
     if (q.id === 1) {
       const currentAmber = page.getByRole("button", {
@@ -79,12 +79,7 @@ try {
       await currentAmber.click();
       assert.equal(await currentAmber.getAttribute("aria-pressed"), "true");
     }
-    assert.equal(
-      await page
-        .getByRole("button", { name: "Submit", exact: true })
-        .isDisabled(),
-      true,
-    );
+    assert.equal(await editor.count(), 0);
   }
   assert.match(await page.locator(".mission-progress").innerText(), /20 \/ 20/);
   assert.equal(
@@ -94,9 +89,6 @@ try {
     ),
     questions[19].canonicalSolution,
   );
-  await page
-    .getByRole("button", { name: "Close terminal", exact: true })
-    .click();
   await page.getByRole("button", { name: "World map", exact: true }).click();
   await page
     .getByRole("button", { name: "Purana Qila quarantine gate", exact: true })
