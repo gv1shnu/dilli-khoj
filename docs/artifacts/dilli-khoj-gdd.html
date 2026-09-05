@@ -1,0 +1,559 @@
+<title>Dilli Khoj GDD</title>
+<style>
+  :root {
+    --bg: #ede9de;
+    --surface: #f5f2e9;
+    --surface-2: #e7e2d4;
+    --ink: #241f1a;
+    --muted: #6b6459;
+    --faint: #8c8474;
+    --amber: #b8660d;
+    --amber-soft: #c67514;
+    --teal: #2e6b5e;
+    --line: rgba(36, 31, 26, 0.14);
+    --line-soft: rgba(36, 31, 26, 0.08);
+    --glow: rgba(198, 117, 20, 0.16);
+    --shadow: 0 1px 2px rgba(36, 31, 26, 0.05), 0 8px 30px rgba(36, 31, 26, 0.06);
+    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16130f;
+      --surface: #1f1b15;
+      --surface-2: #262019;
+      --ink: #ece6d8;
+      --muted: #a79c88;
+      --faint: #8a8071;
+      --amber: #e9a23b;
+      --amber-soft: #e0912a;
+      --teal: #5fa894;
+      --line: rgba(236, 230, 216, 0.16);
+      --line-soft: rgba(236, 230, 216, 0.08);
+      --glow: rgba(233, 162, 59, 0.14);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 34px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16130f;
+    --surface: #1f1b15;
+    --surface-2: #262019;
+    --ink: #ece6d8;
+    --muted: #a79c88;
+    --faint: #8a8071;
+    --amber: #e9a23b;
+    --amber-soft: #e0912a;
+    --teal: #5fa894;
+    --line: rgba(236, 230, 216, 0.16);
+    --line-soft: rgba(236, 230, 216, 0.08);
+    --glow: rgba(233, 162, 59, 0.14);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 34px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 72px); }
+
+  /* ---- Header ---- */
+  header.masthead {
+    position: relative;
+    padding: clamp(48px, 8vw, 104px) 0 clamp(36px, 5vw, 60px);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  header.masthead::before {
+    content: "";
+    position: absolute;
+    top: -40%; right: -10%;
+    width: 620px; height: 620px;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 62%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .masthead > * { position: relative; z-index: 1; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-size: clamp(2.9rem, 8vw, 5.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 .sub {
+    display: block;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.6vw, 1.7rem);
+    color: var(--muted);
+    letter-spacing: 0;
+    margin-top: 0.5em;
+    max-width: 32ch;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    margin-top: 32px;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding: 5px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+  .tag.live { color: var(--amber); border-color: color-mix(in srgb, var(--amber) 40%, var(--line)); }
+
+  /* ---- Layout with section rail ---- */
+  main { padding: clamp(40px, 6vw, 72px) 0 96px; }
+  section {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 68ch);
+    gap: clamp(16px, 4vw, 48px);
+    padding: clamp(34px, 5vw, 52px) 0;
+    border-top: 1px solid var(--line-soft);
+    justify-content: center;
+  }
+  section:first-of-type { border-top: none; }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--amber);
+    padding-top: 0.55rem;
+    letter-spacing: 0.04em;
+  }
+  .sec-body > *:first-child { margin-top: 0; }
+  .sec-body > *:last-child { margin-bottom: 0; }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3.4vw, 2.05rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.7em;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 1.02rem;
+    letter-spacing: 0.01em;
+    margin: 2em 0 0.6em;
+  }
+  p { margin: 0 0 1.1em; }
+  a { color: var(--amber); text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  em { color: inherit; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    padding: 0.12em 0.4em;
+    border-radius: 4px;
+  }
+  .lead { font-size: 1.14rem; color: var(--ink); }
+  .lead strong { color: var(--amber); }
+
+  /* pull quote */
+  .pull {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    line-height: 1.3;
+    font-style: italic;
+    color: var(--ink);
+    border-left: 3px solid var(--amber);
+    padding: 4px 0 4px 22px;
+    margin: 1.4em 0;
+    text-wrap: balance;
+  }
+
+  /* pillars */
+  ol.pillars, ol.loop { list-style: none; counter-reset: item; padding: 0; margin: 0; }
+  ol.pillars > li, ol.loop > li {
+    counter-increment: item;
+    position: relative;
+    padding: 0 0 0 46px;
+    margin: 0 0 1.15em;
+  }
+  ol.pillars > li::before, ol.loop > li::before {
+    content: counter(item);
+    position: absolute; left: 0; top: 0.05em;
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    font-family: var(--mono);
+    font-size: 0.82rem; font-weight: 600;
+    color: var(--amber);
+    border: 1px solid color-mix(in srgb, var(--amber) 35%, var(--line));
+    border-radius: 50%;
+    background: var(--surface);
+  }
+  ol.pillars > li strong { display: block; margin-bottom: 0.1em; }
+
+  ul.plain { padding-left: 1.2em; margin: 0 0 1.1em; }
+  ul.plain li { margin-bottom: 0.5em; padding-left: 0.2em; }
+  ul.plain li::marker { color: var(--amber); }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; margin: 0.5em 0 1.2em; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  caption { text-align: left; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); padding: 12px 16px 0; }
+  th, td { text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint);
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  td.rn { font-family: var(--mono); color: var(--amber); font-weight: 500; }
+  .xp-pos { color: var(--teal); font-weight: 600; }
+  .xp-neg { color: var(--amber); font-weight: 600; }
+  .band { font-family: var(--mono); font-size: 0.72rem; color: var(--faint); }
+
+  /* district legend chips inside curriculum */
+  .mod { display: inline-block; font-family: var(--mono); font-size: 0.72rem; color: var(--teal); font-weight: 600; }
+
+  /* two-surface callouts */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0.6em 0 1.2em; }
+  .duo .box { border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; background: var(--surface); }
+  .duo .box h4 { margin: 0 0 0.5em; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .duo .box.run h4 { color: var(--teal); }
+  .duo .box.submit h4 { color: var(--amber); }
+  .duo .box p { margin: 0; font-size: 0.94rem; color: var(--muted); }
+  @media (max-width: 620px) { .duo { grid-template-columns: 1fr; } }
+
+  /* key-value stat strip */
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; margin: 0.4em 0 1.2em; }
+  .stat { flex: 1 1 130px; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--surface); }
+  .stat .v { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1; }
+  .stat .v.amber { color: var(--amber); }
+  .stat .v.teal { color: var(--teal); }
+  .stat .k { display: block; margin-top: 7px; font-size: 0.78rem; color: var(--muted); line-height: 1.35; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 64px; }
+  footer .page-inner { max-width: 68ch; margin: 0 auto; color: var(--faint); font-size: 0.84rem; }
+  footer code { background: none; padding: 0; color: var(--muted); }
+
+  @media (max-width: 760px) {
+    section { grid-template-columns: 1fr; gap: 6px; }
+    .sec-num { padding-top: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    a, .tag { transition: color 0.15s ease, border-color 0.15s ease; }
+  }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <p class="kicker">Game Design Document · v2026-09-05</p>
+    <h1>Dilli Khoj
+      <span class="sub">Walk a broken city; write SQL to wake its archives; the map lights up as you learn.</span>
+    </h1>
+    <div class="meta-row">
+      <span class="tag">Branch · open-world</span>
+      <span class="tag live">Status · development preview</span>
+      <span class="tag">Browser · 3D · single-player</span>
+      <span class="tag">Teaches · PostgreSQL, Modules 1–8</span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="sec-num">01</div>
+      <div class="sec-body">
+        <h2>High concept</h2>
+        <p class="lead"><strong>Dilli Khoj</strong> — "the search for Delhi" — is a single-player, browser-based 3D exploration game that teaches the practical SQL curriculum of a DBMS course.</p>
+        <p>The player walks the ruins of an imagined, long-abandoned Shahjahanabad and wakes its sealed <strong>archives</strong> one at a time. Each archive is a real SQL question graded against hidden data. Waking an archive restores light to that part of the city and opens the gate to the next.</p>
+        <p>The fantasy is <em>quiet restoration</em> — not competition or combat. You bring a dead city's records back to life by asking the right questions of them. Learning SQL is the literal mechanic by which the world heals.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">02</div>
+      <div class="sec-body">
+        <h2>Design pillars</h2>
+        <ol class="pillars">
+          <li><strong>The curriculum is the map.</strong> The twenty questions follow Modules 1–8 in a fixed order, and that order is literally laid out as a route through the city. Progressing through the world <em>is</em> progressing through the syllabus.</li>
+          <li><strong>Experiment freely, commit deliberately.</strong> Practising a query is unlimited and free — local Postgres in the browser. Only the authoritative <em>Submit</em> touches the hidden grader. Curiosity is never taxed.</li>
+          <li><strong>Debt rations shortcuts, never learning.</strong> Hints and reveals cost XP and are gated by balance. Solving is always free and always available — a player can never be blocked from <em>finishing</em>, only from <em>skipping</em>.</li>
+          <li><strong>No dead ends, no failure states.</strong> A wrong submission costs nothing. No timer, no health, no losing. The only way forward is understanding.</li>
+          <li><strong>Plain language over jargon.</strong> Questions and hints describe the data outcome in everyday words and name the exact columns to use. Technique is suggested, never required — any safe query returning the right rows passes.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">03</div>
+      <div class="sec-body">
+        <h2>Audience &amp; learning goals</h2>
+        <div class="stats">
+          <div class="stat"><span class="v amber">3,000</span><span class="k">students, modern Mac browsers</span></div>
+          <div class="stat"><span class="v teal">₹0</span><span class="k">operating-cost target (free tier)</span></div>
+          <div class="stat"><span class="v">20</span><span class="k">ruins across 7 districts</span></div>
+        </div>
+        <p>The goal is fluent <strong>read-only SQL</strong>: <code>SELECT</code> and <code>WITH … SELECT</code> covering filtering, pattern matching, ordering and paging, string / numeric / date / null functions, aggregation and group-filtering, <code>CASE</code>, window functions, subqueries, and joins with a set operation.</p>
+        <p><strong>Scope guard:</strong> the game is entirely read-only. Even the topics that are <em>about</em> writes (DDL / DML / TCL / DCL in Modules 1–2) are taught through <strong>evidence tables</strong> — catalog, audit, change-log and grant tables — so every concept is exercised with <code>SELECT</code> alone. No writes or privilege changes exist anywhere in the game.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">04</div>
+      <div class="sec-body">
+        <h2>World &amp; narrative</h2>
+        <p>Long after the noise faded, old Delhi went still. Its records — who lived where, what moved through the bazaars, how the wards were run — were sealed in scattered archives and slowly overgrown. The player walks the ruins of Shahjahanabad to wake those archives, one question at a time.</p>
+        <p class="pull">The onboarding never mentions "winning" or "finishing." There is no antagonist and no ending cutscene — the endgame is simply that every region has been brought back to light.</p>
+        <p>The twenty ruins map onto real Delhi landmarks, grouped into <strong>seven districts</strong> that unlock in sequence, each holding one band of the curriculum.</p>
+        <div class="table-wrap">
+          <table>
+            <caption>Districts, in unlock order</caption>
+            <thead><tr><th class="num">#</th><th>District</th><th>Ruins</th><th>Curriculum band</th></tr></thead>
+            <tbody>
+              <tr><td class="num">1</td><td>Yamuna Gates</td><td class="band">1–3</td><td>Schema, keys, constraints</td></tr>
+              <tr><td class="num">2</td><td>The Records Quarter</td><td class="band">4–5</td><td>SQL command families (read-only evidence)</td></tr>
+              <tr><td class="num">3</td><td>Chandni Chowk Bazaars</td><td class="band">6–10</td><td>SELECT, filtering, LIKE/IN/EXISTS, LIMIT</td></tr>
+              <tr><td class="num">4</td><td>Kitchens &amp; Conduits</td><td class="band">11–13</td><td>String, numeric, date, null functions</td></tr>
+              <tr><td class="num">5</td><td>The Outer Yards</td><td class="band">14–16</td><td>GROUP BY, HAVING, CASE</td></tr>
+              <tr><td class="num">6</td><td>The Ridge Lines</td><td class="band">17–18</td><td>Window functions</td></tr>
+              <tr><td class="num">7</td><td>Deep Foundations</td><td class="band">19–20</td><td>Subqueries &amp; joins / set operations</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">05</div>
+      <div class="sec-body">
+        <h2>Core gameplay loop</h2>
+        <ol class="loop">
+          <li><strong>Walk</strong> the city (WASD / arrows, drag to look, Shift to run). Floating arrows trace a walkable route to your next archive.</li>
+          <li><strong>Arrive</strong> at a ruin — a broken place with a glowing <strong>amber</strong> (the sealed archive) rising from it. Press <code>E</code> to open it.</li>
+          <li><strong>Read</strong> what it asks for: a plain-language description, the exact rows and columns wanted, and a sample output. A separate schema browser shows the tables.</li>
+          <li><strong>Run</strong> queries freely against a local copy of the records — unlimited, free, offline-capable. Experiment as much as you like.</li>
+          <li><strong>Submit</strong> when confident. The archive checks your query for real against hidden records you can't see. A wrong answer costs nothing.</li>
+          <li><strong>Restore</strong> on success: the ruin wakes, its lights return, the region appears on your map, and the gate to the next area opens.</li>
+          <li><strong>Travel</strong> via the map to any restored place. Future areas stay sealed until the earlier archives are restored.</li>
+        </ol>
+        <p>Optional at any archive: <strong>open a hint</strong> (small XP cost) or, once all hints are opened, <strong>reveal the full solution</strong> (larger cost). Both are opt-in shortcuts — never required.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">06</div>
+      <div class="sec-body">
+        <h2>World traversal</h2>
+        <p>The world is a <strong>physical open world</strong>, not a menu of levels. Its layout encodes the curriculum so that walking the intended path visits the ruins in syllabus order.</p>
+        <ul class="plain">
+          <li><strong>Serpentine grid.</strong> The twenty ruins sit on a 5×4 grid stitched in snake order, so ruin <code>N+1</code> is always physically adjacent to <code>N</code>. The route through town is the route through the course.</li>
+          <li><strong>Toroidal wrap.</strong> Ground tiles seamlessly (720-unit tiles), so the city reads as boundless — walking off one edge continues the world rather than hitting a wall.</li>
+          <li><strong>Physical gating.</strong> Locked regions are sealed by <strong>gates</strong> that will not admit the player until the prior archive is restored — enforced at the geometry level (<code>canEnter</code>), not just in the UI.</li>
+          <li><strong>Guided routing.</strong> A breadth-first search over walkable cells lays down arrows that always point along a legal path to the current frontier, so a lost player is never truly lost.</li>
+          <li><strong>Per-level kits.</strong> Each location is hand-authored with its own props and landmark silhouette — a stepwell descent, a cable bridge, a ridge ascent, market lanes.</li>
+          <li><strong>Two maps.</strong> Players get an animated atlas where only restored regions are revealed and clickable; admins get a full, inspection-only atlas that never bypasses scoring.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">07</div>
+      <div class="sec-body">
+        <h2>The archives: question design</h2>
+        <p>Every archive presents four things in order — <strong>title</strong>, <strong>description</strong>, <strong>sample output</strong>, and <strong>hints</strong> (opened on demand). The schema browser is a separate panel, not part of the prompt.</p>
+        <ul class="plain">
+          <li><strong>Descriptions</strong> state the required outcome in plain language and name the exact columns and ordering — 12–35 words. They recommend a technique where useful but never require it.</li>
+          <li><strong>Sample output</strong> shows fictional, clearly-fake rows (e.g. <code>sample_col_a</code>) that can never be mistaken for the real answer.</li>
+          <li><strong>Hints</strong> are short, concrete and jargon-free. Ruins 1–10 have one; 11–20 have two. The full solution unlocks only after every hint is opened.</li>
+          <li><strong>Acceptance is by result, not by form.</strong> Each question carries a canonical solution plus structurally different accepted variants (<code>LEFT JOIN</code> vs <code>UNION</code>/<code>NOT EXISTS</code>, <code>HAVING</code> vs a subquery filter). Any safe query returning the correct set passes.</li>
+        </ul>
+        <h3>Reading Modules 1–2 with <code>SELECT</code> only</h3>
+        <p>Schema, keys, constraints and the SQL command families normally imply writes and grants. Dilli Khoj teaches them through evidence tables the player only reads — <code>catalog_columns</code>, <code>column_keys</code>, <code>foreign_keys</code>, <code>change_log</code> (tagged <code>DDL</code> vs <code>DML</code>) and <code>access_grants</code>. That is why these questions name real columns like <code>entity</code> and <code>attribute</code>: those are the actual identifiers the player sees and types, not abstract theory terms.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">08</div>
+      <div class="sec-body">
+        <h2>Progression &amp; unlocks</h2>
+        <ul class="plain">
+          <li><strong>Strictly sequential.</strong> A ruin unlocks only when the previous one is cleared. The frontier is the first ruin not yet cleared.</li>
+          <li><strong>Cleared ruins stay open</strong> for revisiting as non-scoring practice.</li>
+          <li><strong>Server-authoritative in production.</strong> Solved state, XP, hint/reveal usage, survey state, unlocks and completion time are owned by the server. Offline play keeps the same shape but is a non-scoring practice proxy.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">09</div>
+      <div class="sec-body">
+        <h2>Economy: XP, hints, reveals</h2>
+        <p>The economy is a single, closing budget — implemented in <code>src/game/scoring.ts</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <caption>Scoring events</caption>
+            <thead><tr><th>Event</th><th class="num">XP</th></tr></thead>
+            <tbody>
+              <tr><td>Starting balance</td><td class="num">100</td></tr>
+              <tr><td>First completion of a ruin</td><td class="num xp-pos">+20</td></tr>
+              <tr><td>First survey of a ruin</td><td class="num xp-pos">+5</td></tr>
+              <tr><td>Open a hint</td><td class="num xp-neg">−10</td></tr>
+              <tr><td>Reveal the full solution</td><td class="num xp-neg">−20</td></tr>
+              <tr><td>Wrong submission</td><td class="num">0</td></tr>
+              <tr><td>Revisit practice</td><td class="num">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="v teal">600</span><span class="k"><code>MAX_XP</code> — a flawless no-help run</span></div>
+          <div class="stat"><span class="v amber">~13</span><span class="k">of 20 — where maximum help runs out (<code>EXHAUSTS_AROUND</code>)</span></div>
+          <div class="stat"><span class="v">0</span><span class="k">cost of a wrong answer — Submit is a safe probe</span></div>
+        </div>
+        <ul class="plain">
+          <li><strong>Help is a purchase gated by balance.</strong> You cannot open a hint or reveal you can't afford. A player taking maximum help every level runs out around level 13 and must solve the rest unaided — there is no buying your way to the finish.</li>
+          <li><strong>Solving is always free and always available.</strong> Debt never blocks learning; only shortcuts are rationed.</li>
+          <li><strong>A reveal solves nothing automatically.</strong> Even after revealing, the learner must submit a passing query. There is no path to the end without solving.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">10</div>
+      <div class="sec-body">
+        <h2>Grading &amp; integrity</h2>
+        <p>Two distinct execution surfaces keep practice cheap and grading trustworthy.</p>
+        <div class="duo">
+          <div class="box run">
+            <h4>Run · practice</h4>
+            <p>Runs in PGlite — Postgres compiled to WebAssembly, in a browser Web Worker — against the <em>visible</em> dataset. Free, unlimited, offline, never scored.</p>
+          </div>
+          <div class="box submit">
+            <h4>Submit · authoritative</h4>
+            <p>Sent to a Supabase Edge Function judge that parses with <code>libpg-query</code>, enforces a read-only table allow-list and a timeout, runs against <em>hidden</em> data, and compares the result set to precomputed rows.</p>
+          </div>
+        </div>
+        <ul class="plain">
+          <li><strong>Three fixtures per question</strong> — one visible for practice, two hidden for grading — so memorising the visible answer does not pass.</li>
+          <li><strong>Expected rows are computed, never hand-written</strong> — the canonical solution is run against each fixture by real Postgres during content generation.</li>
+          <li><strong>Result-based acceptance with near-miss tests:</strong> known-wrong queries must fail; every accepted variant must pass.</li>
+          <li><strong>Least privilege:</strong> the judge executes as a role that can only <code>SELECT</code> from fixture schemas; private answer and help tables are unreadable by players and by the executor role.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">11</div>
+      <div class="sec-body">
+        <h2>Revisits, leaderboard &amp; endgame</h2>
+        <p>Any cleared ruin reopens from the map as a <strong>revisit</strong> — a non-scoring practice attempt. Variants are deterministic from (player, ruin, visit count): the same tables with a different target or threshold, so a topic can be drilled without ever touching XP, unlocks or the leaderboard.</p>
+        <h3>Leaderboard</h3>
+        <ul class="plain">
+          <li>Lists <strong>only players who have completed all twenty ruins.</strong></li>
+          <li>Ranked by <strong>XP remaining</strong> (descending), then <strong>completion time</strong> (ascending, from server-recorded sign-up to first completion).</li>
+          <li>Shows name and XP — <strong>never email addresses</strong> — top twenty plus the current player's own position.</li>
+        </ul>
+        <h3>Endgame</h3>
+        <p>Restoring the twentieth archive — Signature Bridge — lights the whole city. There is no forced ending screen; the open world remains to wander and revisit.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">12</div>
+      <div class="sec-body">
+        <h2>Interface, audio &amp; art</h2>
+        <p>A reopenable onboarding overlay explains movement, ruins &amp; ambers, and the Run/Submit loop — deliberately saying nothing about "finishing." Controls: WASD/arrows to walk, drag to look, <code>Shift</code> to run, <code>E</code> to open an archive, <code>M</code> to mute ambience. Dialogs trap and restore focus; motion can be paused and honors reduced-motion preferences.</p>
+        <p><strong>Regional soundscapes</strong> give each district its own generated ambience — river wind at the water gates, insects and birds on the wooded ridge, water drops in the stepwell, market murmur in the bazaars — built procedurally with the Web Audio API, so there are no large audio downloads. Art direction is low-poly, quiet and overgrown, with hand-placed landmark silhouettes per ruin; inspiration is credited to <em>Exceletia</em> by edusatyaki.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">13</div>
+      <div class="sec-body">
+        <h2>Technical architecture &amp; content pipeline</h2>
+        <ul class="plain">
+          <li><strong>Client:</strong> Vite + React 19 + TypeScript, 3D via Three.js; hosted as static assets on Cloudflare Workers.</li>
+          <li><strong>Local practice DB:</strong> PGlite (Postgres in WebAssembly) in a Web Worker.</li>
+          <li><strong>Backend:</strong> Supabase — Google auth (approved-domain allow-list), Postgres for authoritative state, and an Edge Function judge. State and grading are exposed only through RPCs; answers, help and fixtures are server-private.</li>
+          <li><strong>CI/CD:</strong> GitHub Actions; <code>main</code> auto-deploys. Timezone pinned to <code>Asia/Kolkata</code> across content and test scripts for deterministic timestamps.</li>
+        </ul>
+        <p><code>src/questions/catalog.ts</code> is the single authoring source of truth. Generators derive everything from it: the client bundle (<strong>hint text and answers stripped</strong> — only a <code>hintCount</code> ships), the judge fixtures migration (hidden schemas and Postgres-computed expected rows), and a forward-only migration that updates player-facing copy in the live database. A reproducibility test asserts the committed fixtures are byte-identical to what the catalog generates, so authoring, the client and the grader can never silently drift apart.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">14</div>
+      <div class="sec-body">
+        <h2>The twenty archives</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>Curriculum sequence — fixed order, never resequenced</caption>
+            <thead><tr><th class="num">#</th><th>Place</th><th class="num">Mod</th><th>Learning target</th><th class="num">Hints</th></tr></thead>
+            <tbody>
+              <tr><td class="rn">01</td><td>Purana Qila quarantine gate</td><td class="num">1</td><td>Entity, attribute &amp; schema</td><td class="num">1</td></tr>
+              <tr><td class="rn">02</td><td>Kashmere Gate ISBT</td><td class="num">1</td><td>Primary, candidate, unique &amp; not-null keys</td><td class="num">1</td></tr>
+              <tr><td class="rn">03</td><td>Nigambodh Ghat register</td><td class="num">1</td><td>Foreign keys &amp; referential integrity</td><td class="num">1</td></tr>
+              <tr><td class="rn">04</td><td>Old Delhi records room</td><td class="num">2</td><td>DDL/DML evidence via catalog &amp; audit tables</td><td class="num">1</td></tr>
+              <tr><td class="rn">05</td><td>Kotwali vault</td><td class="num">2</td><td>TCL/DCL outcomes via logs &amp; grants</td><td class="num">1</td></tr>
+              <tr><td class="rn">06</td><td>Chandni Chowk</td><td class="num">3</td><td>SELECT and WHERE</td><td class="num">1</td></tr>
+              <tr><td class="rn">07</td><td>Fatehpuri Masjid steps</td><td class="num">3</td><td>DISTINCT</td><td class="num">1</td></tr>
+              <tr><td class="rn">08</td><td>Chawri Bazaar lanes</td><td class="num">3</td><td>LIKE, ILIKE and wildcards</td><td class="num">1</td></tr>
+              <tr><td class="rn">09</td><td>Dariba Kalan</td><td class="num">3</td><td>IN, EXISTS and logical operators</td><td class="num">1</td></tr>
+              <tr><td class="rn">10</td><td>Chor Bazaar</td><td class="num">3</td><td>ORDER BY, LIMIT and OFFSET</td><td class="num">1</td></tr>
+              <tr><td class="rn">11</td><td>Karim's, Jama Masjid</td><td class="num">4</td><td>String functions</td><td class="num">2</td></tr>
+              <tr><td class="rn">12</td><td>Wazirabad water works</td><td class="num">4</td><td>Numeric functions &amp; null handling</td><td class="num">2</td></tr>
+              <tr><td class="rn">13</td><td>Old Delhi station clock</td><td class="num">4</td><td>Date functions &amp; aggregation</td><td class="num">2</td></tr>
+              <tr><td class="rn">14</td><td>Azadpur Mandi</td><td class="num">5</td><td>GROUP BY and aggregates</td><td class="num">2</td></tr>
+              <tr><td class="rn">15</td><td>Ghazipur landfill</td><td class="num">5</td><td>Group filtering (HAVING)</td><td class="num">2</td></tr>
+              <tr><td class="rn">16</td><td>Tihar sorting yard</td><td class="num">5</td><td>CASE with grouping &amp; aggregates</td><td class="num">2</td></tr>
+              <tr><td class="rn">17</td><td>Rajiv Chowk interchange</td><td class="num">6</td><td>ROW_NUMBER, RANK, DENSE_RANK</td><td class="num">2</td></tr>
+              <tr><td class="rn">18</td><td>Ridge signal tower</td><td class="num">6</td><td>LAG, LEAD &amp; rolling comparison</td><td class="num">2</td></tr>
+              <tr><td class="rn">19</td><td>Agrasen ki Baoli</td><td class="num">7</td><td>Nested &amp; correlated subqueries</td><td class="num">2</td></tr>
+              <tr><td class="rn">20</td><td>Signature Bridge</td><td class="num">8</td><td>Multi-table joins &amp; a set operation</td><td class="num">2</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-num">15</div>
+      <div class="sec-body">
+        <h2>Non-goals &amp; open items</h2>
+        <ul class="plain">
+          <li><strong>No writes.</strong> No <code>INSERT</code>/<code>UPDATE</code>/<code>DELETE</code>/DDL/DCL is ever run by a player; write-family topics are taught read-only by design.</li>
+          <li><strong>No multiplayer, combat, or timers.</strong> The only competitive surface is the completers-only leaderboard.</li>
+          <li><strong>Not yet deployed.</strong> This branch implements all twenty server-graded questions and trusted progression; the current hosted build still reports an older Ruin-06-only judge. Shipping requires pushing the new migrations and redeploying the judge.</li>
+          <li><strong>Blind human review</strong> of each drafted question remains a production step before a classroom-wide release.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page-inner">
+      Consolidated from <code>src/game/ruins.ts</code>, <code>src/game/progression.ts</code>, <code>src/questions/catalog.ts</code>, <code>src/game/world/</code>, <code>docs/product-spec.md</code>, <code>docs/curriculum-map.md</code>, and the content-generation scripts. Canonical source: <code>docs/game-design-document.md</code>.
+    </div>
+  </footer>
+</div>

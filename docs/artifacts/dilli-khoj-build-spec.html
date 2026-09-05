@@ -1,0 +1,758 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Dilli Khoj Build Spec</title>
+<style>
+  :root{
+    --ink:#100E0C; --ink-2:#191512; --ink-3:#221D18;
+    --rule:#332A22; --rule-soft:#261F19;
+    --text:#EDE4D6; --text-2:#A79880; --text-3:#7A6C58;
+    --amber:#E8A33D; --amber-dim:#8C5F1E;
+    --verdigris:#5AA48D; --rust:#C4553B; --dust:#C9B79A;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --ink:#F4EFE4; --ink-2:#FBF8F1; --ink-3:#EAE3D4;
+      --rule:#D6CBB6; --rule-soft:#E4DBC9;
+      --text:#231C14; --text-2:#655847; --text-3:#8B7C68;
+      --amber:#A96A0E; --amber-dim:#C29A55;
+      --verdigris:#2E6B57; --rust:#9A3A22; --dust:#6E5F49;
+    }
+  }
+  :root[data-theme="light"]{
+    --ink:#F4EFE4; --ink-2:#FBF8F1; --ink-3:#EAE3D4;
+    --rule:#D6CBB6; --rule-soft:#E4DBC9;
+    --text:#231C14; --text-2:#655847; --text-3:#8B7C68;
+    --amber:#A96A0E; --amber-dim:#C29A55;
+    --verdigris:#2E6B57; --rust:#9A3A22; --dust:#6E5F49;
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--ink); color:var(--text);
+    font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+    font-size:16px; line-height:1.62; margin:0; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px 96px;}
+  .col{max-width:70ch;}
+
+  h1,h2,h3,.eyebrow,.num{font-family:Oswald,"Arial Narrow",sans-serif; text-wrap:balance;}
+  h1{font-size:clamp(38px,6vw,66px); font-weight:600; line-height:1.02; letter-spacing:.5px;
+     margin:0 0 6px; text-transform:uppercase;}
+  h2{font-size:26px; font-weight:500; letter-spacing:.6px; text-transform:uppercase; margin:0;}
+  h3{font-size:17px; font-weight:500; letter-spacing:.7px; text-transform:uppercase;
+     margin:26px 0 8px; color:var(--dust);}
+  h3:first-child{margin-top:0;}
+  p{margin:0 0 14px;}
+  a{color:var(--amber);}
+  strong{font-weight:600; color:var(--text);}
+  em{color:var(--dust); font-style:normal;}
+  kbd{font-family:"IBM Plex Mono",monospace; font-size:.85em; border:1px solid var(--rule);
+      border-radius:3px; padding:1px 5px; color:var(--dust);}
+  .eyebrow{font-size:12px; letter-spacing:2.4px; text-transform:uppercase; color:var(--amber);}
+
+  header{padding:64px 0 34px; border-bottom:1px solid var(--rule);}
+  .sub{font-size:19px; color:var(--text-2); max-width:62ch; margin:14px 0 0;}
+  .facts{display:flex; flex-wrap:wrap; margin-top:34px; border:1px solid var(--rule);
+         border-radius:2px; overflow:hidden;}
+  .fact{flex:1 1 158px; padding:14px 18px; border-right:1px solid var(--rule); background:var(--ink-2);}
+  .fact:last-child{border-right:none;}
+  .fact .k{font-size:11px; letter-spacing:1.8px; text-transform:uppercase; color:var(--text-3);
+           font-family:Oswald,sans-serif;}
+  .fact .v{font-family:"IBM Plex Mono",monospace; font-size:16px; margin-top:3px;
+           font-variant-numeric:tabular-nums;}
+  .fact .v.ok{color:var(--verdigris);}
+
+  section{padding:52px 0 0;}
+  .shead{display:flex; align-items:baseline; gap:16px; margin-bottom:22px;
+         border-bottom:1px solid var(--rule-soft); padding-bottom:10px;}
+  .shead .num{font-size:13px; letter-spacing:1.6px; color:var(--amber-dim);
+              font-variant-numeric:tabular-nums; flex:0 0 auto;}
+
+  .verdict{background:var(--ink-2); border-left:3px solid var(--rust); padding:22px 26px;
+           margin:0 0 18px; border-radius:0 3px 3px 0;}
+  .verdict .lede{font-size:18px; margin-bottom:10px; font-weight:500; color:var(--text);}
+  .verdict p:last-child{margin-bottom:0;}
+  .keep{border-left-color:var(--verdigris);}
+  .note{border-left-color:var(--amber);}
+
+  .stack{display:grid; gap:9px; margin:8px 0 24px;}
+  .tier{display:grid; grid-template-columns:158px 1fr; border:1px solid var(--rule);
+        background:var(--ink-2); border-radius:2px;}
+  .tier .lbl{padding:16px 14px; border-right:1px solid var(--rule); background:var(--ink-3);
+             font-family:Oswald,sans-serif; font-size:13px; letter-spacing:1.4px;
+             text-transform:uppercase; color:var(--dust); display:flex; align-items:center;}
+  .tier .bd{padding:14px 18px;}
+  .tier .bd .t{font-family:"IBM Plex Mono",monospace; font-size:14.5px; color:var(--amber); margin-bottom:3px;}
+  .tier .bd .d{font-size:14.5px; color:var(--text-2);}
+  .tier.sealed .lbl{background:var(--rust); color:#fff;}
+  .flow{text-align:center; color:var(--text-3); font-size:13px; letter-spacing:1px; margin:-2px 0;}
+
+  .scroll{overflow-x:auto; border:1px solid var(--rule); border-radius:2px; margin:0 0 20px;}
+  table{border-collapse:collapse; width:100%; min-width:700px; font-size:14.5px;}
+  thead th{background:var(--ink-3); text-align:left; padding:11px 14px; font-family:Oswald,sans-serif;
+           font-weight:500; font-size:12px; letter-spacing:1.4px; text-transform:uppercase;
+           color:var(--dust); border-bottom:1px solid var(--rule); white-space:nowrap;}
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--rule-soft); vertical-align:top; color:var(--text-2);}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even){background:color-mix(in srgb, var(--ink-2) 55%, transparent);}
+  td.n,td.wp{font-family:"IBM Plex Mono",monospace; color:var(--amber-dim);
+       font-variant-numeric:tabular-nums; white-space:nowrap;}
+  td.n{width:34px; text-align:right;}
+  td.place{color:var(--text); font-weight:500;}
+  td.tt{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--verdigris); white-space:nowrap;}
+  td.tok{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--amber); white-space:nowrap;}
+  td.threat{color:var(--text); font-weight:500;}
+  td.stop{color:var(--verdigris);} td.stop.part{color:var(--rust);}
+  tr.dist td{background:var(--ink-3); color:var(--dust); font-family:Oswald,sans-serif;
+             letter-spacing:1.4px; text-transform:uppercase; font-size:12px; padding:9px 14px;}
+
+  pre{background:var(--ink-3); border:1px solid var(--rule); border-radius:2px; padding:16px 18px;
+      overflow-x:auto; margin:0 0 20px; font-family:"IBM Plex Mono",monospace; font-size:13.5px;
+      line-height:1.6; color:var(--text-2);}
+  pre .c{color:var(--text-3);} pre .k{color:var(--amber);} pre .s{color:var(--verdigris);}
+  pre .x{color:var(--rust);}
+  code{font-family:"IBM Plex Mono",monospace; font-size:.92em; color:var(--dust);}
+
+  ul.plain{list-style:none; padding:0; margin:0 0 18px; display:grid; gap:12px;}
+  ul.plain li{padding-left:26px; position:relative; color:var(--text-2);}
+  ul.plain li::before{content:"—"; position:absolute; left:0; color:var(--amber-dim);
+                      font-family:"IBM Plex Mono",monospace;}
+  ul.plain li b{color:var(--text);}
+
+  .asks{display:grid; gap:11px; margin-bottom:20px;}
+  .ask{display:grid; grid-template-columns:38px 1fr 76px; align-items:center;
+       border:1px solid var(--rule); background:var(--ink-2); border-radius:2px;}
+  .ask .i{font-family:Oswald,sans-serif; font-size:15px; color:var(--ink); background:var(--amber);
+          align-self:stretch; display:flex; align-items:center; justify-content:center; font-weight:600;}
+  .ask .b{padding:13px 16px;}
+  .ask .b b{color:var(--text); display:block; font-size:14.5px;}
+  .ask .b span{font-size:14px; color:var(--text-2);}
+  .ask .t{padding:13px 14px; text-align:right; font-family:"IBM Plex Mono",monospace;
+          font-size:13px; color:var(--text-3); white-space:nowrap;}
+  .ask.new .i{background:var(--rust); color:#fff;}
+
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:30px;}
+  @media(max-width:760px){
+    .two{grid-template-columns:1fr;}
+    .tier{grid-template-columns:1fr;}
+    .tier .lbl{border-right:none; border-bottom:1px solid var(--rule);}
+    .ask{grid-template-columns:34px 1fr;} .ask .t{display:none;}
+  }
+  footer{margin-top:62px; padding-top:20px; border-top:1px solid var(--rule);
+         font-size:13.5px; color:var(--text-3);}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Implementation spec · revision 4</div>
+  <h1>Dilli Khoj</h1>
+  <p class="sub">A post-apocalyptic Delhi you roam freely, where the only way past a district
+  checkpoint is a PostgreSQL query you type yourself. Twenty ruins across seven districts, following
+  the DBMS Topic Tree from L1 to L8.</p>
+  <div class="facts">
+    <div class="fact"><div class="k">Ship by</div><div class="v">04 Sep, 08:00</div></div>
+    <div class="fact"><div class="k">Peak concurrent</div><div class="v">3,000</div></div>
+    <div class="fact"><div class="k">Allowed SQL</div><div class="v ok">DQL only</div></div>
+    <div class="fact"><div class="k">Verdict in</div><div class="v ok">60–120 ms</div></div>
+    <div class="fact"><div class="k">Cost</div><div class="v ok">₹0 / month</div></div>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><span class="num">01</span><h2>Changes in this revision</h2></div>
+  <div class="col">
+    <ul class="plain">
+      <li><b>Hosting.</b> GitHub Pages is out — see section 02. Private repo, Cloudflare Pages.</li>
+      <li><b>Free roaming, staged districts.</b> The whole current district is open to walk from the
+      moment it unlocks; its ruins can be solved in any order; clearing all of them opens the next
+      district. Movement is never gated on a query — a checkpoint is.</li>
+      <li><b>Seeded questions, not seeded data.</b> Better than revision 2 in every direction: one
+      cacheable dataset for all 3,000 players, no per-player storage, and sharing an answer still
+      fails because your question names a different target.</li>
+      <li><b>Live verdicts.</b> Section 08 is new: the whole submission path, its latency budget, and
+      what it costs at three thousand people. A student learns whether they were right in about a
+      tenth of a second, and every verdict says something they can act on.</li>
+      <li><b>A known fleet.</b> Every student is on a MacBook Air or Pro, which retires the hardware
+      risk entirely and lets the world budget go up rather than down.</li>
+      <li><b>This is a spec, not a plan.</b> Section 13 is the work breakdown to implement
+      against, with contracts between packages so parallel work joins cleanly, and acceptance tests
+      that don't need me watching.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">02</span><h2>Hosting</h2></div>
+  <div class="col">
+    <div class="verdict">
+      <div class="lede">No host hides client-side code. itch.io doesn’t either.</div>
+      <p>Whatever you deploy, the browser downloads it and devtools shows it — itch.io serves your
+      bundle from <code>html-classic.itch.zone</code> and a student reads it in the Sources panel
+      exactly as they would on Pages. What itch.io actually prevents is <em>casual repository
+      browsing</em>: readable source, comments, commit history. That’s a real difference, but it’s a
+      smaller one than it looks.</p>
+      <p>itch.io also carries a specific problem for us: HTML5 games run inside an iframe on a
+      rotating subdomain, and Google refuses OAuth in embedded contexts. Ask #4 in section 13 stops
+      working. Supabase allowed-origins become a moving target too.</p>
+    </div>
+    <div class="verdict keep">
+      <div class="lede">Cloudflare Pages, deploying from a private GitHub repo.</div>
+      <p>Free, and it does what you actually wanted: the repo stays <strong>private</strong>, so
+      nobody browses your source or your commits. The deployed bundle is Vite-minified with source
+      maps off — machine-readable, not pleasant. Unlimited static bandwidth, which matters when
+      3,000 first-loads is roughly 15 GB. Custom domain, instant rollback if a level is broken at
+      09:00.</p>
+      <p>Fallbacks: Netlify (100 GB/month, enough) and Vercel (fine for a university course, though
+      its free tier carries a non-commercial clause).</p>
+    </div>
+    <div class="verdict note">
+      <div class="lede">The real protection is that the client holds nothing worth stealing.</div>
+      <p>That is what revision 2 bought. Level text arrives one at a time, hints and solutions live
+      in a schema the player role cannot see, XP is server state, and grading happens where the
+      student has no keyboard. If somebody reads the whole bundle, they learn how the game is drawn
+      and nothing about the answers. Design for that, and hosting stops being a security decision.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">03</span><h2>Architecture</h2></div>
+  <div class="stack">
+    <div class="tier">
+      <div class="lbl">Player’s browser</div>
+      <div class="bd">
+        <div class="t">Vite + TypeScript · Three.js r160 · minified, no source maps</div>
+        <div class="d">Roamable ruined Delhi, docked SQL terminal, HUD. All art generated in code —
+        no downloaded models, no textures.</div>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="lbl">Practice engine</div>
+      <div class="bd">
+        <div class="t">PGlite — PostgreSQL 17 in WebAssembly</div>
+        <div class="d">One shared world dataset, cached in IndexedDB after first load. Real planner,
+        real <code>EXPLAIN</code>, real error text. Every exploratory query is free and instant.</div>
+      </div>
+    </div>
+    <div class="flow">↓ &nbsp; SUBMIT — the only path that scores &nbsp; ↓</div>
+    <div class="tier sealed">
+      <div class="lbl">Judge</div>
+      <div class="bd">
+        <div class="t">Supabase Edge Function · role dilli_player</div>
+        <div class="d">Re-executes inside <code>BEGIN READ ONLY</code> with a 2-second statement
+        timeout, reads the query plan, hashes the result against the player’s seeded target, awards
+        XP, unlocks. The only component that knows what “correct” means.</div>
+      </div>
+    </div>
+    <div class="tier sealed">
+      <div class="lbl">Vault</div>
+      <div class="bd">
+        <div class="t">schema vault — targets, hints, solutions, plan gates</div>
+        <div class="d">The player role has no privilege on it whatsoever. Hints and solutions come
+        out one at a time, after XP is deducted server-side.</div>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="lbl">Your desk</div>
+      <div class="bd">
+        <div class="t">Admin dashboard + nightly mirror into a Sheet</div>
+        <div class="d">Live bird’s-eye of all 3,000; the Sheet is the archive you can pivot.</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <p><strong>Load, checked.</strong> Exploratory queries never leave the tab. Only graded
+    submissions reach the judge — roughly 25 per player, so about 75,000 Edge Function calls against
+    a 500,000/month free allowance, and around 12 authoritative queries per second at peak on tables
+    of a few thousand rows.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">04</span><h2>Roaming and the districts</h2></div>
+  <div class="two">
+    <div>
+      <h3>How movement works</h3>
+      <p>The city is one continuous space and you walk it on foot, WASD, third person. Nothing
+      teleports you and no query moves you. What changes is what’s <em>open</em>: a district’s
+      militia checkpoints — collapsed flyovers, welded shutters, a barricaded Metro mouth — hold
+      until that district is cleared.</p>
+      <p>Inside the current district you go where you like and take the ruins in any order. They all
+      teach the same topic band, so order within a district carries no pedagogical weight. Clear all
+      of them and the checkpoints open.</p>
+      <h3>Finding your way without a map</h3>
+      <p>Unsolved ruins in the current district burn a sodium beacon visible through the dust;
+      everything outside it is dark. The map key (<kbd>M</kbd>) draws only what you’ve walked past.
+      There is no level list, no “7 of 20”, and no view of the final destination — you learn how far
+      you’ve come by looking back.</p>
+    </div>
+    <div>
+      <h3>Seeded questions, shared world</h3>
+      <p>Every player downloads the same dataset. What differs is the question: the target is chosen
+      by <code>hashtext(player_id || ruin)</code>, so one student is asked for the stall in ward K-7
+      and their neighbour for B-2. Same tables, same query shape, different answer.</p>
+      <p>This is strictly better than seeding the data per player. The dataset caches once for all
+      3,000, the server stores nothing per player, and a leaked answer is still worthless. What
+      <em>does</em> travel between students is the method — the shape of the SQL — and that’s them
+      teaching each other, which is the point of the exercise.</p>
+      <h3>Surveying pays</h3>
+      <p>Walking within 20 m of any ruin in the current district marks it surveyed and pays
+      <strong>+5 XP</strong>, once. Exploration is rewarded, sequence stays intact, and it gives the
+      admin view a clean signal for who is exploring versus who is stuck.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">05</span><h2>The twenty ruins, in seven districts</h2></div>
+  <p class="col">One sub-topic per ruin, so the lecture sequence is preserved and the finale lands on
+  joins plus a subquery. The districts narrow as you approach the vault — five ruins in the opening
+  quarter, one at the end. Every puzzle is a <code>SELECT</code>.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>#</th><th>Ruin</th><th>Topic Tree</th><th>What they write</th><th>Fragment</th></tr></thead>
+      <tbody>
+        <tr class="dist"><td colspan="5">District 1 · Walled City North — L1–L2 · foundations</td></tr>
+        <tr><td class="n">1</td><td class="place">Purana Qila, quarantine gate</td><td class="tt">L1 · entity/attribute</td><td>Read the survivor manifest — first <code>SELECT</code>, name the columns you want</td><td class="tok">ward_code</td></tr>
+        <tr><td class="n">2</td><td class="place">Kashmere Gate ISBT</td><td class="tt">L1 · primary key</td><td>The catalog says which column can’t repeat. Use it to pull the one intact record</td><td class="tok">bus_id</td></tr>
+        <tr><td class="n">3</td><td class="place">Nigambodh Ghat register</td><td class="tt">L1 · foreign key</td><td>Read <code>key_column_usage</code> to learn what points where, then follow the reference</td><td class="tok">ref_code</td></tr>
+        <tr><td class="n">4</td><td class="place">Records room, Old Delhi</td><td class="tt">L2 · DDL as artefact</td><td>Two manifests, one altered. Find the column only the newer one has</td><td class="tok">col_name</td></tr>
+        <tr><td class="n">5</td><td class="place">Kotwali vault</td><td class="tt">L2 · TCL as artefact</td><td>Read <code>txn_log</code>: which write survived the rollback, and what the ledger says now</td><td class="tok">vault_seal</td></tr>
+        <tr class="dist"><td colspan="5">District 2 · Chandni Chowk quarter — L3 · retrieving data</td></tr>
+        <tr><td class="n">6</td><td class="place">Chandni Chowk</td><td class="tt">L3 · SELECT + WHERE</td><td>Filter the stall register to the ones still trading</td><td class="tok">stall_id</td></tr>
+        <tr><td class="n">7</td><td class="place">Fatehpuri Masjid steps</td><td class="tt">L3 · DISTINCT</td><td>How many different wards fed this quarter — duplicates are the trap</td><td class="tok">ward_list</td></tr>
+        <tr><td class="n">8</td><td class="place">Chawri Bazaar lanes</td><td class="tt">L3 · LIKE, wildcards</td><td>Only a fragment of the name survived the fire</td><td class="tok">partial_name</td></tr>
+        <tr><td class="n">9</td><td class="place">Dariba Kalan</td><td class="tt">L3 · IN, AND/OR/NOT</td><td>Three possible caches, one set of conditions, one that satisfies all of them</td><td class="tok">cache_ref</td></tr>
+        <tr><td class="n">10</td><td class="place">Chor Bazaar</td><td class="tt">L3 · ORDER BY, LIMIT/OFFSET</td><td>Not the biggest haul. The third biggest</td><td class="tok">haul_tag</td></tr>
+        <tr class="dist"><td colspan="5">District 3 · Jama Masjid and the water line — L4 · functions</td></tr>
+        <tr><td class="n">11</td><td class="place">Karim’s, Jama Masjid</td><td class="tt">L4 · string functions</td><td>A callsign is buried inside a longer string. Cut it out</td><td class="tok">callsign</td></tr>
+        <tr><td class="n">12</td><td class="place">Wazirabad water works</td><td class="tt">L4 · NULL handling, numeric</td><td>Missing readings. <code>COALESCE</code> before you can round and total</td><td class="tok">flow_rate</td></tr>
+        <tr><td class="n">13</td><td class="place">Old Delhi station clock</td><td class="tt">L4 · date functions</td><td>The last train out — extract the hour it left</td><td class="tok">depart_hr</td></tr>
+        <tr class="dist"><td colspan="5">District 4 · The mandis — L5 · grouping</td></tr>
+        <tr><td class="n">14</td><td class="place">Azadpur Mandi</td><td class="tt">L5 · GROUP BY, aggregates</td><td>Which zone drew the most rations</td><td class="tok">zone_id</td></tr>
+        <tr><td class="n">15</td><td class="place">Ghazipur landfill</td><td class="tt">L5 · HAVING</td><td>Only the groups above a threshold — and it isn’t a <code>WHERE</code></td><td class="tok">heap_no</td></tr>
+        <tr><td class="n">16</td><td class="place">Tihar sorting yard</td><td class="tt">L5 · CASE with grouping</td><td>Band the survivors by risk, then count the bands</td><td class="tok">band_key</td></tr>
+        <tr class="dist"><td colspan="5">District 5 · Metro and the Ridge — L6 · window functions</td></tr>
+        <tr><td class="n">17</td><td class="place">Rajiv Chowk interchange</td><td class="tt">L6 · RANK family</td><td>Rank the platforms without collapsing the rows</td><td class="tok">platform</td></tr>
+        <tr><td class="n">18</td><td class="place">Ridge signal tower</td><td class="tt">L6 · LAG / LEAD</td><td>The transmission that broke the pattern — compare each to the one before</td><td class="tok">signal_id</td></tr>
+        <tr class="dist"><td colspan="5">District 6 · The Baoli — L7 · subqueries</td></tr>
+        <tr><td class="n">19</td><td class="place">Agrasen ki Baoli</td><td class="tt">L7 · subqueries, correlated</td><td>A query inside a query. Each step down the well is one more nesting</td><td class="tok">step_code</td></tr>
+        <tr class="dist"><td colspan="5">District 7 · Yamuna crossing — L8 · the finale</td></tr>
+        <tr><td class="n">20</td><td class="place">Signature Bridge</td><td class="tt">L8 · joins + subquery</td><td>Three registers joined, filtered by a nested query, opens the last span</td><td class="tok">— vault —</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">06</span><h2>Against the mischievous</h2></div>
+  <div class="col"><p>Every attack below is one a bright second-year will try in the first ten
+  minutes. The posture isn’t a wall — it’s making the cheat cost more effort than the query.</p></div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>What they’ll try</th><th>Why it fails</th><th>Held?</th></tr></thead>
+      <tbody>
+        <tr><td class="threat">Read the answers out of the bundle</td><td>Level text, hints, solutions and targets live in <code>vault</code> on the server. The client is sent one level at a time and never the answer.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Set <code>xp = 500</code>, <code>district = 7</code> in the console</td><td>Client XP is a display of server state. Progress is written only by a <code>security definer</code> function; RLS denies the anon key any write to <code>players</code>.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">POST straight to Supabase with the public key</td><td>The anon key can insert nothing that scores. Scoring requires the session JWT, and the judge is the only writer.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Browse the local data, then submit <code>SELECT 'S-104'</code></td><td>The judge reads the <code>EXPLAIN</code> plan. A constant projection has no relation scan and fails the structural gate, with a message naming what was missing.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Get the answer from a friend who’s ahead</td><td>Seeded questions: their target isn’t yours. The SQL shape travels, the answer doesn’t.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Walk into district 7 early and try the finale</td><td>Checkpoint colliders are server-authoritative: the judge refuses any level outside your unlocked district, whatever the client believes.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Brute-force a short answer by resubmitting</td><td>One submission per two seconds per player, server-side. Every attempt is logged; a burst is visible in the admin feed.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Run <code>DROP</code>, <code>UPDATE</code>, <code>GRANT</code>, <code>COPY</code>, <code>pg_read_file</code></td><td>Three independent stops: read-only transaction, a role with <code>SELECT</code> and nothing else, and a statement-kind check before execution.</td><td class="stop">Held</td></tr>
+        <tr><td class="threat">Sign in as a classmate to farm XP</td><td>Google Sign-In restricted to your two domains proves the address. A typed email box does not — ask #4.</td><td class="stop">Held, with §13</td></tr>
+        <tr><td class="threat">Two students, one laptop; or screen-sharing the run</td><td>Nothing technical touches this. Seeded questions at least force the audience to write their own queries.</td><td class="stop part">Not stoppable</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col">
+    <h3>Grade the plan, not the text</h3>
+    <p>The piece doing the heavy lifting, and it costs almost nothing. Before comparing results the
+    judge runs <code>EXPLAIN (FORMAT JSON)</code> and reads the node tree — which relations were
+    actually scanned, whether a join happened, whether there was an aggregate or a subplan. Regexes
+    over SQL text are trivially fooled; a plan is what Postgres truly intends to do.</p>
+    <pre><span class="c">-- vault.gate for ruin 20</span>
+require_relations : [<span class="s">'dilli.crossings'</span>, <span class="s">'dilli.convoys'</span>, <span class="s">'dilli.wards'</span>]
+require_nodes     : [<span class="s">'Join'</span>, <span class="s">'SubPlan'</span>]
+forbid            : [<span class="x">'Nested Loop without join filter'</span>]   <span class="c">-- the cartesian trap</span>
+
+<span class="c">-- what a student sees when the rows are right but the method isn't</span>
+<span class="x">Correct rows — but the bridge needs all three registers joined.</span>
+<span class="x">Your plan touched only dilli.crossings.</span></pre>
+    <p>It doubles as teaching: a cartesian product at ruin 20 gets named as one, out of the same
+    <code>EXPLAIN</code> output your L13 and L14 lectures cover.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">07</span><h2>DQL only — enforced three ways</h2></div>
+  <div class="two">
+    <div>
+      <p>Nothing but <code>SELECT</code> and <code>WITH … SELECT</code> reaches the database, and
+      each layer would hold alone:</p>
+      <ul class="plain">
+        <li><b>Statement kind.</b> The judge parses and rejects anything that isn’t a single query
+        statement, before a connection opens.</li>
+        <li><b>Role grants.</b> <code>dilli_player</code> holds <code>SELECT</code> on the
+        <code>dilli</code> schema and nothing else, anywhere. No <code>CREATE</code>, no
+        <code>TEMP</code>, no function execution.</li>
+        <li><b>Read-only transaction.</b> Every execution is wrapped in <code>BEGIN READ ONLY</code>,
+        so even a privilege mistake cannot write.</li>
+      </ul>
+      <p>The practice engine enforces the same rule, so nobody learns a habit locally that the judge
+      rejects.</p>
+    </div>
+    <div>
+      <h3>So how do L1 and L2 still get taught?</h3>
+      <p>By reading the evidence rather than issuing the command — which is what an analyst on a
+      strange database does on day one anyway.</p>
+      <ul class="plain">
+        <li><b>Constraints and keys</b> from <code>information_schema.table_constraints</code> and
+        <code>key_column_usage</code>. “Which column can’t repeat, and why was this row rejected?”
+        is a <code>SELECT</code>.</li>
+        <li><b>DDL</b> as an artefact: a column present in one manifest and not its older twin, read
+        out of <code>information_schema.columns</code>.</li>
+        <li><b>DML and TCL</b> in a <code>txn_log</code> table — which writes committed, which rolled
+        back, so what the ledger should say now.</li>
+        <li><b>DCL</b> in <code>role_table_grants</code>: who could still read the manifest after the
+        city fell.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">08</span><h2>Submission and evaluation at scale</h2></div>
+  <div class="col">
+    <p>Two paths, and the split is what makes this affordable. <strong>Run</strong> is local and free —
+    it absorbs the eight or nine queries out of ten that are a student poking at the data.
+    <strong>Submit</strong> is the only path that scores, and it is the one that has to be fast,
+    honest and cheap when three thousand people are doing it.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>#</th><th>Step</th><th>Where</th><th>Typical</th></tr></thead>
+      <tbody>
+        <tr><td class="n">1</td><td class="place">Run — iterate freely, unlimited</td><td class="tt">PGlite, in the tab</td><td>1–5 ms, no network</td></tr>
+        <tr><td class="n">2</td><td class="place">Submit — POST /judge with JWT + {ruin, sql}</td><td class="tt">client → edge</td><td>30–40 ms RTT to Mumbai</td></tr>
+        <tr><td class="n">3</td><td class="place">Verify the session JWT</td><td class="tt">edge, project secret, no round trip</td><td>&lt;1 ms</td></tr>
+        <tr><td class="n">4</td><td class="place">Statement kind — one statement, SELECT or WITH…SELECT</td><td class="tt">edge, before any connection</td><td>&lt;1 ms</td></tr>
+        <tr><td class="n">5</td><td class="place">Rate limit + district check, one atomic read</td><td class="tt">pooler → Postgres</td><td>2–4 ms</td></tr>
+        <tr><td class="n">6</td><td class="place"><code>BEGIN READ ONLY</code>; <code>SET LOCAL statement_timeout='2s'</code></td><td class="tt">Postgres</td><td>&lt;1 ms</td></tr>
+        <tr><td class="n">7</td><td class="place"><code>EXPLAIN (FORMAT JSON)</code> — plan gate <em>and</em> admission control</td><td class="tt">Postgres</td><td>0.3–2 ms</td></tr>
+        <tr><td class="n">8</td><td class="place">Execute, fetch 51 rows</td><td class="tt">Postgres</td><td>0.5–5 ms</td></tr>
+        <tr><td class="n">9</td><td class="place">Normalise, sha256, compare to this player’s seeded target</td><td class="tt">edge</td><td>&lt;1 ms</td></tr>
+        <tr><td class="n">10</td><td class="place"><code>ROLLBACK</code>; log the attempt; award XP via <code>security definer</code></td><td class="tt">Postgres</td><td>2–5 ms</td></tr>
+        <tr><td class="n">11</td><td class="place">Verdict renders — green, or a reason</td><td class="tt">client</td><td>one frame</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col">
+    <p><strong>Server work is 10–20 ms; the student sees a verdict in 60–120 ms.</strong> That is
+    inside the window where a UI feels instant, so no optimistic guessing on the client — it would
+    buy nothing and a wrong “correct” is trust you don’t get back.</p>
+
+    <h3>The plan gate is also admission control</h3>
+    <p>This is the part worth understanding, because it is what keeps a free instance standing.
+    <code>EXPLAIN</code> reports estimated rows and cost <em>before</em> a single row is read. Fifty
+    students writing a three-way cross join at ruin 20 is not a hypothetical — it is Thursday. So the
+    judge refuses any plan whose estimate exceeds a million rows, in microseconds, without executing
+    anything:</p>
+    <pre><span class="c">-- one gate, three jobs: method, anti-cheat, and load shedding</span>
+<span class="k">if</span> plan.rows  <span class="k">&gt;</span> 1_000_000  <span class="k">or</span> plan.cost <span class="k">&gt;</span> 50_000:
+    reject(<span class="x">"That query would scan the whole city. Look at what you're joining on —</span>
+<span class="x">            the plan says 4.1 billion rows before any filter."</span>)</pre>
+    <p>The 2-second <code>statement_timeout</code> is the backstop, not the defence. If runaway
+    queries reach execution at all, fifty of them at once is fifty CPU-seconds per second on a shared
+    instance — which is how you lose an event. Rejecting on the estimate costs nothing and teaches
+    more, because the student is shown the number that condemned their query.</p>
+
+    <h3>The numbers at 3,000</h3>
+    <ul class="plain">
+      <li><b>~30 submissions per player</b> over a 100-minute session, wrong answers included — call
+      it 90,000 submissions total, averaging <strong>15 per second</strong>. Design headroom: 100/s.</li>
+      <li><b>Postgres work per submission</b> is two sub-millisecond queries against tables of a few
+      hundred rows. Throughput is not the constraint; connections are.</li>
+      <li><b>~105,000 Edge Function calls</b> including briefs, hints and surveys, against 500,000 a
+      month free.</li>
+      <li><b>~210 MB of verdict JSON</b> against 5 GB of free egress; a 36 MB
+      <code>attempts</code> table with <code>sql_text</code> capped at 2,000 characters.</li>
+    </ul>
+
+    <h3>Three things that must be right or it falls over</h3>
+    <ul class="plain">
+      <li><b>Use the transaction-mode pooler, never a direct connection.</b> Port 6543, not 5432. The
+      free tier gives roughly 60 direct connections; Supavisor multiplexes thousands of clients onto
+      a small backend pool. With postgres.js this also means <code>prepare: false</code> — transaction
+      pooling cannot carry prepared statements between statements, and this is the single most likely
+      way an implementation breaks production while everything works locally.</li>
+      <li><b>Static assets never touch Supabase.</b> Three thousand people pulling a 5 MB bundle in
+      the first minute is about 250 MB/s. Cloudflare absorbs that without noticing; a free Supabase
+      project would burn its entire 5 GB egress in ten minutes and then serve errors.</li>
+      <li><b>Pre-warm the project.</b> A free project pauses after a week idle and cold-starts in
+      about 30 seconds — which the first hundred students would experience as a broken game. Hit it
+      the evening before.</li>
+    </ul>
+
+    <h3>What the student sees</h3>
+    <p>Never a bare “wrong”. Every verdict says something they can act on.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Verdict</th><th>What appears</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">ok</td><td>Fragment reveals, XP ticks up, the ruin’s beacon goes dark. If it was the district’s last ruin, the checkpoint opens.</td></tr>
+        <tr><td class="tok">wrong_rows</td><td>“The register says otherwise — your query returned 3 rows, the seal takes 1.” Counts, never contents.</td></tr>
+        <tr><td class="tok">wrong_method</td><td>Names what the plan missed: “correct rows, but the bridge needs all three registers joined — your plan touched only <code>dilli.crossings</code>.”</td></tr>
+        <tr><td class="tok">error</td><td>The raw Postgres error with its caret. This is the artefact they need to learn to read.</td></tr>
+        <tr><td class="tok">too_large</td><td>The admission-control message above, with the planner’s own row estimate.</td></tr>
+        <tr><td class="tok">timeout</td><td>“Still running after two seconds — look at what it’s scanning.”</td></tr>
+        <tr><td class="tok">rate_limited</td><td>“One submission every two seconds.” Shown as a cooling button, not an error.</td></tr>
+        <tr><td class="tok">locked</td><td>You are not in that district yet. Should be unreachable through the UI; it exists because the client is not trusted.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">09</span><h2>XP and hints</h2></div>
+  <div class="two">
+    <div>
+      <pre><span class="c">-- opening balance</span>
+start              <span class="k">100</span>
+<span class="c">-- earn</span>
+ruin solved        <span class="k">+20</span>   <span class="c">(20 ruins → +400)</span>
+ruin surveyed      <span class="k">+5</span>    <span class="c">(once each, on foot)</span>
+<span class="c">-- spend</span>
+hint               <span class="k">-10</span>
+reveal solution    <span class="k">-30</span>   <span class="c">(only after hints are spent)</span>
+
+<span class="c">-- hint allowance</span>
+ruins 1–10         1 hint each
+ruins 11–20        2 hints each
+
+<span class="c">-- clean run  </span> 100 + 400 + 100          = <span class="s">600</span>
+<span class="c">-- typical    </span> 100 + 400 + 100 − 60 − 30 = <span class="s">510</span></pre>
+    </div>
+    <div>
+      <h3>Rules the server enforces</h3>
+      <ul class="plain">
+        <li><b>Balance may go negative.</b> A student stuck at 0 XP with a hint they can’t afford is
+        a support ticket at 2 a.m. Debt is recorded, ranks last, blocks nothing.</li>
+        <li><b>Reveal appears only when that ruin’s hints are spent</b> — checked server-side, not by
+        hiding a button.</li>
+        <li><b>Hints and solutions are fetched after the deduction,</b> one at a time. Buying a hint
+        is a server event; nothing is pre-loaded into the client to be read early.</li>
+        <li><b>Survey XP is granted by the judge</b> on a position claim the server sanity-checks
+        against walking speed, so you can’t claim twenty surveys in one second.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">10</span><h2>The terminal</h2></div>
+  <div class="col">
+    <ul class="plain">
+      <li><b>Docked right, floatable.</b> 420 px right dock by default; drag the title bar to undock,
+      drag the left edge to resize, <kbd>`</kbd> collapses. Position persists per player.</li>
+      <li><b>Two buttons, not one.</b> <kbd>Ctrl</kbd>+<kbd>Enter</kbd> runs locally — instant, free,
+      unlimited. <strong>Submit</strong> sends it to the judge. Students learn the difference between
+      trying something and claiming it, which is worth teaching on its own.</li>
+      <li><b>Cleared at every ruin.</b> New ruin, new blank terminal. The previous ruin’s queries stay
+      in a scrollback you can read but not copy from.</li>
+      <li><b>No paste.</b> <code>paste</code>, <code>drop</code> and middle-click cancelled on the
+      editor; clue and schema panels <code>user-select:none</code>. Devtools defeats it — but with
+      seeded questions there is nothing worth pasting.</li>
+      <li><b>Real Postgres errors,</b> caret and all. <code>ERROR: column "spice" does not exist</code>
+      is the artefact they need to learn to read.</li>
+      <li><b>The verdict is live.</b> Submit shows a checking state for a minimum of 150 ms so it
+      does not flash, then the judge's answer — typically inside 120 ms. Section 08 lists every
+      verdict and its wording.</li>
+      <li><b>No timer.</b> Elapsed time is recorded for you and never shown to them.</li>
+      <li><b>Only opens inside a ruin’s radius,</b> and only for a ruin in the unlocked district.
+      Elsewhere the key does nothing and the HUD says why.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">11</span><h2>Data model</h2></div>
+  <pre><span class="c">-- ── who may play ──────────────────────────────────────────────</span>
+<span class="k">create table</span> players (
+  id            uuid <span class="k">primary key default</span> gen_random_uuid(),
+  email         text <span class="k">unique not null check</span> (
+                  email <span class="k">~*</span> <span class="s">'^[a-z0-9._%+-]+@(students\.)?example\.edu$'</span>),
+  university_id text <span class="k">not null</span>,
+  seed          int  <span class="k">not null</span>,          <span class="c">-- picks this player's targets</span>
+  xp            int  <span class="k">not null default</span> 100,
+  district      int  <span class="k">not null default</span> 1,
+  solved        int[] <span class="k">not null default</span> <span class="s">'{}'</span>,
+  surveyed      int[] <span class="k">not null default</span> <span class="s">'{}'</span>,
+  started_at    timestamptz <span class="k">default</span> now(),
+  last_seen_at  timestamptz <span class="k">default</span> now()
+);
+
+<span class="c">-- ── the trail ─────────────────────────────────────────────────</span>
+<span class="k">create table</span> attempts (
+  id bigserial <span class="k">primary key</span>, player_id uuid <span class="k">references</span> players,
+  ruin int, sql_text text, verdict text,   <span class="c">-- ok | wrong_rows | wrong_method | error | locked</span>
+  plan_relations text[], ms int, pg_error text, at timestamptz <span class="k">default</span> now()
+);
+<span class="k">create table</span> spends (
+  id bigserial <span class="k">primary key</span>, player_id uuid <span class="k">references</span> players,
+  ruin int, kind text <span class="k">check</span> (kind <span class="k">in</span> (<span class="s">'hint'</span>,<span class="s">'reveal'</span>)),
+  cost int, at timestamptz <span class="k">default</span> now()
+);
+<span class="k">create table</span> journey (
+  id bigserial <span class="k">primary key</span>, player_id uuid <span class="k">references</span> players,
+  ruin int, surveyed_at timestamptz, first_attempt_at timestamptz,
+  solved_at timestamptz, hints_used int <span class="k">default</span> 0, attempts int <span class="k">default</span> 0
+);
+
+<span class="c">-- ── the wall ──────────────────────────────────────────────────</span>
+<span class="k">create schema</span> dilli;   <span class="c">-- the world.  dilli_player: SELECT</span>
+<span class="k">create schema</span> vault;   <span class="c">-- targets, gates, hints, solutions.  dilli_player: nothing</span>
+
+<span class="k">revoke all on schema</span> vault <span class="k">from</span> dilli_player, anon, authenticated;
+<span class="k">grant  usage on schema</span> dilli <span class="k">to</span> dilli_player;
+<span class="k">grant  select on all tables in schema</span> dilli <span class="k">to</span> dilli_player;
+<span class="k">alter role</span> dilli_player <span class="k">set</span> statement_timeout <span class="k">=</span> <span class="s">'2s'</span>;
+<span class="k">alter role</span> dilli_player <span class="k">set</span> default_transaction_read_only <span class="k">=</span> <span class="k">on</span>;</pre>
+</section>
+
+<section>
+  <div class="shead"><span class="num">12</span><h2>Contracts between packages</h2></div>
+  <p class="col">These are frozen before work starts, so world and server can be built in parallel and
+  join without a merge argument at 3 a.m.</p>
+  <pre><span class="c">// A · judge — the only scoring path</span>
+POST /functions/v1/judge      <span class="c">// Authorization: Bearer &lt;supabase jwt&gt;</span>
+  → { ruin: int, sql: string }
+  ← { verdict: <span class="s">'ok'|'wrong_rows'|'wrong_method'|'error'|'locked'|'rate_limited'</span>,
+      message: string,            <span class="c">// player-facing, never leaks the target</span>
+      rows?: object[],            <span class="c">// capped at 50</span>
+      xp: int, district: int, solved: int[],
+      fragment?: string,          <span class="c">// on ok</span>
+      district_cleared?: boolean }
+
+<span class="c">// B · level brief — one at a time, current district only</span>
+GET  /functions/v1/brief?ruin=7
+  ← { ruin, district, name, brief: string,
+      tables: [{ schema, table, columns: string[] }],
+      hints_total: int, hints_bought: int, reveal_unlocked: boolean }
+
+<span class="c">// C · paid reveals</span>
+POST /functions/v1/hint    → { ruin } ← { text, xp }
+POST /functions/v1/reveal  → { ruin } ← { sql, xp }
+
+<span class="c">// D · survey claim, speed-checked server-side</span>
+POST /functions/v1/survey  → { ruin, pos:[x,z] } ← { xp, surveyed: int[] }
+
+<span class="c">// E · world data — static, cached in IndexedDB, identical for everyone</span>
+GET  /world/schema.sql        <span class="c">// CREATE TABLE ... for the dilli schema</span>
+GET  /world/rows.jsonl        <span class="c">// the shared dataset</span>
+GET  /world/ruins.json        <span class="c">// [{ n, district, name, pos:[x,z], archetype, radius }]</span>
+GET  /world/checkpoints.json  <span class="c">// [{ district, colliders:[[x,z,w,d]] }]</span></pre>
+</section>
+
+<section>
+  <div class="shead"><span class="num">13</span><h2>Work packages</h2></div>
+  <p class="col">Ordered by dependency. Anything marked parallel can run alongside the package above
+  it. Each has a definition of done that is checkable without me.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>WP</th><th>Package</th><th>Needs</th><th>Done when</th></tr></thead>
+      <tbody>
+        <tr><td class="wp">0</td><td class="place">Repo &amp; deploy skeleton</td><td class="tt">—</td><td>Private repo, Vite + TS, Cloudflare Pages auto-deploy, env vars wired, minify on, source maps off. A hello-world build is live and the bundle contains no key but the Supabase anon key.</td></tr>
+        <tr><td class="wp">1</td><td class="place">Database &amp; vault</td><td class="tt">WP-0</td><td>Migrations create both schemas, <code>dilli_player</code>, RLS, and the seeded-target function. A test script proves the role can <code>SELECT</code> from <code>dilli</code> and is refused on all of: <code>vault</code>, <code>DROP</code>, <code>UPDATE</code>, <code>CREATE TEMP</code>, <code>GRANT</code>, <code>pg_read_file</code>.</td></tr>
+        <tr><td class="wp">2</td><td class="place">The judge</td><td class="tt">WP-1</td><td>Contract A implemented. A curl suite covers 12 cases: correct, wrong rows, constant-SELECT, cartesian at ruin 20, locked district, non-SELECT, timeout, rate limit, forged JWT, missing JWT, replayed submission, 50-row cap.</td></tr>
+        <tr><td class="wp">3</td><td class="place">World geometry &amp; roaming <em>(parallel from WP-0)</em></td><td class="tt">WP-0</td><td>Continuous ruined-Delhi terrain, WASD third person, collision, dust fog capping draw distance at ~150 m, district checkpoint colliders, beacons on unsolved ruins in the current district, <kbd>M</kbd> map drawing only visited ground. Holds 60 fps on an M-series MacBook Air at the default fog distance, in Safari and Chrome.</td></tr>
+        <tr><td class="wp">4</td><td class="place">Ruins kit <em>(parallel)</em></td><td class="tt">WP-3</td><td>Seven procedural archetypes — gate, depot, bazaar row, tower, mandi shed, stepwell, bridge span — instanced and vertex-coloured, no textures, no downloaded models. Placed from <code>ruins.json</code>.</td></tr>
+        <tr><td class="wp">5</td><td class="place">Practice engine</td><td class="tt">WP-0</td><td>PGlite boots, loads <code>schema.sql</code> + <code>rows.jsonl</code>, caches in IndexedDB, second load under 1 s, verified in Safari and Chrome. Non-SELECT rejected with the judge’s exact wording.</td></tr>
+        <tr><td class="wp">6</td><td class="place">Terminal UI</td><td class="tt">WP-5</td><td>Dock, undock, resize, collapse, persistence. Run vs Submit. Paste, drop and middle-click blocked. Results table capped at 50 with row count and timing. Raw Postgres errors. Clears per ruin. Opens only inside an unlocked ruin’s radius.</td></tr>
+        <tr><td class="wp">7</td><td class="place">Auth &amp; progression</td><td class="tt">WP-2</td><td>Google provider restricted to both domains, roster row created, session resumes mid-run on refresh with district, XP and solved list intact.</td></tr>
+        <tr><td class="wp">8</td><td class="place">Content — 20 ruins</td><td class="tt">WP-1, WP-2</td><td>For each ruin: world rows, seeded target function, brief under 40 words, hints, solution, plan gate, expected hash. All 20 solvable by the reference solution and rejected for the three named near-misses.</td></tr>
+        <tr><td class="wp">9</td><td class="place">Telemetry</td><td class="tt">WP-2</td><td>Attempts, spends and journey rows written; client queue survives a 60-second network cut and flushes on reconnect without duplicating.</td></tr>
+        <tr><td class="wp">10</td><td class="place">Admin dashboard</td><td class="tt">WP-9</td><td>District strip with live stuck-counts, sortable roster, one-player trail, misconception feed, anomaly flags, nudge action. Behind a Supabase login.</td></tr>
+        <tr><td class="wp">11</td><td class="place">Attack pass</td><td class="tt">all</td><td>Every row of section 06 attempted against the deployed build and defeated, with the transcript committed.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col">
+    <h3>Cut lines, pre-approved, in this order</h3>
+    <ul class="plain">
+      <li><b>Twenty ruins → twelve</b> by trimming districts 2 and 4 to three ruins each. Districts
+      and the L1→L8 arc survive.</li>
+      <li><b>Ruins kit → three archetypes</b> recoloured per district.</li>
+      <li><b>Admin dashboard → Supabase table editor</b> plus four saved SQL views. You lose the
+      view, not the data.</li>
+      <li><b>Roaming → district-sized arenas</b> with a fade between them, instead of one continuous
+      city. Last resort; it’s the thing you asked for.</li>
+      <li><b>Never cut:</b> the judge, the plan gate, seeded questions. Those three are the
+      difference between a hunt and a leaderboard nobody believes.</li>
+    </ul>
+    <h3>What I’ll check on review</h3>
+    <ul class="plain">
+      <li>The bundle, read end to end, for anything that shouldn’t be in it — targets, hashes,
+      solutions, a service key.</li>
+      <li>Every row of section 06, attempted by hand against the live build.</li>
+      <li>All twenty ruins solved cold, on a small screen and a throttled connection.</li>
+      <li>The plan gates: that each rejects a constant <code>SELECT</code> and accepts every
+      reasonable alternative phrasing of the right answer — the failure mode I most expect is a gate
+      that’s too strict and rejects a correct student.</li>
+      <li>Brief wording, hint wording, and error copy — the part that decides whether 3,000 people
+      have a good morning.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">14</span><h2>What only you can do</h2></div>
+  <p class="col">Four things gated on your account. Implementation is blocked on 1 and 2, and section 06 has a
+  hole in it without 4.</p>
+  <div class="asks">
+    <div class="ask"><div class="i">1</div><div class="b"><b>Supabase project + anon key</b><span>Free tier, region Mumbai or Singapore. Project URL and anon public key — not the service key.</span></div><div class="t">~5 min</div></div>
+    <div class="ask"><div class="i">2</div><div class="b"><b>Private GitHub repo + Cloudflare Pages</b><span>Private repo, connect it to a Cloudflare Pages project.</span></div><div class="t">~10 min</div></div>
+    <div class="ask"><div class="i">3</div><div class="b"><b>Confirm the domains</b><span><code>@example.edu</code> and <code>@students.example.edu</code>. It’s a database check constraint — say now if there’s a third.</span></div><div class="t">~1 min</div></div>
+    <div class="ask new"><div class="i">4</div><div class="b"><b>Google OAuth client, restricted to those domains</b><span>Ten minutes in Google Cloud console, then paste the client ID into Supabase Auth. Without it anyone can type a classmate’s address and nothing can tell.</span></div><div class="t">~10 min</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="num">15</span><h2>Risks</h2></div>
+  <div class="col">
+    <ul class="plain">
+      <li><b>Free-tier Postgres at peak.</b> The load-bearing risk. Graded submissions only — around
+      12 authoritative queries per second on small indexed tables — should sit fine on a shared
+      instance, but it is untested at 3,000. Keep $25 of Supabase Pro available for the day, or split
+      the cohort across two free projects by email hash.</li>
+      <li><b>A continuous open city is the biggest new cost in this revision.</b> Fog capping draw
+      distance at 150 m is what makes it affordable; without that, WP-3 overruns and takes WP-8’s
+      time with it. If WP-3 isn’t holding 60 fps by 23:30, take the arena cut early rather than late.</li>
+      <li><b>Over-strict plan gates</b> rejecting correct students is the failure I expect most, and
+      it’s the worst one — it makes the game feel broken and unfair at the same time. Every gate needs
+      at least three accepted phrasings tested in WP-8.</li>
+      <li><b>The fleet risk is gone, and it buys something.</b> Every student on an M-series MacBook
+      means WASM Postgres and the 3D world both have comfortable headroom — no capability gate, no
+      low-spec fallback path, and WP-3 can afford a longer fog distance and denser rubble than
+      revision 3 assumed. The remaining browser question is Safari, which is the macOS default:
+      it runs PGlite fine, but it evicts site data after seven days of no interaction, so treat the
+      cached world as a one-session convenience rather than storage. Test both browsers; recommend
+      Chrome in the joining instructions, support Safari.</li>
+      <li><b>Retina.</b> Cap <code>devicePixelRatio</code> at 1.5. On a 14-inch Pro the uncapped path
+      renders roughly four times the pixels for no visible gain and turns a 60 fps scene into 30.</li>
+      <li><b>Untested at 3,000.</b> One real section as a pilot before the main run is the only honest
+      proof. If you can get one, take it.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  Dilli Khoj — implementation spec, revision 4, 3 September 2026. Built against sections
+  12 and 13; reviewed against section 13’s review list. Topic sequence from the L1–L8 rows
+  of NST_DBMS_2026.xlsx. Revision 1 put the game in the browser; revision 2 moved the judge to the
+  server; revision 3 opened the city and handed over the keyboard; revision 4 wrote down what
+  happens in the tenth of a second after a student presses Submit.
+</footer>
+
+</div>
+
+</body></html>
