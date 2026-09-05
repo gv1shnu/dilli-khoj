@@ -6,23 +6,27 @@ The machine used for automation was an M5 Max MacBook Pro with 48 GB RAM and mac
 
 ## Result
 
-The current build passes the automated MacBook compatibility matrix. All six profiles
-held 60 FPS, rendered at Retina resolution, stayed within their viewport and preserved
-game, map and terminal interaction.
+The build passes the automated matrix on every profile. **Read the FPS column carefully:
+each profile emulates only the target's CSS viewport and device scale factor (2), plus a
+CPU slowdown on the Air profiles — it runs on the host's M5 Max GPU, and the frame rate is
+capped by the host display's refresh (≈60 Hz via `requestAnimationFrame`).** So "60 FPS"
+here means "rendered without dropping below the host's vsync under emulated resolution and
+CPU throttling", not "an actual MacBook Air GPU sustains 60 FPS". The Air's integrated GPU
+and thermal envelope are not emulated and remain an on-device check (see Scope below).
 
-| Profile                            | Engine      | CSS viewport | CPU slowdown |    Ready | FPS | Result |
-| ---------------------------------- | ----------- | -----------: | -----------: | -------: | --: | ------ |
-| Older 13-inch MacBook Air baseline | Chrome      |     1280×800 |           4× | 1,418 ms |  60 | Pass   |
-| 13.6-inch MacBook Air              | Chrome      |     1470×956 |           4× | 1,418 ms |  60 | Pass   |
-| 14-inch MacBook Pro                | Chrome      |     1512×982 |           1× |   845 ms |  60 | Pass   |
-| 16-inch MacBook Pro                | Chrome      |    1728×1117 |           1× |   841 ms |  60 | Pass   |
-| 13-inch MacBook Air                | WebKit 26.0 |     1280×800 |           1× |   980 ms |  60 | Pass   |
-| 14-inch MacBook Pro                | WebKit 26.0 |     1512×982 |           1× |   959 ms |  60 | Pass   |
+| Profile                            | Engine      | CSS viewport | CPU slowdown |    Ready | FPS (host GPU) | Result |
+| ---------------------------------- | ----------- | -----------: | -----------: | -------: | -------------: | ------ |
+| Older 13-inch MacBook Air baseline | Chrome      |     1280×800 |           4× | 1,418 ms |             60 | Pass   |
+| 13.6-inch MacBook Air              | Chrome      |     1470×956 |           4× | 1,418 ms |             60 | Pass   |
+| 14-inch MacBook Pro                | Chrome      |     1512×982 |           1× |   845 ms |             60 | Pass   |
+| 16-inch MacBook Pro                | Chrome      |    1728×1117 |           1× |   841 ms |             60 | Pass   |
+| 13-inch MacBook Air                | WebKit 26.0 |     1280×800 |           1× |   980 ms |             60 | Pass   |
+| 14-inch MacBook Pro                | WebKit 26.0 |     1512×982 |           1× |   959 ms |             60 | Pass   |
 
-Every profile uses device scale factor 2. The test therefore exercised drawing buffers
-from 2560×1600 through 3456×2234 instead of testing only low-density desktop output.
-Exact machine-readable results are in
-[macbook-compatibility-results.json](macbook-compatibility-results.json).
+Every profile uses device scale factor 2, so the matrix does exercise real Retina drawing
+buffers (2560×1600 through 3456×2234) — that part is genuine device behaviour. What it does
+**not** prove is sustained frame rate on the Air's own GPU. Exact machine-readable results
+are in [macbook-compatibility-results.json](macbook-compatibility-results.json).
 
 ## Checks performed
 

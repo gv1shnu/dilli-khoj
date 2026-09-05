@@ -13,7 +13,7 @@ A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore
 - Topic-matched revisits, completers-only leaderboard and restricted read-only administration.
 - Target cohort: up to 3,000 students on modern Mac browsers; ₹0 operating target.
 
-Art direction inspiration from [Exceletia by edusatyaki](https://github.com/edusatyaki/Exceletia). See [credits](CREDITS.md) for shipped assets and attribution.
+Character Art inspired from [Exceletia by edusatyaki](https://github.com/edusatyaki/Exceletia). See [credits](CREDITS.md) for shipped assets and attribution.
 
 ## Run locally
 
@@ -99,3 +99,11 @@ test -s dist/models/soldier.glb
 Keep curriculum order, the infinite world and Soldier's `MODEL_YAW_OFFSET` intact. Regenerate computed content instead of editing expected answers by hand. Update relevant docs alongside behavioral changes. Use personal Git identities and review staged files before committing.
 
 Feature-branch pushes run CI. Merging to `main` triggers the web deployment workflow; backend deployment is manual. Deployment, live migrations, credential changes and paid services require the owner's explicit approval.
+
+## License
+
+Dilli Khoj is released under the [PolyForm Noncommercial License 1.0.0](LICENSE):
+free to use, study, modify, and share for any noncommercial purpose (including
+educational and research use) with attribution. Commercial use is reserved to
+the copyright holder — contact them for a commercial license. Third-party assets
+keep their own licenses; see [CREDITS.md](CREDITS.md).

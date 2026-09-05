@@ -24,7 +24,14 @@ export async function postgresHarness() {
   // Unlinked Homebrew formulae keep their catalog beside the binaries instead
   // of /opt/homebrew/share. Supplying it explicitly works for linked installs too.
   if (existsSync(join(share, "postgres.bki"))) initArgs.push("-L", share);
-  execFileSync(join(bin, "initdb"), initArgs, { stdio: "pipe" });
+  // A valid locale must be set or recent PostgreSQL on macOS aborts startup with
+  // "postmaster became multithreaded during startup". Default to C when unset.
+  const pgEnv = {
+    ...process.env,
+    LC_ALL: process.env.LC_ALL ?? "C",
+    LANG: process.env.LANG ?? "C",
+  };
+  execFileSync(join(bin, "initdb"), initArgs, { stdio: "pipe", env: pgEnv });
   execFileSync(
     join(bin, "pg_ctl"),
     [
@@ -37,7 +44,7 @@ export async function postgresHarness() {
       "-w",
       "start",
     ],
-    { stdio: "ignore" },
+    { stdio: "ignore", env: pgEnv },
   );
   const url = `postgres://127.0.0.1:${port}/postgres`;
   const sql = postgres(url, {

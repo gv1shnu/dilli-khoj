@@ -36,11 +36,14 @@ was 840 ms with 41.1 MB heap and 179/109 ms active/covered task time.
 ## MacBook display and engine matrix
 
 All profiles use device scale factor 2. Chrome Air profiles use four-times CPU
-slowdown to provide a conservative older-Air CPU condition. Full details and caveats
+slowdown to provide a conservative older-Air CPU condition. **The FPS column is measured
+on the host M5 Max GPU and capped by the host's ≈60 Hz display; only the viewport, scale
+factor and CPU are emulated, not the Air's GPU — so these numbers show "did not drop below
+the host vsync", not a frame rate the oldest Air will reach.** Full details and caveats
 are in the [MacBook compatibility report](macbook-compatibility.md) and
 [raw results](macbook-compatibility-results.json).
 
-| Profile           | Engine      |  Viewport | Drawing buffer | CPU slowdown |    Ready | FPS |
+| Profile           | Engine      |  Viewport | Drawing buffer | CPU slowdown |    Ready | FPS (host GPU) |
 | ----------------- | ----------- | --------: | -------------: | -----------: | -------: | --: |
 | Older 13-inch Air | Chrome      |  1280×800 |      2560×1600 |           4× | 1,418 ms |  60 |
 | 13.6-inch Air     | Chrome      |  1470×956 |      2940×1912 |           4× | 1,418 ms |  60 |
