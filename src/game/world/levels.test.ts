@@ -7,6 +7,7 @@ import { soundscapeSignature } from "../ambience";
 describe("authored physical locations", () => {
   it("gives every ruin a distinct audible environment", () => {
     expect(new Set(LEVELS.map((level) => level.sound.name)).size).toBe(20);
+    expect(new Set(LEVELS.map((level) => level.sound.detail)).size).toBe(20);
     expect(
       new Set(LEVELS.map((level) => soundscapeSignature(level.sound))).size,
     ).toBe(20);

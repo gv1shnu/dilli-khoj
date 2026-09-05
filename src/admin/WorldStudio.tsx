@@ -82,7 +82,7 @@ export function WorldStudio() {
         <p>
           {level.sound.name}
           <br />
-          WASD · move / Shift · run / Drag · orbit / M · mute
+          WASD · run / Shift · walk / Drag · orbit / M · mute
         </p>
         <p role="status">
           {near

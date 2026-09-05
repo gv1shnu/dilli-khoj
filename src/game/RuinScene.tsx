@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -10,6 +10,7 @@ import { currentRuinId, isUnlocked } from "./progression";
 import { createCharacter } from "./character";
 import { createAmbience } from "./ambience";
 import { createGuideArrows } from "./guide";
+import { findRoute, type Point } from "./world/layout";
 
 interface RuinSceneProps {
   onProximityChange: (nearTerminal: boolean) => void;
@@ -17,6 +18,7 @@ interface RuinSceneProps {
   cleared?: readonly number[];
   initialLocation?: number;
   autoWalk?: boolean;
+  xpAnchor?: RefObject<HTMLDivElement | null>;
   onFrameStats?: (stats: {
     fps: number;
     calls: number;
@@ -52,6 +54,7 @@ export function RuinScene({
   initialLocation,
   onFrameStats,
   autoWalk = false,
+  xpAnchor,
 }: RuinSceneProps) {
   const autoWalkRef = useRef(autoWalk);
   autoWalkRef.current = autoWalk;
@@ -228,6 +231,10 @@ export function RuinScene({
     let lastDiscovery: number | null = null;
     let lastSave = 0;
     let lastStep = 0;
+    let autoRoute: Point[] = [];
+    let autoRouteAt = -10;
+    let autoRouteLocation = 0;
+    let autoRouteRestored = false;
     let statsAt = 0,
       statsFrames = 0;
     const guide = createGuideArrows();
@@ -299,6 +306,8 @@ export function RuinScene({
       lastArchive = null;
       lastDiscovery = null;
       wasNear = false;
+      autoRoute = [];
+      autoRouteAt = -10;
       proximityCallback.current(false);
       events.current.onArchiveNear?.(null);
       events.current.onDiscovery?.(null);
@@ -343,18 +352,49 @@ export function RuinScene({
         !paused.current &&
         character.object.position.distanceTo(autoTarget) >= autoStopDistance;
       if (auto) {
+        const location = world.location();
+        const restored = progressRef.current.includes(location);
+        if (
+          elapsed - autoRouteAt > 1 ||
+          autoRouteLocation !== location ||
+          autoRouteRestored !== restored ||
+          autoRoute.length === 0
+        ) {
+          autoRoute = findRoute(
+            [character.object.position.x, character.object.position.z],
+            [autoTarget.x, autoTarget.z],
+            blocked,
+            3,
+            world.canWalk,
+          );
+          autoRouteAt = elapsed;
+          autoRouteLocation = location;
+          autoRouteRestored = restored;
+        }
+        while (
+          autoRoute.length > 1 &&
+          Math.hypot(
+            autoRoute[0][0] - character.object.position.x,
+            autoRoute[0][1] - character.object.position.z,
+          ) < 1.2
+        )
+          autoRoute.shift();
+        const waypoint = autoRoute[0] ?? [autoTarget.x, autoTarget.z];
         move.set(
-          autoTarget.x - character.object.position.x,
+          waypoint[0] - character.object.position.x,
           0,
-          autoTarget.z - character.object.position.z,
+          waypoint[1] - character.object.position.z,
         );
       }
-      const running = keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
+      // Movement is decisive by default; holding Shift gives precise walking.
+      // Development auto-walk remains slow enough for visual walkthroughs.
+      const walking =
+        keys.has("ShiftLeft") || keys.has("ShiftRight") || auto;
       let speed01 = 0;
       if (move.lengthSq() > 0) {
         move.normalize();
-        const speed = running ? RUN_SPEED : WALK_SPEED;
-        speed01 = running ? 1 : 0.5;
+        const speed = walking ? WALK_SPEED : RUN_SPEED;
+        speed01 = walking ? 0.5 : 1;
         const pos = character.object.position;
         let nx = pos.x + move.x * speed * delta;
         let nz = pos.z + move.z * speed * delta;
@@ -441,7 +481,7 @@ export function RuinScene({
       if (
         !paused.current &&
         speed01 > 0 &&
-        elapsed - lastStep > (running ? 0.28 : 0.45)
+        elapsed - lastStep > (walking ? 0.45 : 0.28)
       ) {
         ambience.footstep(true);
         lastStep = elapsed;
@@ -480,6 +520,18 @@ export function RuinScene({
       controls.target.add(shift);
       prevTarget.copy(controls.target);
       controls.update();
+
+      // Keep score feedback physically attached to the avatar even after the
+      // player rotates or zooms the camera.
+      const xpElement = xpAnchor?.current;
+      if (xpElement) {
+        const head = character.object.position
+          .clone()
+          .add(new THREE.Vector3(0, 2.35, 0))
+          .project(camera);
+        xpElement.style.left = `${(head.x * 0.5 + 0.5) * host.clientWidth}px`;
+        xpElement.style.top = `${(-head.y * 0.5 + 0.5) * host.clientHeight}px`;
+      }
 
       renderer.info.reset();
       composer.render();

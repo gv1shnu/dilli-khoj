@@ -7,7 +7,27 @@ export interface Soundscape {
   hum: number;
   birds: number;
   tone: number;
-  detail: "bell" | "metal" | "drip" | "insects" | "wood" | "rail";
+  detail:
+    | "fortress"
+    | "depot"
+    | "river"
+    | "office"
+    | "vault"
+    | "bazaar"
+    | "courtyard"
+    | "workshop"
+    | "jeweller"
+    | "salvage"
+    | "kitchen"
+    | "waterworks"
+    | "station"
+    | "mandi"
+    | "landfill"
+    | "sorting"
+    | "concourse"
+    | "woodland"
+    | "stepwell"
+    | "bridge";
 }
 export interface LevelDefinition {
   id: number;

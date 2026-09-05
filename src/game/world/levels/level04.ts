@@ -20,7 +20,7 @@ export const level04: LevelDefinition = {
     hum: 0.012,
     birds: 0.08,
     tone: 125,
-    detail: "wood",
+    detail: "office",
   },
   build(k) {
     k.floor(0, 0, 102, 102);

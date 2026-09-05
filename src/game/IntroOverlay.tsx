@@ -45,13 +45,13 @@ export function IntroOverlay({ onClose }: IntroOverlayProps) {
                 <kbd>D</kbd> or <kbd>↑</kbd>
                 <kbd>↓</kbd>
                 <kbd>←</kbd>
-                <kbd>→</kbd> — walk
+                <kbd>→</kbd> — run
               </li>
               <li>
                 <span className="intro-mouse">Drag</span> — look around
               </li>
               <li>
-                <kbd>Shift</kbd> — run
+                <kbd>Shift</kbd> — walk
               </li>
               <li>
                 <kbd>E</kbd> — open an archive you're standing at

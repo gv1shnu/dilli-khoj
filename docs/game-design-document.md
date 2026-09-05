@@ -91,7 +91,7 @@ that unlock in sequence. Each district holds one band of the curriculum:
 
 ## 5. Core gameplay loop
 
-1. **Walk** the current ruin (WASD / arrows, drag to look, Shift to run). The
+1. **Run** through the current ruin (WASD / arrows, drag to look, Shift to walk). The
    amber trail points directly to that ruin's archive.
 2. **Arrive** at a ruin — a broken place with a glowing **amber** (the sealed
    archive) rising from it. Press **E** to open it.
@@ -272,7 +272,7 @@ Integrity properties:
 
 - **Onboarding overlay** (reopenable via "?") explains movement, ruins & ambers, and
   the Run/Submit loop — deliberately saying nothing about "finishing."
-- **Controls:** WASD/arrows to walk, drag to look, Shift to run, **E** to open an
+- **Controls:** WASD/arrows to run, drag to look, Shift to walk, **E** to open an
   archive, **M** to mute/unmute ambience.
 - **Archive panel:** prompt + sample output on one side, a SQL editor with **Run**
   and **Submit** on the other, and a separate schema browser.

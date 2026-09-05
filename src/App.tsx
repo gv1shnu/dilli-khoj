@@ -96,6 +96,7 @@ export function App() {
           key={player?.id ?? "local-dev"}
           player={player}
           onExit={onExit}
+          walkthrough={import.meta.env.DEV && hash.startsWith("#walkthrough")}
         />
       )}
     </GameEntry>
@@ -105,9 +106,11 @@ export function App() {
 function GameShell({
   player,
   onExit,
+  walkthrough = false,
 }: {
   player: PlayerIdentity | null;
   onExit: () => void;
+  walkthrough?: boolean;
 }) {
   const offline = !player;
   const storageKey = practiceStorageKey(player?.id ?? null);
@@ -132,7 +135,7 @@ function GameShell({
     };
   }, []);
   const refresh = useCallback(async () => {
-    if (offline) return;
+    if (offline) return null;
     const revision = ++refreshRevision.current;
     try {
       const next = await fetchGameState();
@@ -140,9 +143,11 @@ function GameShell({
         setServer(next);
         setServerError("");
       }
+      return next;
     } catch (error) {
       if (alive.current && revision === refreshRevision.current)
         setServerError(getErrorMessage(error));
+      return null;
     }
   }, [offline]);
   useEffect(() => {
@@ -212,7 +217,7 @@ function GameShell({
   const operation = useRef(0);
   const busy = useRef(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
-  const prevXp = useRef<number | null>(null);
+  const xpAnchorRef = useRef<HTMLDivElement>(null);
 
   // Put the cursor ready on the next line when a fresh archive opens.
   useEffect(() => {
@@ -224,16 +229,11 @@ function GameShell({
     el.setSelectionRange(end, end);
   }, [question.id, terminalOpen, revisitQuestion, status.kind]);
 
-  // Float the XP change above the avatar on solve / hint / reveal.
-  useEffect(() => {
-    if (xp === null) return;
-    const prev = prevXp.current;
-    prevXp.current = xp;
-    if (prev === null || prev === xp) return;
-    const delta = xp - prev;
+  const showXpChange = (delta: number) => {
+    if (delta === 0) return;
     const floatId = Date.now() + Math.random();
     setXpFloats((current) => [...current, { id: floatId, delta }]);
-  }, [xp]);
+  };
 
   useEffect(() => {
     try {
@@ -446,9 +446,12 @@ function GameShell({
       message: "Sending to the authoritative judge…",
     });
     try {
+      const xpBefore = server?.xp ?? null;
       const verdict = await submitToJudge(sql, question.id);
       if (operation.current !== request) return;
-      await refresh();
+      const refreshed = await refresh();
+      if (xpBefore !== null)
+        showXpChange((refreshed?.xp ?? verdict.xp) - xpBefore);
       setStatus({
         kind: verdict.correct ? "pass" : "fail",
         message: `${verdict.message} ${verdict.casesPassed}/${verdict.casesTotal} cases passed.`,
@@ -466,12 +469,15 @@ function GameShell({
     busy.current = true;
     setStatus({ kind: "loading", message: "Opening purchased help…" });
     try {
+      const xpBefore = server?.xp ?? null;
       await gameAction(
         kind,
         question.id,
         kind === "hint" ? (progress?.hintsOpened ?? 0) + 1 : null,
       );
-      await refresh();
+      const refreshed = await refresh();
+      if (xpBefore !== null && refreshed)
+        showXpChange(refreshed.xp - xpBefore);
       if (alive.current)
         setStatus({
           kind: "idle",
@@ -522,9 +528,17 @@ function GameShell({
         }}
         onDiscovery={setDiscovery}
         inputPaused={terminalOpen || showIntro || showMap || Boolean(community)}
+        autoWalk={walkthrough}
+        xpAnchor={xpAnchorRef}
       />
       {xpFloats.length > 0 && (
-        <div className="xp-floats" aria-hidden="true">
+        <div
+          ref={xpAnchorRef}
+          className="xp-floats"
+          role="status"
+          aria-label="Experience change"
+          aria-live="polite"
+        >
           {xpFloats.map((f) => (
             <span
               key={f.id}
@@ -658,7 +672,7 @@ function GameShell({
           <span>YOU ARE EXPLORING</span>
           <strong>{ruinById(locationId)?.place}</strong>
           <small>
-            WASD · walk &nbsp; Shift · run &nbsp; Drag · look &nbsp; M · sound
+            WASD · run &nbsp; Shift · walk &nbsp; Drag · look &nbsp; M · sound
           </small>
         </div>
       )}

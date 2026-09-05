@@ -184,6 +184,7 @@ try {
     () => !document.querySelector("#sql-editor")?.disabled,
   );
   await page.getByText("105 XP", { exact: true }).waitFor();
+  assert.equal(await page.locator(".xp-float").count(), 0);
   await page.getByRole("button", { name: "World map", exact: true }).click();
   assert.equal(
     await page.getByRole("button", { name: /Kashmere Gate/ }).isDisabled(),
@@ -211,17 +212,35 @@ try {
   await page
     .getByText("Hint 1: Server-purchased hint", { exact: true })
     .waitFor();
+  await page.getByText("−10 XP", { exact: true }).waitFor();
+  assert.equal(
+    await page.getByText("−10 XP", { exact: true }).getAttribute("class"),
+    "xp-float xp-float--loss",
+  );
   await page.getByText("95 XP", { exact: true }).waitFor();
   await page
     .getByRole("button", { name: "Reveal · 20 XP", exact: true })
     .click();
   await page.getByText("Server-purchased solution", { exact: true }).waitFor();
+  await page.getByText("−20 XP", { exact: true }).waitFor();
   await page.getByText("75 XP", { exact: true }).waitFor();
   await page.getByRole("button", { name: "Submit", exact: true }).click();
   await page
     .getByRole("status")
     .filter({ hasText: "3/3 cases passed" })
     .waitFor();
+  await page.getByText("+20 XP", { exact: true }).waitFor();
+  assert.equal(
+    await page.getByText("+20 XP", { exact: true }).getAttribute("class"),
+    "xp-float xp-float--gain",
+  );
+  const xpAnchor = page.locator(".xp-floats");
+  const anchorPosition = await xpAnchor.evaluate((element) => ({
+    left: Number.parseFloat(element.style.left),
+    top: Number.parseFloat(element.style.top),
+  }));
+  assert.ok(anchorPosition.left > 0 && anchorPosition.left < 1440);
+  assert.ok(anchorPosition.top > 0 && anchorPosition.top < 900);
   assert.match(await page.locator(".mission-progress").innerText(), /1 \/ 20/);
   assert.equal(
     await page.getByRole("combobox", { name: "Choose archive" }).count(),
