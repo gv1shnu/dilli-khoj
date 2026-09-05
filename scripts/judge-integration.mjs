@@ -72,6 +72,15 @@ async function submit(
   );
   return { status: response.status, body: await response.json() };
 }
+async function addLoadPlayer(id, question) {
+  await addPlayer(pg.db, id, `${id}@partner.example`);
+  if (question.id <= 1) return;
+  await pg.sql`
+    insert into public.ruin_progress (player_id, ruin_id, solved_at)
+    select ${id}::uuid, prior::smallint, clock_timestamp()
+    from generate_series(1, ${question.id - 1}) prior
+  `;
+}
 try {
   const firstId = randomUUID();
   for (const q of questions) {
@@ -127,19 +136,21 @@ try {
     // Only the disposable cluster: log server durations, then retain aggregates.
     await pg.sql.unsafe("alter system set log_min_duration_statement = 0");
     await pg.sql`select pg_reload_conf()`;
-    const cohort = Array.from({ length: 200 }, () => randomUUID());
-    for (const id of cohort)
-      await addPlayer(pg.db, id, `${id}@partner.example`);
+    const cohort = Array.from({ length: 200 }, (_, index) => ({
+      id: randomUUID(),
+      question: questions[index % questions.length],
+    }));
+    for (const item of cohort) await addLoadPlayer(item.id, item.question);
     const logPath = `${pg.dir}/server.log`;
     const offset = (await readFile(logPath)).length;
     const latencies = [];
     const started = performance.now();
     const results = await Promise.all(
-      cohort.map(async (id) => {
+      cohort.map(async ({ id, question }) => {
         const start = performance.now();
         const result = await submit(
-          questions[0],
-          questions[0].canonicalSolution,
+          question,
+          question.canonicalSolution,
           randomUUID(),
           id,
         );
@@ -179,7 +190,7 @@ try {
     latencies.sort((a, b) => a - b);
     const report = {
       environment:
-        "Disposable local PostgreSQL 17; single Node judge; 200 simultaneous first-ruin submissions; server duration logging enabled. No HTTP or hosted pooler.",
+        "Disposable local PostgreSQL 17; single Node judge; 200 simultaneous submissions rotating through all 20 ruins; server duration logging enabled. No HTTP or hosted pooler.",
       requests: cohort.length,
       correct: results.length,
       elapsedMs,
@@ -202,11 +213,11 @@ try {
       const counts = {};
       const tasks = [];
       const duration = 3;
-      const cohort = Array.from({ length: rate * duration }, () =>
-        randomUUID(),
-      );
-      for (const id of cohort)
-        await addPlayer(pg.db, id, `${id}@partner.example`);
+      const cohort = Array.from({ length: rate * duration }, (_, index) => ({
+        id: randomUUID(),
+        question: questions[index % questions.length],
+      }));
+      for (const item of cohort) await addLoadPlayer(item.id, item.question);
       const start = performance.now();
       for (let i = 0; i < rate * duration; i++) {
         const due = start + (i * 1000) / rate;
@@ -216,10 +227,10 @@ try {
         const before = performance.now();
         tasks.push(
           submit(
-            questions[0],
-            questions[0].canonicalSolution,
+            cohort[i].question,
+            cohort[i].question.canonicalSolution,
             randomUUID(),
-            cohort[i],
+            cohort[i].id,
           ).then((r) => {
             latencies.push(performance.now() - before);
             const status =
@@ -231,7 +242,7 @@ try {
       await Promise.all(tasks);
       latencies.sort((a, b) => a - b);
       const measurement = {
-        mode: "local-first-solve",
+        mode: "local-mixed-first-solve",
         rate,
         seconds: duration,
         requests: tasks.length,
@@ -248,7 +259,7 @@ try {
       JSON.stringify(
         {
           environment:
-            "Local PostgreSQL 17, one Node judge instance, direct database connections; no Supavisor, HTTP transport or cloud capacity claim",
+            "Local PostgreSQL 17, one Node judge instance, submissions rotating through all 20 ruins, direct database connections; no Supavisor, HTTP transport or cloud capacity claim",
           measurements,
         },
         null,
