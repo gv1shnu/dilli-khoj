@@ -69,14 +69,14 @@ const QUESTIONS: RuinQuestion[] = [
     id: 1,
     title: "Reading the Resident Records",
     description:
-      "Find the fields belonging to resident records. List each field’s name and the kind of value it stores, alphabetically by field name.",
+      "Each row of `catalog_columns` describes one column of a table. List the `attribute` and `data_type` of every column belonging to the `resident` table, sorted alphabetically by `attribute`.",
     sampleColumns: ["attribute", "data_type"],
     sampleRows: [
       ["sample_col_a", "text"],
       ["sample_col_b", "integer"],
     ],
     ordered: true,
-    hints: ["An entity's attributes are just the rows where `entity` matches; filter then sort."],
+    hints: ["Keep the rows where `entity` = 'resident', return `attribute` and `data_type`, and sort by `attribute`."],
     schema: [
       {
         name: "catalog_columns",
@@ -106,11 +106,11 @@ const QUESTIONS: RuinQuestion[] = [
     id: 2,
     title: "Keys to the Bus Bay",
     description:
-      "For buses, list the chosen identifier and the alternative identifiers. Put their field names in alphabetical order.",
+      "Each row of `column_keys` marks how a column can identify a row. For the `bus` table, list the `attribute` of every column whose `key_kind` is 'primary' or 'candidate', sorted alphabetically.",
     sampleColumns: ["attribute"],
     sampleRows: [["sample_key_1"], ["sample_key_2"]],
     ordered: true,
-    hints: ["A unique identifier is a primary or candidate key; match either with a set membership test."],
+    hints: ["Filter to `entity` = 'bus' and `key_kind` in ('primary', 'candidate'), then sort by `attribute`."],
     schema: [
       {
         name: "column_keys",
@@ -140,14 +140,14 @@ const QUESTIONS: RuinQuestion[] = [
     id: 3,
     title: "Tracing the Family Links",
     description:
-      "Find links pointing to family records. Show the originating table and field for each link, alphabetically by table name, then field name.",
+      "Each row of `foreign_keys` records a column that points from one table to another. List the `child_entity` and `child_attribute` of every row whose `parent_entity` is 'family', sorted by both columns.",
     sampleColumns: ["child_entity", "child_attribute"],
     sampleRows: [
       ["sample_child", "sample_ref_col"],
       ["sample_child_2", "sample_ref_col_2"],
     ],
     ordered: true,
-    hints: ["A foreign key that references `family` is a row whose parent entity is `family`."],
+    hints: ["Keep the rows where `parent_entity` = 'family', then sort by `child_entity`, then `child_attribute`."],
     schema: [
       {
         name: "foreign_keys",
@@ -177,14 +177,14 @@ const QUESTIONS: RuinQuestion[] = [
     id: 4,
     title: "Evidence of the Rebuild",
     description:
-      "Find changes to the structure of stored records. Show the affected object’s name and recorded action, with the newest changes first.",
+      "The `change_log` records edits to stored records. Show the `object_name` and `op` for changes to their structure, with the newest `changed_at` first.",
     sampleColumns: ["object_name", "op"],
     sampleRows: [
       ["sample_table", "CREATE TABLE"],
       ["sample_index", "ALTER TABLE"],
     ],
     ordered: true,
-    hints: ["Data-definition changes are the `DDL` rows; filter on `op_kind`, then order by time descending."],
+    hints: ["Keep the rows where `op_kind` = 'DDL', then order by `changed_at` from newest to oldest."],
     schema: [
       {
         name: "change_log",
@@ -214,14 +214,14 @@ const QUESTIONS: RuinQuestion[] = [
     id: 5,
     title: "Who Holds the Keys",
     description:
-      "Find who has permission to read each set of records. Show the permission holder and record-set name, alphabetically by holder, then name.",
+      "The `access_grants` records who may perform each action. Show the `grantee` and `object_name` for granted permission to read, sorted by both.",
     sampleColumns: ["grantee", "object_name"],
     sampleRows: [
       ["sample_role", "sample_object"],
       ["sample_role_2", "sample_object_2"],
     ],
     ordered: true,
-    hints: ["Only rows where the privilege is `SELECT` and the boolean `granted` is true count."],
+    hints: ["Keep rows where `privilege` = 'SELECT' and `granted` is true, then sort by `grantee`, then `object_name`."],
     schema: [
       {
         name: "access_grants",
@@ -353,7 +353,7 @@ const QUESTIONS: RuinQuestion[] = [
     sampleColumns: ["vault_id"],
     sampleRows: [[900], [901]],
     ordered: true,
-    hints: ["Combine a set-membership check on the ward with a negation of `sealed`."],
+    hints: ["Keep rows where `ward_code` is in ('D-1','D-3','D-9') and `sealed` is false; sort by `vault_id`."],
     schema: [
       {
         name: "vaults",
@@ -389,7 +389,7 @@ const QUESTIONS: RuinQuestion[] = [
       ["Sample Coin", 998],
     ],
     ordered: true,
-    hints: ["Order by value descending, add `item` as a tie-break, then keep only the top rows."],
+    hints: ["Order by `value_coins` descending, then `item` for ties, and keep the top three with `LIMIT 3`."],
     schema: [
       {
         name: "finds",
@@ -425,7 +425,7 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     ordered: true,
     hints: [
-      "String functions transform each value: one upper-cases text, another counts characters.",
+      "Use `upper(dish)` to capitalise the name and `length(notes)` to count characters.",
       "Alias the two computed columns exactly as `dish_caps` and `note_len`.",
     ],
     schema: [
@@ -463,8 +463,8 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     ordered: true,
     hints: [
-      "A null backup would poison the sum; replace it with zero first.",
-      "Round the total to a whole number with a numeric function.",
+      "Adding a missing `backup_lpm` gives nothing — replace it with 0 using `coalesce(backup_lpm, 0)`.",
+      "Wrap the total in `round()` to get a whole number.",
     ],
     schema: [
       {
@@ -502,8 +502,8 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     ordered: true,
     hints: [
-      "Reduce each timestamp to its date before grouping.",
-      "Group by that date and count the rows in each group.",
+      "Convert `depart_at` to a date with `depart_at::date`.",
+      "Group by that date and use `count(*)` for each group's total.",
     ],
     schema: [
       {
@@ -575,8 +575,8 @@ const QUESTIONS: RuinQuestion[] = [
     sampleRows: [["H-00"], ["H-99"]],
     ordered: true,
     hints: [
-      "Filter the groups after they are formed, not the individual rows.",
-      "The threshold applies to the summed metal per heap.",
+      "Group by `heap_no`, then filter the groups with `HAVING` (not `WHERE`).",
+      "The limit applies to each heap's total: `HAVING sum(metal_kg) > 800`.",
     ],
     schema: [
       {
@@ -651,8 +651,8 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     ordered: true,
     hints: [
-      "A window function ranks rows without collapsing them.",
-      "Partition by `line` and order by `taps` descending so ties share a rank.",
+      "`RANK()` numbers rows while keeping every row in the output.",
+      "Use `RANK() OVER (PARTITION BY line ORDER BY taps DESC)` so ties share a placing.",
     ],
     schema: [
       {
@@ -690,8 +690,8 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     ordered: true,
     hints: [
-      "A window function can look back one row in an ordered sequence.",
-      "Order the window by `hour` so the previous row is the previous hour.",
+      "`LAG(signal)` returns the `signal` from the previous row in order.",
+      "Use `LAG(signal) OVER (ORDER BY hour)` so the previous row is the previous hour.",
     ],
     schema: [
       {
@@ -729,7 +729,7 @@ const QUESTIONS: RuinQuestion[] = [
     ordered: true,
     hints: [
       "Compute the average depth once, then compare each row against it.",
-      "A scalar subquery in the `WHERE` clause returns that single average.",
+      "Put `(SELECT avg(depth_m) FROM wells)` in the `WHERE` clause to compare against.",
     ],
     schema: [
       {
@@ -766,8 +766,8 @@ const QUESTIONS: RuinQuestion[] = [
     ],
     ordered: true,
     hints: [
-      "First inner-join spans to their tower on the shared key.",
-      "A set operation appends the towers with no matching span; check with `NOT EXISTS`.",
+      "A `LEFT JOIN` from `towers` to `spans` on `tower_id` keeps every tower, even span-less ones.",
+      "Sort by `tower_name`, then `span_id`; a tower with no span shows a missing `span_id`.",
     ],
     schema: [
       {

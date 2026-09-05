@@ -2,7 +2,7 @@
   {
     "id": 1,
     "title": "Reading the Resident Records",
-    "description": "Find the fields belonging to resident records. List each field’s name and the kind of value it stores, alphabetically by field name.",
+    "description": "Each row of `catalog_columns` describes one column of a table. List the `attribute` and `data_type` of every column belonging to the `resident` table, sorted alphabetically by `attribute`.",
     "sampleColumns": [
       "attribute",
       "data_type"
@@ -91,7 +91,7 @@
   {
     "id": 2,
     "title": "Keys to the Bus Bay",
-    "description": "For buses, list the chosen identifier and the alternative identifiers. Put their field names in alphabetical order.",
+    "description": "Each row of `column_keys` marks how a column can identify a row. For the `bus` table, list the `attribute` of every column whose `key_kind` is 'primary' or 'candidate', sorted alphabetically.",
     "sampleColumns": [
       "attribute"
     ],
@@ -169,7 +169,7 @@
   {
     "id": 3,
     "title": "Tracing the Family Links",
-    "description": "Find links pointing to family records. Show the originating table and field for each link, alphabetically by table name, then field name.",
+    "description": "Each row of `foreign_keys` records a column that points from one table to another. List the `child_entity` and `child_attribute` of every row whose `parent_entity` is 'family', sorted by both columns.",
     "sampleColumns": [
       "child_entity",
       "child_attribute"
@@ -252,7 +252,7 @@
   {
     "id": 4,
     "title": "Evidence of the Rebuild",
-    "description": "Find changes to the structure of stored records. Show the affected object’s name and recorded action, with the newest changes first.",
+    "description": "The `change_log` records edits to stored records. Show the `object_name` and `op` for changes to their structure, with the newest `changed_at` first.",
     "sampleColumns": [
       "object_name",
       "op"
@@ -337,7 +337,7 @@
   {
     "id": 5,
     "title": "Who Holds the Keys",
-    "description": "Find who has permission to read each set of records. Show the permission holder and record-set name, alphabetically by holder, then name.",
+    "description": "The `access_grants` records who may perform each action. Show the `grantee` and `object_name` for granted permission to read, sorted by both.",
     "sampleColumns": [
       "grantee",
       "object_name"

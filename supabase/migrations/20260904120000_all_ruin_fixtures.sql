@@ -66,7 +66,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (1, '2026-09-04.1', '["catalog_columns"]'::jsonb);
 
 insert into game_private.question_help values
-        (1, '2026-09-04.1', 'Reading the Resident Records', 'Find the fields belonging to resident records. List each field’s name and the kind of value it stores, alphabetically by field name.', '["An entity''s attributes are just the rows where `entity` matches; filter then sort."]'::jsonb, 'SELECT attribute, data_type
+        (1, '2026-09-04.1', 'Reading the Resident Records', 'Each row of `catalog_columns` describes one column of a table. List the `attribute` and `data_type` of every column belonging to the `resident` table, sorted alphabetically by `attribute`.', '["Keep the rows where `entity` = ''resident'', return `attribute` and `data_type`, and sort by `attribute`."]'::jsonb, 'SELECT attribute, data_type
 FROM catalog_columns
 WHERE entity = ''resident''
 ORDER BY attribute;');
@@ -131,7 +131,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (2, '2026-09-04.1', '["column_keys"]'::jsonb);
 
 insert into game_private.question_help values
-        (2, '2026-09-04.1', 'Keys to the Bus Bay', 'For buses, list the chosen identifier and the alternative identifiers. Put their field names in alphabetical order.', '["A unique identifier is a primary or candidate key; match either with a set membership test."]'::jsonb, 'SELECT attribute
+        (2, '2026-09-04.1', 'Keys to the Bus Bay', 'Each row of `column_keys` marks how a column can identify a row. For the `bus` table, list the `attribute` of every column whose `key_kind` is ''primary'' or ''candidate'', sorted alphabetically.', '["Filter to `entity` = ''bus'' and `key_kind` in (''primary'', ''candidate''), then sort by `attribute`."]'::jsonb, 'SELECT attribute
 FROM column_keys
 WHERE entity = ''bus''
   AND key_kind IN (''primary'', ''candidate'')
@@ -200,7 +200,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (3, '2026-09-04.1', '["foreign_keys"]'::jsonb);
 
 insert into game_private.question_help values
-        (3, '2026-09-04.1', 'Tracing the Family Links', 'Find links pointing to family records. Show the originating table and field for each link, alphabetically by table name, then field name.', '["A foreign key that references `family` is a row whose parent entity is `family`."]'::jsonb, 'SELECT child_entity, child_attribute
+        (3, '2026-09-04.1', 'Tracing the Family Links', 'Each row of `foreign_keys` records a column that points from one table to another. List the `child_entity` and `child_attribute` of every row whose `parent_entity` is ''family'', sorted by both columns.', '["Keep the rows where `parent_entity` = ''family'', then sort by `child_entity`, then `child_attribute`."]'::jsonb, 'SELECT child_entity, child_attribute
 FROM foreign_keys
 WHERE parent_entity = ''family''
 ORDER BY child_entity, child_attribute;');
@@ -262,7 +262,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (4, '2026-09-04.1', '["change_log"]'::jsonb);
 
 insert into game_private.question_help values
-        (4, '2026-09-04.1', 'Evidence of the Rebuild', 'Find changes to the structure of stored records. Show the affected object’s name and recorded action, with the newest changes first.', '["Data-definition changes are the `DDL` rows; filter on `op_kind`, then order by time descending."]'::jsonb, 'SELECT object_name, op
+        (4, '2026-09-04.1', 'Evidence of the Rebuild', 'The `change_log` records edits to stored records. Show the `object_name` and `op` for changes to their structure, with the newest `changed_at` first.', '["Keep the rows where `op_kind` = ''DDL'', then order by `changed_at` from newest to oldest."]'::jsonb, 'SELECT object_name, op
 FROM change_log
 WHERE op_kind = ''DDL''
 ORDER BY changed_at DESC;');
@@ -324,7 +324,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (5, '2026-09-04.1', '["access_grants"]'::jsonb);
 
 insert into game_private.question_help values
-        (5, '2026-09-04.1', 'Who Holds the Keys', 'Find who has permission to read each set of records. Show the permission holder and record-set name, alphabetically by holder, then name.', '["Only rows where the privilege is `SELECT` and the boolean `granted` is true count."]'::jsonb, 'SELECT grantee, object_name
+        (5, '2026-09-04.1', 'Who Holds the Keys', 'The `access_grants` records who may perform each action. Show the `grantee` and `object_name` for granted permission to read, sorted by both.', '["Keep rows where `privilege` = ''SELECT'' and `granted` is true, then sort by `grantee`, then `object_name`."]'::jsonb, 'SELECT grantee, object_name
 FROM access_grants
 WHERE privilege = ''SELECT''
   AND granted
@@ -591,7 +591,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (9, '2026-09-04.1', '["vaults"]'::jsonb);
 
 insert into game_private.question_help values
-        (9, '2026-09-04.1', 'Unsealed in the Silver Lane', 'Find unsealed vaults in wards D-1, D-3, or D-9. List their identification numbers in increasing order.', '["Combine a set-membership check on the ward with a negation of `sealed`."]'::jsonb, 'SELECT vault_id
+        (9, '2026-09-04.1', 'Unsealed in the Silver Lane', 'Find unsealed vaults in wards D-1, D-3, or D-9. List their identification numbers in increasing order.', '["Keep rows where `ward_code` is in (''D-1'',''D-3'',''D-9'') and `sealed` is false; sort by `vault_id`."]'::jsonb, 'SELECT vault_id
 FROM vaults
 WHERE ward_code IN (''D-1'', ''D-3'', ''D-9'')
   AND NOT sealed
@@ -663,7 +663,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (10, '2026-09-04.1', '["finds"]'::jsonb);
 
 insert into game_private.question_help values
-        (10, '2026-09-04.1', 'The Three Richest Finds', 'Show the three most valuable finds with their coin values, most valuable first. When values match, arrange the item names alphabetically.', '["Order by value descending, add `item` as a tie-break, then keep only the top rows."]'::jsonb, 'SELECT item, value_coins
+        (10, '2026-09-04.1', 'The Three Richest Finds', 'Show the three most valuable finds with their coin values, most valuable first. When values match, arrange the item names alphabetically.', '["Order by `value_coins` descending, then `item` for ties, and keep the top three with `LIMIT 3`."]'::jsonb, 'SELECT item, value_coins
 FROM finds
 ORDER BY value_coins DESC, item
 LIMIT 3;');
@@ -728,7 +728,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (11, '2026-09-04.1', '["recipes"]'::jsonb);
 
 insert into game_private.question_help values
-        (11, '2026-09-04.1', 'Karim''s Recipe Cards', 'Write each dish’s name in capital letters and give the number of characters in its notes. Arrange dishes alphabetically by their original names.', '["String functions transform each value: one upper-cases text, another counts characters.","Alias the two computed columns exactly as `dish_caps` and `note_len`."]'::jsonb, 'SELECT upper(dish) AS dish_caps, length(notes) AS note_len
+        (11, '2026-09-04.1', 'Karim''s Recipe Cards', 'Write each dish’s name in capital letters and give the number of characters in its notes. Arrange dishes alphabetically by their original names.', '["Use `upper(dish)` to capitalise the name and `length(notes)` to count characters.","Alias the two computed columns exactly as `dish_caps` and `note_len`."]'::jsonb, 'SELECT upper(dish) AS dish_caps, length(notes) AS note_len
 FROM recipes
 ORDER BY dish;');
 
@@ -789,7 +789,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (12, '2026-09-04.1', '["pumps"]'::jsonb);
 
 insert into game_private.question_help values
-        (12, '2026-09-04.1', 'Total Flow at Wazirabad', 'For each pump, combine its main and backup flows and round to the nearest whole number. Treat missing backup flow as zero; list pumps by identification number.', '["A null backup would poison the sum; replace it with zero first.","Round the total to a whole number with a numeric function."]'::jsonb, 'SELECT pump_id, round(litres_per_min + coalesce(backup_lpm, 0)) AS total_flow
+        (12, '2026-09-04.1', 'Total Flow at Wazirabad', 'For each pump, combine its main and backup flows and round to the nearest whole number. Treat missing backup flow as zero; list pumps by identification number.', '["Adding a missing `backup_lpm` gives nothing — replace it with 0 using `coalesce(backup_lpm, 0)`.","Wrap the total in `round()` to get a whole number."]'::jsonb, 'SELECT pump_id, round(litres_per_min + coalesce(backup_lpm, 0)) AS total_flow
 FROM pumps
 ORDER BY pump_id;');
 
@@ -853,7 +853,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (13, '2026-09-04.1', '["departures"]'::jsonb);
 
 insert into game_private.question_help values
-        (13, '2026-09-04.1', 'Departures by Day', 'Count the departures on each calendar day. Show each date and its departure total, earliest day first.', '["Reduce each timestamp to its date before grouping.","Group by that date and count the rows in each group."]'::jsonb, 'SELECT depart_at::date AS date, count(*) AS trains
+        (13, '2026-09-04.1', 'Departures by Day', 'Count the departures on each calendar day. Show each date and its departure total, earliest day first.', '["Convert `depart_at` to a date with `depart_at::date`.","Group by that date and use `count(*)` for each group''s total."]'::jsonb, 'SELECT depart_at::date AS date, count(*) AS trains
 FROM departures
 GROUP BY depart_at::date
 ORDER BY date;');
@@ -983,7 +983,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (15, '2026-09-04.1', '["heaps"]'::jsonb);
 
 insert into game_private.question_help values
-        (15, '2026-09-04.1', 'Heaps Above the Line', 'Find disposal heaps containing more than 800 kilograms of recovered metal in total. List their heap numbers in increasing order.', '["Filter the groups after they are formed, not the individual rows.","The threshold applies to the summed metal per heap."]'::jsonb, 'SELECT heap_no
+        (15, '2026-09-04.1', 'Heaps Above the Line', 'Find disposal heaps containing more than 800 kilograms of recovered metal in total. List their heap numbers in increasing order.', '["Group by `heap_no`, then filter the groups with `HAVING` (not `WHERE`).","The limit applies to each heap''s total: `HAVING sum(metal_kg) > 800`."]'::jsonb, 'SELECT heap_no
 FROM heaps
 GROUP BY heap_no
 HAVING sum(metal_kg) > 800
@@ -1123,7 +1123,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (17, '2026-09-04.1', '["riders"]'::jsonb);
 
 insert into game_private.question_help values
-        (17, '2026-09-04.1', 'Ranking the Rush', 'Show each line, rider, tap total, and placing. Within each line, highest totals come first; ties share a placing and skip subsequent places. Arrange by line, placing, then rider.', '["A window function ranks rows without collapsing them.","Partition by `line` and order by `taps` descending so ties share a rank."]'::jsonb, 'SELECT line, rider, taps,
+        (17, '2026-09-04.1', 'Ranking the Rush', 'Show each line, rider, tap total, and placing. Within each line, highest totals come first; ties share a placing and skip subsequent places. Arrange by line, placing, then rider.', '["`RANK()` numbers rows while keeping every row in the output.","Use `RANK() OVER (PARTITION BY line ORDER BY taps DESC)` so ties share a placing."]'::jsonb, 'SELECT line, rider, taps,
        RANK() OVER (PARTITION BY line ORDER BY taps DESC) AS line_rank
 FROM riders
 ORDER BY line, line_rank, rider;');
@@ -1188,7 +1188,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (18, '2026-09-04.1', '["readings"]'::jsonb);
 
 insert into game_private.question_help values
-        (18, '2026-09-04.1', 'The Previous Signal', 'Show each reading’s hour, signal, and preceding signal in time order. The first reading has no preceding value.', '["A window function can look back one row in an ordered sequence.","Order the window by `hour` so the previous row is the previous hour."]'::jsonb, 'SELECT hour, signal,
+        (18, '2026-09-04.1', 'The Previous Signal', 'Show each reading’s hour, signal, and preceding signal in time order. The first reading has no preceding value.', '["`LAG(signal)` returns the `signal` from the previous row in order.","Use `LAG(signal) OVER (ORDER BY hour)` so the previous row is the previous hour."]'::jsonb, 'SELECT hour, signal,
        LAG(signal) OVER (ORDER BY hour) AS prev_signal
 FROM readings
 ORDER BY hour;');
@@ -1253,7 +1253,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (19, '2026-09-04.1', '["wells"]'::jsonb);
 
 insert into game_private.question_help values
-        (19, '2026-09-04.1', 'Deeper than Average', 'Find wells deeper than the average well depth. Show their identification numbers and depths, deepest first; break ties by identification number.', '["Compute the average depth once, then compare each row against it.","A scalar subquery in the `WHERE` clause returns that single average."]'::jsonb, 'SELECT well_id, depth_m
+        (19, '2026-09-04.1', 'Deeper than Average', 'Find wells deeper than the average well depth. Show their identification numbers and depths, deepest first; break ties by identification number.', '["Compute the average depth once, then compare each row against it.","Put `(SELECT avg(depth_m) FROM wells)` in the `WHERE` clause to compare against."]'::jsonb, 'SELECT well_id, depth_m
 FROM wells
 WHERE depth_m > (SELECT avg(depth_m) FROM wells)
 ORDER BY depth_m DESC, well_id;');
@@ -1318,7 +1318,7 @@ insert into game_private.questions (ruin_id, dataset_version, allowed_tables) va
         (20, '2026-09-04.1', '["spans","towers"]'::jsonb);
 
 insert into game_private.question_help values
-        (20, '2026-09-04.1', 'Spans and Their Towers', 'List each tower with its attached span numbers, including towers without spans. For those towers, leave the span missing; arrange alphabetically by tower name, then by span number.', '["First inner-join spans to their tower on the shared key.","A set operation appends the towers with no matching span; check with `NOT EXISTS`."]'::jsonb, 'SELECT t.tower_name, s.span_id
+        (20, '2026-09-04.1', 'Spans and Their Towers', 'List each tower with its attached span numbers, including towers without spans. For those towers, leave the span missing; arrange alphabetically by tower name, then by span number.', '["A `LEFT JOIN` from `towers` to `spans` on `tower_id` keeps every tower, even span-less ones.","Sort by `tower_name`, then `span_id`; a tower with no span shows a missing `span_id`."]'::jsonb, 'SELECT t.tower_name, s.span_id
 FROM towers t
 JOIN spans s ON s.tower_id = t.tower_id
 UNION
