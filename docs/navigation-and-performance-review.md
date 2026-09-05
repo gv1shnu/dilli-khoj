@@ -6,15 +6,15 @@ Reviewed 4 September 2026 against `build/foundation`. This describes source and 
 
 This is a single-page application without a route library. There are no separate `/map`, `/leaderboard`, `/admin` or `/ruins/1` pages.
 
-| Entry | What it opens | Access |
-| --- | --- | --- |
-| `/` or `/#` | Intro, sign-in and game shell | Approved signed-in players; DEV offline bypass available |
-| `/#admin` | Question Studio with the complete geographic atlas, fixtures, answers and local JSON editing/export | DEV build only; excluded from student production assets |
-| World map button | Animated geographic atlas modal | Players: cleared regions only. Server-recognized admins: all 20 regions |
-| Leaderboard button | Top 20 completers plus personal rank modal | Signed-in approved players |
-| Admin button | Complete atlas, player table and question-review modal | Server-allowlisted admins; each protected read is audited |
-| Archive arrows/dropdown | First-pass/current archive or a cleared ruin's alternate practice question | Sequential unlock rules; selection is component state, not a URL |
-| Fullscreen button | Browser fullscreen for the complete game or DEV studio | Available where the browser supports the Fullscreen API |
+| Entry                   | What it opens                                                                                       | Access                                                                  |
+| ----------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `/` or `/#`             | Intro, sign-in and game shell                                                                       | Approved signed-in players; DEV offline bypass available                |
+| `/#admin`               | Question Studio with the complete geographic atlas, fixtures, answers and local JSON editing/export | DEV build only; excluded from student production assets                 |
+| World map button        | Animated geographic atlas modal                                                                     | Players: cleared regions only. Server-recognized admins: all 20 regions |
+| Leaderboard button      | Top 20 completers plus personal rank modal                                                          | Signed-in approved players                                              |
+| Admin button            | Complete atlas, player table and question-review modal                                              | Server-allowlisted admins; each protected read is audited               |
+| Archive arrows/dropdown | First-pass/current archive or a cleared ruin's alternate practice question                          | Sequential unlock rules; selection is component state, not a URL        |
+| Fullscreen button       | Browser fullscreen for the complete game or DEV studio                                              | Available where the browser supports the Fullscreen API                 |
 
 Supabase receives `POST /functions/v1/judge-query`. Browser gameplay uses `/rest/v1/rpc/game_state`, `game_action`, `begin_revisit`, `completion_leaderboard`, `admin_players` and `admin_question`. These are Supabase API paths, not pages on the static web host. Google login returns to the web origin.
 
@@ -22,21 +22,21 @@ Cloudflare is configured with SPA fallback: an unknown web path may load the app
 
 ## Repository paths
 
-| Folder | Responsibility |
-| --- | --- |
-| `src/App.tsx`, `src/game/GameEntry.tsx` | Game shell, sign-in, progression and panel orchestration |
-| `src/game/` | 3D world, Soldier, maps, intro, gameplay helpers and community panels |
-| `src/components/` | Shared controls and result display |
-| `src/admin/` | DEV-only Question Studio |
-| `src/db/` | Browser PostgreSQL worker and visible fixture setup |
-| `src/sql/` | Local SQL policy and result comparison |
-| `src/lib/` | Supabase client, RPC calls and submission retry IDs |
-| `src/questions/` | Authoring catalog and generated visible/revisit content |
-| `scripts/` | Content generators, regression tests, browser checks and disposable database benchmarks |
-| `supabase/functions/` | Authenticated judge, AST validation and result comparison |
-| `supabase/migrations/`, `supabase/tests/` | Private fixtures, server gameplay, grants/RLS and database checks |
-| `public/` | Static assets, including the Soldier model |
-| `docs/`, `.github/workflows/` | Team documentation and CI/release workflows |
+| Folder                                    | Responsibility                                                                          |
+| ----------------------------------------- | --------------------------------------------------------------------------------------- |
+| `src/App.tsx`, `src/game/GameEntry.tsx`   | Game shell, sign-in, progression and panel orchestration                                |
+| `src/game/`                               | 3D world, Soldier, maps, intro, gameplay helpers and community panels                   |
+| `src/components/`                         | Shared controls and result display                                                      |
+| `src/admin/`                              | DEV-only Question Studio                                                                |
+| `src/db/`                                 | Browser PostgreSQL worker and visible fixture setup                                     |
+| `src/sql/`                                | Local SQL policy and result comparison                                                  |
+| `src/lib/`                                | Supabase client, RPC calls and submission retry IDs                                     |
+| `src/questions/`                          | Authoring catalog and generated visible/revisit content                                 |
+| `scripts/`                                | Content generators, regression tests, browser checks and disposable database benchmarks |
+| `supabase/functions/`                     | Authenticated judge, AST validation and result comparison                               |
+| `supabase/migrations/`, `supabase/tests/` | Private fixtures, server gameplay, grants/RLS and database checks                       |
+| `public/`                                 | Static assets, including the Soldier model                                              |
+| `docs/`, `.github/workflows/`             | Team documentation and CI/release workflows                                             |
 
 ## Geographic atlas and access
 
@@ -85,48 +85,74 @@ A separate privileged function records the attempt and updates progression atomi
 
 ### Measured
 
-The clean repeat used one local Node judge and disposable PostgreSQL, three seconds per stage, without competing browser/unit tests. All 1,125 submissions were correct:
+The clean repeat used one local Node judge and disposable PostgreSQL, rotated
+submissions through all twenty ruins for three seconds per stage, and ran without
+competing browser/unit tests. All 1,125 submissions were correct:
 
 | Arrival rate | p50 | p95 |
-| --- | --- | --- |
-| 25/s | 9ms | 34ms |
-| 50/s | 6ms | 8ms |
-| 100/s | 4ms | 9ms |
-| 200/s | 4ms | 8ms |
+| ------------ | --- | --- |
+| 25/s         | 5ms | 6ms |
+| 50/s         | 4ms | 5ms |
+| 100/s        | 4ms | 4ms |
+| 200/s        | 3ms | 3ms |
 
 See [current load evidence](local-load-results.json). The earlier run recorded 16,911ms p95 at 200/s while the laptop was also being used for browser/test work. That slow result did not reproduce in the clean run; contention is a likely contributor, not a proven attribution. The warm later stages can be faster than the first stage. Neither three-second run establishes sustained capacity.
 
-A separate [duration profile](local-profile-results.json) sent 200 first-ruin requests simultaneously: all passed, total elapsed 356ms and p95 345ms. Aggregate PostgreSQL protocol durations were approximately 14ms for authorization, 48ms for preparation, 18ms for student SQL, 11ms for transaction setup/commit and 70ms for recording. These are aggregate server times across 200 submissions, not per-request latencies. End-to-end time also includes Node queueing, network/protocol work and processing. Recording/preparation consumed more server time than these tiny student queries.
+A separate [duration profile](local-profile-results.json) sent 200 mixed-ruin
+requests simultaneously: all passed, total elapsed 285ms and p95 277ms. Aggregate
+PostgreSQL protocol durations were approximately 9ms for authorization, 29ms for
+preparation, 21ms for student SQL, 7ms for transaction setup/commit and 49ms for
+recording. These are aggregate server times across 200 submissions, not per-request
+latencies. End-to-end time also includes Node queueing, network/protocol work and
+processing. Recording and preparation consumed more server time than the small
+student queries.
 
 Run `pnpm test:profile` to reproduce the duration diagnostic. It enables statement-duration logging only in the disposable local cluster and writes aggregate measurements; it never profiles the hosted database or copies raw SQL logs into the repository.
 
-Both workloads exercise first-ruin load, not a realistic mix of expensive later queries, and exclude hosted HTTP, Edge isolates and Supavisor. No cloud capacity conclusion follows from these local numbers.
+Both workloads rotate evenly through all twenty current queries, but run only three
+seconds per shaped stage and exclude hosted HTTP, Edge isolates and Supavisor. No
+cloud capacity conclusion follows from these local numbers.
 
 ### Performance pros and cons
 
 Compared with the preceding fullscreen build, the geographic atlas update adds about 8.1KB of main JavaScript (3.1KB gzip) and 1.4KB CSS (0.45KB gzip), measured from Vite production output. No new image, map-tile or font asset is fetched. These bundle figures do not measure animation frame cost.
 
-| Choice | Pros | Cons / limits |
-| --- | --- | --- |
-| Local PostgreSQL Run | Unlimited practice stays off the server; worker separates SQL execution from the UI thread | Large WASM/data download, startup and browser memory cost; expensive results can still tax the device |
-| Server Submit with three fixtures | Hidden cases reject visible-answer shortcuts; one consistent authority owns grades | Three executions and serial protocol exchanges per submission; heavier later queries still need sustained load testing |
-| One executor/progress connection per isolate | Constrains connection pressure on the zero-cost database target | Requests share queues; network delay compounds across awaited commands; connection limits must be tuned against hosted evidence |
-| Fixed server RPCs and profile locks | Prevent double awards/purchases and concurrent-account inconsistencies | Repeated identity/manifest reads and locking add work; high per-account contention can queue |
-| Thirty-second progress polling | Simple cross-tab/device refresh and recovery from missed updates | About 100 background RPCs/s at 3,000 tabs, even before grading; needs visibility-aware backoff/jitter |
-| Shared SVG atlas | Small code-defined artwork; no tile service, external image fetch, extra WebGL context or animation loop | CSS animation still uses rendering resources; all public geographic metadata ships to the browser; fog is presentation only |
-| Cleared-only map rendering | Only visible region controls/parcels are rendered; up to 20 regions, with precomputed parcel geometry | The static terrain drawing is still present under the SVG clip; this is not lazy loading geographic data |
-| CSS motion controls | Users can pause effects; reduced-motion preferences disable them | The existing 3D background still renders while the atlas is open; atlas pause does not pause that scene |
-| Infinite instanced world | Reuses geometry and avoids downloading twenty separate environments | Grass, shadows, bloom and high pixel ratio create GPU load; fullscreen can increase pixel work |
-| Static hosting and immutable assets | Cacheable delivery fits the zero-cost goal; no web server per player | First cohort download can saturate campus Wi-Fi; actual transfer/caching behavior remains unmeasured |
+| Choice                                       | Pros                                                                                                                            | Cons / limits                                                                                                                                      |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local PostgreSQL Run                         | Unlimited practice stays off the server; worker separates SQL execution from the UI thread                                      | Large WASM/data download, startup and browser memory cost; expensive results can still tax the device                                              |
+| Server Submit with three fixtures            | Hidden cases reject visible-answer shortcuts; one consistent authority owns grades                                              | Three executions and serial protocol exchanges per submission; heavier later queries still need sustained load testing                             |
+| One executor/progress connection per isolate | Constrains connection pressure on the zero-cost database target                                                                 | Requests share queues; network delay compounds across awaited commands; connection limits must be tuned against hosted evidence                    |
+| Fixed server RPCs and profile locks          | Prevent double awards/purchases and concurrent-account inconsistencies                                                          | Repeated identity/manifest reads and locking add work; high per-account contention can queue                                                       |
+| Visibility-aware progress polling            | Focus and visible-tab refresh preserve cross-device recovery; hidden tabs stop polling and a 0–5 second jitter spreads requests | Up to roughly 86–100 RPCs/s if all 3,000 tabs remain visible; hosted measurement may still require a longer interval or push-based synchronization |
+| Shared SVG atlas                             | Small code-defined artwork; no tile service, external image fetch, extra WebGL context or animation loop                        | CSS animation still uses rendering resources; all public geographic metadata ships to the browser; fog is presentation only                        |
+| Cleared-only map rendering                   | Only visible region controls/parcels are rendered; up to 20 regions, with precomputed parcel geometry                           | The static terrain drawing is still present under the SVG clip; this is not lazy loading geographic data                                           |
+| Overlay-aware rendering                      | Terminals, maps and dialogs reduce the 3D render loop to 12 FPS while retaining an immediately available scene                  | Active exploration still renders shadows, bloom and up to 2× device pixel ratio; baseline hardware remains to be tested                            |
+| Lazy ruin construction                       | Only the active ruin and its 3×3 visual field are built at startup; visited ruins remain cached for instant map revisits        | A complete 20-ruin session eventually caches every environment; long-session memory still needs measurement                                        |
+| Static hosting and immutable assets          | Cacheable delivery fits the zero-cost goal; no web server per player                                                            | First cohort download can saturate campus Wi-Fi; actual transfer/caching behavior remains unmeasured                                               |
 
 ### Structural bottlenecks and next actions
 
 1. **Judge connection queue.** One executor connection and one progress connection are allowed per warm judge instance. Every submission runs three case transactions. Each case separately awaits BEGIN, three SET commands, a describe step, cursor execution and COMMIT. Concurrent submissions queue behind this work, as the simultaneous-burst profile shows, but the clean local 200/s run did not saturate it. Real network latency would add to the many serial exchanges. Reduce redundant round trips and instrument queue time before considering bounded concurrency; raising connections blindly can overwhelm the free database.
 2. **Lease versus queue duration.** The lease expires after five seconds. The contended run exceeded sixteen seconds, even though the clean repeat was much faster. A retry after expiry can duplicate expensive work, even though final recording still prevents duplicate XP. Add bounded admission/queue time and a lease strategy consistent with actual execution time.
-3. **Background progress traffic.** Every signed-in tab polls the full `game_state` every 30 seconds, including while idle. At 3,000 open tabs that is about 100 RPC calls/second before any submissions, with synchronized bursts possible. Refresh on meaningful events/focus, pause hidden tabs and add backoff/jitter or a carefully budgeted synchronization mechanism.
-4. **Browser render load.** Movement pauses while editing, but the full animation/shadow/bloom render loop continues. The world has 81,000 instanced grass blades, nine repeated tiles, 2× maximum pixel ratio and a 2048² shadow map. Fullscreen can increase pixel work further. Keep the infinite world, but reduce render frequency when overlays are open and profile adaptive pixel ratio/shadow quality and tile-level culling. This is a code-derived GPU hypothesis, not a measured frame-time attribution.
+3. **Background progress traffic.** Hidden-tab polling is now paused, focus/visibility
+   refreshes are deduplicated, and each visible tab adds 0–5 seconds of jitter to the
+   30-second interval. A classroom with 3,000 continuously visible tabs could still
+   average roughly 86–100 RPC calls/second before grading. Measure the hosted RPC and
+   connection cost before deciding whether the interval must grow further.
+4. **Browser render load.** Covered gameplay now renders at 12 FPS, active play keeps
+   the full animation rate, and ruins are constructed only on first entry. A local
+   1440×900 Chromium sample held 60 FPS; initial JavaScript heap fell from about 122 MB
+   to 42 MB and main-thread task time fell about 36% while the world map was open.
+   These are single-machine development samples, not classroom guarantees. Profile
+   adaptive pixel ratio, shadow quality, long-session caching and fullscreen on the
+   lowest-spec target laptop. Run `pnpm test:browser:performance` beside the local
+   development server to repeat the 1440×900 guardrail.
 5. **First download and startup.** The current build contains roughly 10.1MB PGlite WASM, 6.3MB PostgreSQL data, 1.21MB main JS and a 2.16MB Soldier GLB before compression. Local gzip estimates for these four files total about 7.3MB, excluding the worker/other assets; actual hosted encoding/cache behavior is unmeasured. At cohort scale this can bottleneck campus Wi-Fi. Measure actual transferred bytes/cache hits and preload before the start; keep PostgreSQL work off the main thread.
-6. **Costly SQL/result growth.** Statement and row limits help but do not bound all memory/output costs. There is no planner-cost ceiling or result-byte cap, and local Run fetches the whole result. Test adversarial joins, recursion/aggregates and large values; bound output and admission before expanding concurrency.
+6. **Costly SQL/result growth.** Statement and row limits are supplemented by 64 KiB
+   result ceilings in local practice and the judge; practice also refuses to render
+   more than 100 rows. Planner cost remains unbounded. Test adversarial joins,
+   recursion, aggregates and large computed values; add a planner-cost gate before
+   expanding concurrency.
 7. **Smaller avoidable work.** Manifest JSON is rebuilt/fetched for every submit; leaderboard ranking is recomputed on reads; the admin panel refetches players and the question together when either page or ruin changes. Cache immutable versioned manifests, benchmark leaderboard queries and separate admin fetch dependencies after the primary queueing/render issues.
 
 The authoritative `latency_ms` field starts after initial authorization and is captured before verdict recording. It is not end-to-end latency; operational dashboards should measure total request time and separate queue, policy, execution and recording phases.

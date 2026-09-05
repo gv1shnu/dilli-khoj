@@ -5,26 +5,26 @@ release is blocked.** Local implementation does not imply deployment.
 
 ## Implemented on this branch
 
-| Area               | Behavior                                                                                                                                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| World              | Twenty physically distinct 120-unit ruin environments, repeating visual fields, wrapped player/camera, sequential gates, animated Soldier, run-first movement, intro and browser fullscreen                        |
-| Guidance and map   | Player-selectable trail to current archive or unlocked next gate; illustrated bottom-to-top journey map with uneven spacing, gray zig-zag paths and distinct icons; pause/reduced motion and compact-screen access |
-| Feedback and audio | Twenty procedural ambience profiles; player-anchored green XP gains and red help deductions; M toggles audio and Shift changes running to walking                                                                  |
-| Content            | 20 curriculum-ordered first-pass questions; 60 generated server datasets; visible-only browser fixtures                                                                                                            |
-| Identity           | Shared three-domain/admin policy; confirmed, non-anonymous Google accounts required; current server records checked                                                                                                |
-| Grading            | All 20 ruins supported; JWT validation, AST policy, read-only restricted role, bounded row fetch, timeouts and three-case comparison                                                                               |
-| Progress           | Server prerequisites, survey +5, first solve +20, hints −10, reveal −20; start 100, maximum 600; wrong answers free                                                                                                |
-| Consistency        | Profile-row locking and idempotent requests prevent repeated awards/purchases; completion timestamp recorded once                                                                                                  |
-| Browser state      | Signed-in progression comes from server; drafts/retry IDs keyed by UUID; account changes remount the game; DEV preview is separate                                                                                 |
-| Help               | Only purchased hints/solutions returned to a student; answers and hints excluded from production content                                                                                                           |
-| Revisits           | Two alternate objectives per ruin, alternating server-selected variants; local, non-scoring practice                                                                                                               |
-| Leaderboard        | Completed players only, XP descending then server signup-to-completion elapsed time; top 20 plus personal rank; no emails                                                                                          |
-| Admin              | Server allowlist, protected player/content reads and audit trail; editing remains DEV-only and requires reviewed source updates                                                                                    |
+| Area               | Behavior                                                                                                                                                                                                               |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| World              | Twenty physically distinct 120-unit ruin environments constructed on first entry, repeating visual fields, wrapped player/camera, sequential gates, animated Soldier, run-first movement, intro and browser fullscreen |
+| Guidance and map   | Player-selectable trail to current archive or unlocked next gate; illustrated bottom-to-top journey map with uneven spacing, gray zig-zag paths and distinct icons; pause/reduced motion and compact-screen access     |
+| Feedback and audio | Twenty procedural ambience profiles; player-anchored green XP gains and red help deductions; M toggles audio and Shift changes running to walking                                                                      |
+| Content            | 20 curriculum-ordered first-pass questions; 60 generated server datasets; visible-only browser fixtures                                                                                                                |
+| Identity           | Shared three-domain/admin policy; confirmed, non-anonymous Google accounts required; current server records checked                                                                                                    |
+| Grading            | All 20 ruins supported; JWT validation, AST policy, read-only restricted role, bounded row fetch, timeouts and three-case comparison                                                                                   |
+| Progress           | Server prerequisites, survey +5, first solve +20, hints −10, reveal −20; start 100, maximum 600; wrong answers free                                                                                                    |
+| Consistency        | Profile-row locking and idempotent requests prevent repeated awards/purchases; completion timestamp recorded once                                                                                                      |
+| Browser state      | Signed-in progression comes from server; hidden tabs stop polling and visible polls use jitter; drafts/retry IDs are keyed by UUID; account changes remount the game; DEV preview is separate                          |
+| Help               | Only purchased hints/solutions returned to a student; answers and hints excluded from production content                                                                                                               |
+| Revisits           | Two alternate objectives per ruin, alternating server-selected variants; local, non-scoring practice                                                                                                                   |
+| Leaderboard        | Completed players only, XP descending then server signup-to-completion elapsed time; top 20 plus personal rank; no emails                                                                                              |
+| Admin              | Server allowlist, protected player/content reads and audit trail; editing remains DEV-only and requires reviewed source updates                                                                                        |
 
 ## Verification
 
 - Laptop baseline: Node 22.23.2, pnpm 11.19.0, frozen install, typecheck, 39 original tests, build and `dist/models/soldier.glb` verified.
-- Current unit/integration suite: **150 tests pass**, including migration reproduction,
+- Current unit/integration suite: **152 tests pass**, including migration reproduction,
   all-ruin fixtures, authorization, grants, transactional gameplay, revisits,
   leaderboard, admin, retry isolation, trail targeting, map progression, movement,
   sound profiles and avatar-anchored feedback.
@@ -36,20 +36,35 @@ release is blocked.** Local implementation does not imply deployment.
   restoration. Mocked signed-in browser checks cover player progression, all-20 admin
   inspection and revocation. Build and student-asset checks pass.
 - Chromium authenticated UI contracts: mocked server-only unlocks, paid help, leaderboard and account switching passed without live requests.
-- Load test repeated without competing browser/unit tests: 1,125 first-solve requests passed. At 25/50/100/200 requests/second, p95 was 34/8/9/8ms. The earlier 16,911ms p95 at 200/s did not reproduce; laptop contention is a likely factor, not a proven attribution. See [current load evidence](local-load-results.json) and [review](navigation-and-performance-review.md).
-- A separate 200-simultaneous-request profile completed in 356ms, p95 345ms. It records aggregate PostgreSQL protocol timings. Both tests use one local Node handler and PostgreSQL 17, first-ruin SQL only, and exclude HTTP/Edge/Supavisor. They do not prove sustained or hosted capacity for 3,000 students.
+- The latest clean shaped load run rotated through all twenty ruins and passed 1,125
+  first-solve requests. At 25/50/100/200 requests/second, p95 was 6/5/4/3ms. The
+  earlier 16,911ms p95 at
+  200/s did not reproduce; laptop contention is a likely factor, not a proven
+  attribution. See [current load evidence](local-load-results.json) and
+  [review](navigation-and-performance-review.md).
+- A separate mixed-ruin 200-simultaneous-request profile completed in 285ms, p95
+  277ms. It
+  records aggregate PostgreSQL protocol timings. Both tests use one local Node
+  handler and PostgreSQL 17 and exclude HTTP, Edge and Supavisor. They do not prove
+  sustained or hosted capacity for 3,000 students.
 - Fullscreen entry and explicit exit passed interactively in both the game and DEV studio; typecheck/build/asset checks passed afterward.
+- The slow player-facing walkthrough covers Ruins 01–20, all sequential gates, map
+  revisits and the final state. A local 1440×900 Chromium sample held 60 FPS; initial
+  heap fell from about 122 MB to 42 MB after lazy ruin construction, and world-map
+  main-thread work fell about 36% after covered-scene throttling.
 
 ## Limitations and release blockers
 
 - No new live migrations, judge deployment or web deployment have been performed. Handoff reports an older hosted build and Ruin 06 judge; current remote state was not independently rechecked.
-- The formal slow walkthrough is recorded only through Ruin 06. Automated coverage
-  and shorter interactive checks do not replace a complete Ruin 01–20 physical pass.
 - Full Supabase Auth/PostgREST/hook/pooler integration and real multi-device sessions remain unverified. Minimal Auth tables in local tests do not replace that gate.
 - Sustained mixed-query load, hosted free-tier compute and campus download capacity remain unproven. Clean local results do not remove those release gates.
 - Question review has started: wrong-condition probes can pass all three fixtures for 01, 06 and 19; see [review ledger](question-review.md). Each question has a canonical query plus two variants, but many variants are cosmetic and do not establish the required structural diversity. Blind human review and stronger acceptance cases remain required.
-- Safari/Firefox and baseline hardware coverage remain required.
-- No planner-cost ceiling or result-byte ceiling is implemented. Statement/lock timeouts, AST policy, read-only grants and row limits provide partial resource controls.
+- Firefox renders the entry flow correctly. Native Safari/Firefox interaction and
+  baseline classroom hardware coverage remain required; Safari remote automation and
+  macOS Computer Use permission are currently disabled.
+- A 64 KiB result-byte ceiling is implemented. No planner-cost ceiling is implemented;
+  statement/lock timeouts, AST policy, read-only grants and row limits provide the
+  remaining resource controls.
 - Revisit drafts are session-only; first-pass drafts persist on the current browser, scoped by account, without cross-device synchronization.
 - Admin is read-only in production. Content edits are exported from the DEV studio, reviewed, regenerated and deployed by maintainers.
 - Retention policy requires an operational cleanup process before launch; no hosted scheduler was configured.

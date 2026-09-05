@@ -3,6 +3,7 @@
 Date: 2026-09-05  
 Branch: `open-world`  
 Starting revision: `6c7a0b8`
+Continuation revision: `1c7f2a3`
 
 This is the live review log for a slow, sequential playthrough from Ruin 01 to Ruin 20. Each ruin is checked through the player-facing game: arrival, physical route, amber trail, archive interaction, visible result, restored gate, exit route, transition, and ambience profile change.
 
@@ -66,56 +67,136 @@ User comments made during the walkthrough are recorded under the ruin where they
 
 ## Ruin 07
 
-- Status: awaiting walkthrough
+- Status: completed and revisited after the 20/20 state
+- Arrival/environment: Fatehpuri Masjid steps presented a broad pale courtyard,
+  repeated arches and stepped masonry; its “Courtyard air · pigeons” profile was
+  selected on entry.
+- Amber/archive: map travel returned to the entrance, selected **Current amber** and
+  reached Archive 07 without collision.
+- Restoration/exit: selecting **Next gate** redirected the trail through the open
+  passage and advanced sequentially.
 
 ## Ruin 08
 
-- Status: awaiting walkthrough
+- Status: completed and revisited after the 20/20 state
+- Arrival/environment: Chawri Bazaar lanes used the “Workshop alleys · brass chimes”
+  profile and remained physically distinct from the open mosque courtyard.
+- Amber/archive: map travel again reset the selector to **Current amber** and the
+  guided route reached Archive 08 without collision.
+- Restoration/exit: the sequential passage from Ruin 07 crossed Ruin 08 and continued
+  toward Ruin 09 only while the already-restored **Next gate** direction was active.
 
 ## Ruin 09
 
-- Status: awaiting walkthrough
+- Status: completed; transition to Ruin 10 rechecked
+- Arrival/environment: Dariba Kalan used the “Jewellers’ passage · delicate ringing”
+  profile.
+- Amber/archive: Archive 09 had already been restored in the first walkthrough
+  segment; its reachable central archive was rechecked after the mirrored-copy fix.
+- Restoration/exit: the open passage advanced to Ruin 10 and reset the trail to that
+  new ruin's amber.
 
 ## Ruin 10
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 11
+- Arrival/environment: Chor Bazaar used the “Salvage yard · rattling metal” profile.
+- Amber/archive: the guided route reached Archive 10; the visible task passed and the
+  green solve feedback appeared.
+- Restoration/exit: the selector changed to **Next gate** and the route crossed the
+  working passage without collision.
 
 ## Ruin 11
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 12
+- Arrival/environment: Karim's courtyard selected “Kitchen courtyard · utensils and
+  shutters.”
+- Amber/archive: the trail and slow route reached Archive 11; the visible task passed.
+- Restoration/exit: the restored gate route advanced normally, including lazy first
+  construction of Ruin 12 without a visible interaction pause.
 
 ## Ruin 12
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 13
+- Arrival/environment: Wazirabad used “Waterworks · flowing channels and pump hum.”
+- Amber/archive: the raised waterworks route reached Archive 12 and the visible task
+  passed.
+- Restoration/exit: the gate opened, the trail redirected and the transition worked.
 
 ## Ruin 13
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 14
+- Arrival/environment: Old Delhi station selected “Station wind · distant rail
+  resonance.”
+- Amber/archive: the guided route reached Archive 13 and the visible task passed.
+- Restoration/exit: the open gate advanced to the mandi without a construction hitch.
 
 ## Ruin 14
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 15
+- Arrival/environment: Azadpur Mandi selected “Mandi breeze · wood and nesting birds.”
+- Amber/archive: the trail reached Archive 14 and the visible task passed.
+- Restoration/exit: the gate route advanced to the landfill normally.
 
 ## Ruin 15
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 16
+- Arrival/environment: Ghazipur landfill selected “Scrap hills · gusts and distant
+  metal.”
+- Amber/archive: the guided route crossed the scrap landscape and reached Archive 15;
+  the visible task passed.
+- Restoration/exit: the open passage advanced to the sorting yard.
 
 ## Ruin 16
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 17
+- Arrival/environment: Tihar selected “Sorting yard · fence rattle.”
+- Amber/archive: the trail reached Archive 16 and the visible task passed.
+- Restoration/exit: the working gate advanced to Rajiv Chowk.
 
 ## Ruin 17
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 18
+- Arrival/environment: Rajiv Chowk selected “Underground concourse · electrical
+  resonance.”
+- Amber/archive: the guided route reached Archive 17 and the visible task passed.
+- Restoration/exit: the exit path advanced to the ridge without collision.
 
 ## Ruin 18
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 19
+- Arrival/environment: the ridge used trees, raised ground and signal structures with
+  “Woodland canopy · insects and birds.”
+- Amber/archive: the deliberately slow walkthrough route climbed the ridge and reached
+  Archive 18. Position telemetry confirmed continued progress through its long raised
+  turn; the visible task passed.
+- Restoration/exit: the return route crossed the gate and advanced to the stepwell.
 
 ## Ruin 19
 
-- Status: awaiting walkthrough
+- Status: completed; transitioned sequentially to Ruin 20
+- Arrival/environment: Agrasen ki Baoli selected “Stepwell hush · falling water.”
+- Amber/archive: the trail reached Archive 19 immediately after entry and the visible
+  task passed.
+- Restoration/exit: the gate opened and advanced to the final bridge.
 
 ## Ruin 20
 
-- Status: awaiting walkthrough
+- Status: completed; final state and full map verified
+- Arrival/environment: Signature Bridge selected “Bridge height · river wind and cable
+  song.”
+- Amber/archive: the trail reached Archive 20 and the visible task passed. Green
+  `+20 XP` feedback was visible above the player.
+- Final state: progress displayed 20/20, **Next gate** remained disabled with the final
+  ruin explanation, the mission copy changed to the restored-city state, and the
+  completed world map exposed all twenty travel points.
+
+## Walkthrough result
+
+- All twenty archives are reachable from their entrances.
+- Ruins 01–19 have working restored-gate routes and sequential transitions.
+- Map travel to a restored ruin resets the trail to its amber; manual selection can
+  redirect it to the gate.
+- Lazy first-entry construction did not produce a visible transition stall during the
+  Ruin 10–20 continuation.
+- The full journey, final state and completed travel map have no open
+  progression-blocking findings. Question quality remains a separate postponed review.

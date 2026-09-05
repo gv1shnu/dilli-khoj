@@ -120,7 +120,6 @@ The Edge Function creates at most one executor and one progress connection per w
 - Ask students to open the landing page 10–15 minutes before play begins, even if the game opens for everyone at the same time.
 - Provide a visible capability check for WebAssembly, IndexedDB and browser version before downloading world content.
 
-
 ## Server gameplay API
 
 Authenticated browser RPCs `game_state`, `game_action` and `begin_revisit` verify the current approved player. The browser cannot write profile XP or ruin progress directly. Purchases and first solves lock the profile row, bind retry IDs, enforce prerequisites and affordability, and stamp completion once. `game_state` returns only hints/solutions already purchased by that player.
@@ -133,4 +132,13 @@ Numeric comparison uses PostgreSQL type OIDs to normalize bigint/numeric wire va
 
 ## Measured local performance
 
-[Local load results](local-load-results.json) record 25/50/100/200 requests per second against one Node handler process and disposable PostgreSQL 17. All verdicts were correct. A clean repeat recorded 8ms p95 at 200 requests/second; the earlier roughly 17-second result did not reproduce without competing laptop work. See the [detailed review](navigation-and-performance-review.md) and [burst profile](local-profile-results.json). These short first-ruin benchmarks are not a hosted or sustained capacity claim. HTTP, Edge isolates, Supavisor and the free-tier project require separate authorized measurement.
+[Local load results](local-load-results.json) record 25/50/100/200 requests per
+second against one Node handler process and disposable PostgreSQL 17. All 1,125
+verdicts were correct; the latest mixed-ruin p95 measurements were 6/5/4/3ms. A
+separate mixed-ruin burst of 200 simultaneous requests completed in 285ms with 277ms
+p95. The earlier roughly 17-second result did not reproduce without competing laptop
+work. See the
+[detailed review](navigation-and-performance-review.md) and
+[burst profile](local-profile-results.json). These short mixed-ruin benchmarks are
+not a hosted or sustained capacity claim. HTTP, Edge isolates, Supavisor and the
+free-tier project require separate authorized measurement.

@@ -18,50 +18,55 @@ for verification evidence and [setup](setup.md) to reproduce it.
   Practice can replay the solve animation without awarding official XP.
 - All twenty first-pass objectives and forty alternating revisit objectives are wired
   to the generated client and server content pipeline.
-- The current automated baseline is **150 passing tests**, with typecheck, production
+- The current automated baseline is **152 passing tests**, with typecheck, production
   build, browser smoke and mocked authentication contracts also passing.
+- Ruins are constructed on first entry, cutting the measured Ruin 01 development heap
+  from about 122 MB to 42 MB while active play remained at 60 FPS. Covered scenes
+  render at 12 FPS, and hidden signed-in tabs no longer poll the backend.
+- The slow physical walkthrough now covers Ruins 01–20, all nineteen sequential gates,
+  the final state and completed-map revisits. See
+  [walkthrough notes](walkthrough-notes.md).
 
 ## Remaining work, in order
 
-1. **Complete and record a slow Ruin 01–20 walkthrough.** The formal log currently
-   covers Ruins 01–06. Inspect every route, gate transition, wrap boundary, collision,
-   camera angle, trail target, map revisit, soundscape transition and the final-ruin
-   state. Add each finding to [walkthrough notes](walkthrough-notes.md) before fixing
-   it so the acceptance record remains complete.
-2. **Finish question and fixture acceptance.** Review all twenty first-pass objectives
-   and forty revisits. Keep every question description free of SQL keywords, clauses,
-   operators and query fragments; put technique guidance in hints. Repair the known
+1. **Measure the remaining classroom performance risks.** Run long-session memory and
+   fullscreen GPU checks on the lowest-spec classroom laptop, then measure the hosted
+   backend and real campus-network cache/preload behavior. Local Chromium currently
+   holds 60 FPS at 1440×900; initial heap and covered-scene work have been reduced.
+2. **Finish browser, device and accessibility QA.** The full Chromium interaction
+   smoke passes and Firefox renders the entry flow correctly. Complete native Safari
+   and Firefox interaction passes after the owner enables automation or supervises
+   them; cover keyboard-only play, fullscreen, reduced motion, audio recovery, focus,
+   compact layouts and refresh recovery.
+3. **Run full local Supabase integration.** Exercise Auth, PostgREST, signup hooks,
+   row-level security, RPC grants, denied and revoked admin access, retries, concurrent
+   purchases and judge isolation on a disposable stack. This requires the owner to
+   provide a running Docker-compatible container daemon.
+4. **Verify authenticated economy and progression in the UI.** With two real approved
+   accounts, confirm survey and solve gains, hint and reveal deductions, player-anchored
+   green/red animations, sequential unlocking, account switching, two-device behavior
+   and refresh recovery.
+5. **Finish grading hardening.** The judge now has row, time, query-size and 64 KiB
+   result limits. Add a planner-cost gate, bound admission/queue time, reconcile the
+   grading lease with the longest permitted execution, and repeat the mixed-query
+   profile on the authorized hosted target.
+6. **Finish question and fixture acceptance as the later content phase.** Review all
+   twenty first-pass objectives and forty revisits. Keep every question description
+   free of SQL keywords, clauses, operators and query fragments; put technique
+   guidance in hints. Repair the known
    false-positive fixtures for Ruins 01, 06 and 19, clarify null and tie behavior, add
    targeted wrong-answer regressions, strengthen hidden data, and obtain blind human
    solves. Regenerate versioned client, judge and revisit artifacts afterward. Track
    decisions in [question review](question-review.md).
-3. **Verify authenticated economy and progression in the UI.** With real local
-   accounts, confirm survey and solve gains, hint and reveal deductions, player-anchored
-   green/red animations, sequential unlocking, gate state, map state, refresh recovery,
-   account switching, two-device behavior and the final completion state.
-4. **Run full local Supabase integration.** Exercise Auth, PostgREST, signup hooks,
-   row-level security, RPC grants, denied and revoked admin access, retries, concurrent
-   purchases and judge isolation on a disposable stack. The PostgreSQL and mocked-auth
-   suites do not replace this gate.
-5. **Harden grading execution.** Add result-byte and planner-cost controls, bound
-   admission and queue time, reconcile the grading lease with the longest permitted
-   execution, and test adversarial read-only submissions while preserving award and
-   purchase idempotency.
-6. **Measure and improve classroom performance.** Run sustained mixed-ruin workloads
-   locally and on an explicitly authorized hosted target. Measure background polling,
-   serial database round trips, PGlite payload/cache behavior, memory growth, GPU use
-   and campus-network preload behavior. Use the evidence in
-   [navigation and performance review](navigation-and-performance-review.md) as the
-   starting baseline.
-7. **Finish browser, device and accessibility QA.** Cover Chrome, Safari and Firefox
-   on baseline classroom hardware; keyboard-only play; fullscreen enter/exit; reduced
-   motion; audio toggle and context recovery; dialog focus; compact layouts; and pause
-   behavior when the editor or map is open.
-8. **Prepare operations and the release candidate.** Verify retention cleanup,
+7. **Prepare operations and the release candidate.** Verify retention cleanup,
    observability, alerting and rollback. Freeze the exact commit and migration set,
    then obtain owner approval for the production release. Follow the documented order:
    migrations → judge → web, followed by a signed-in production smoke test. See the
    [deployment runbook](deployment-runbook.md).
+
+The owner-dependent work is maintained separately in
+[owner actions](owner-actions.md). Question rewriting remains postponed until the
+physical world and performance pass is complete.
 
 ## Development completion criteria
 

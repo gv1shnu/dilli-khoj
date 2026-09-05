@@ -395,37 +395,34 @@ twenty-ruin journey:
 - twenty first-pass objectives plus forty alternating, non-scoring revisit
   objectives.
 
-The automated suite, typecheck, production build, browser smoke tests and mocked
-authentication contracts pass in the development preview. These checks do not
-replace a slow human walkthrough of every route, gate, collision boundary, soundscape
-and question.
+The 152-test automated suite, typecheck, production build, browser smoke tests and
+mocked authentication contracts pass in the development preview. The slow physical
+walkthrough covers all twenty archives, nineteen sequential gates, map revisits and
+the final state. Ruins are constructed on first entry, covered scenes render at 12 FPS,
+and hidden signed-in tabs stop polling the backend.
 
 ---
 
 ## 19. Completion plan
 
-1. **Finish the complete 1–20 walkthrough.** Record every traversal route, gate
-   transition, wrap boundary, collision, camera problem, map revisit, trail target,
-   ambience change and final-ruin state. The formal walkthrough log currently covers
-   Ruins 01–06.
-2. **Complete the content acceptance review.** Review all twenty first-pass objectives
-   and forty revisits; keep descriptions free of SQL keywords and query syntax; close
-   the known fixture loopholes in Ruins 01, 06 and 19; make null and tie behavior
-   explicit; and obtain blind human solves.
+1. **Establish the target performance envelope.** Profile long sessions and fullscreen
+   on baseline classroom hardware, then measure the authorized hosted backend and real
+   campus-network download/cache behavior.
+2. **Finish native-browser and accessibility QA.** Complete Safari and Firefox
+   interaction passes, keyboard-only play, reduced motion, audio recovery, focus and
+   refresh boundaries after the owner enables the required macOS controls.
 3. **Exercise the real backend locally.** Use a disposable Supabase stack to verify
    Google authentication, signup hooks, RPC grants, row-level security, account
    switching, retry idempotency, help purchases, progression and judge isolation for
    all twenty ruins.
-4. **Harden execution.** Add result-byte and query-cost controls, bound queue time,
-   reconcile execution limits with the grading lease, and test adversarial read-only
-   submissions without weakening award and purchase idempotency.
-5. **Establish the performance envelope.** Profile mixed later-ruin workloads on
-   baseline classroom hardware and an authorized hosted target; measure polling,
-   database round trips, PGlite download/cache behavior, memory growth and GPU use.
-6. **Finish compatibility and accessibility QA.** Cover Chrome, Safari and Firefox;
-   keyboard-only play; fullscreen; reduced motion; audio controls; dialog focus; and
-   refresh/recovery at each progression boundary.
-7. **Prepare release operations.** Verify retention cleanup, monitoring, alerting and
+4. **Finish execution hardening.** The judge has query-size, row, time and result-byte
+   limits. Add a planner-cost gate, bound queue time, reconcile execution limits with
+   the grading lease, and test adversarial read-only submissions.
+5. **Complete the later content acceptance review.** Review all twenty first-pass
+   objectives and forty revisits; keep descriptions free of SQL keywords and query
+   syntax; close the known fixture loopholes in Ruins 01, 06 and 19; make null and tie
+   behavior explicit; and obtain blind human solves.
+6. **Prepare release operations.** Verify retention cleanup, monitoring, alerting and
    rollback, then review the exact commit and migration order. After owner approval,
    release migrations, judge and web in that order and run a signed-in production
    smoke test.
