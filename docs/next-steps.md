@@ -1,28 +1,72 @@
 # Next steps
 
-The gameplay implementation is now on `build/foundation`; no hosted rollout has been performed. See [implementation status](implementation-status.md) for the evidence and [setup](setup.md) to reproduce it.
+The twenty-ruin game is implemented on `open-world` as a development preview. No
+hosted rollout has been performed. See [implementation status](implementation-status.md)
+for verification evidence and [setup](setup.md) to reproduce it.
 
-## Completed locally
+## Current baseline
 
-1. Shared signup/judge policy accepts the three approved domains and current server admin allowlist.
-2. All 20 ruins have generated, versioned server fixtures: visible plus two hidden cases.
-3. Server transactions own progression, XP, ordered help purchases and unlocks. Signed-in Run passes never unlock ruins. Drafts and retry identifiers are scoped by account.
-4. Each ruin has two different non-scoring revisit objectives; server visit counts choose alternating variants.
-5. Completers-only leaderboard ranks XP descending, then **server sign-up-to-completion wall time** ascending. Loading and time away count; revisits do not change completion time. Top 20 and personal rank are available.
-6. Protected, audited admin reads expose player progress and question content. Editing remains in the DEV Question Studio and reviewed source pipeline.
+- Twenty physically distinct 3D ruins, sequential gates and repeating visual fields
+  are implemented.
+- The player controls whether the amber trail points to the current archive or the
+  next unlocked gate.
+- The illustrated journey map runs from Ruin 01 at the bottom to Ruin 20 at the top,
+  with uneven spacing, gray zig-zag paths and distinct landmark icons.
+- All ruins have individual procedural soundscapes. Running is the default movement;
+  holding **Shift** walks.
+- Solve rewards rise over the player in green. Hint and reveal deductions rise in red.
+  Practice can replay the solve animation without awarding official XP.
+- All twenty first-pass objectives and forty alternating revisit objectives are wired
+  to the generated client and server content pipeline.
+- The current automated baseline is **150 passing tests**, with typecheck, production
+  build, browser smoke and mocked authentication contracts also passing.
 
-## Next tasks, in order
+## Remaining work, in order
 
-1. **Review questions with the owner now.** Start at Ruin 01 in [question review](question-review.md), agree the intended difficulty and explicit NULL/tie semantics, then review all 20 first passes and 40 revisits. This is a discussion in progress, not approval. Keep curriculum order unchanged.
-2. **Repair the acceptance matrix.** Add targeted wrong-SQL regressions for the confirmed loopholes in 01, 06 and 19, strengthen hidden data distributions, and replace cosmetic variants with genuinely different correct approaches that meet the authoring standard. Regenerate public/server/revisit content with coherent versioning; obtain blind human solves before release. Existing green tests do not cover these gaps.
-3. **Complete full local Supabase integration.** Use a disposable stack to test Auth, PostgREST, signup hooks, RLS, new RPCs, real account switching/two devices and denied/revoked admin access. Current PGlite/PostgreSQL tests model Auth tables and roles but do not exercise the full stack. Review live provider/OAuth settings only on an authorized target.
-4. **Harden execution and retry behavior.** Add result-byte and expensive-query controls, bound admission/queue time, reconcile the five-second lease with possible longer execution, and test adversarial SQL. Keep final award/purchase idempotency intact.
-5. **Profile and improve realistic performance.** Run sustained mixed-ruin workloads and measure the hosted pool/runtime on an explicitly authorized target. Address background polling (~100 RPC/s at 3,000 tabs), serial DB round trips and the 3D render loop while editing. The earlier 17-second p95 did not reproduce; the clean short local 200/s test was 8ms p95. Neither establishes hosted capacity. See [pros, cons and evidence](navigation-and-performance-review.md).
-6. **Finish browser/device/network QA.** Test Safari/Firefox, baseline MacBook Air, fullscreen, atlas reduced motion and keyboard navigation, repeated world wrapping, memory growth and campus preload/cache behavior. Chromium/mocked-auth checks are already passing.
-7. **Prepare operations and release approval.** Implement/verify retention cleanup, observability and rollback; review exact commit and migration plan. With explicit owner approval only: migrations → judge → web. Keep the ₹0 target. A feature-branch push does not authorize deployment.
+1. **Complete and record a slow Ruin 01–20 walkthrough.** The formal log currently
+   covers Ruins 01–06. Inspect every route, gate transition, wrap boundary, collision,
+   camera angle, trail target, map revisit, soundscape transition and the final-ruin
+   state. Add each finding to [walkthrough notes](walkthrough-notes.md) before fixing
+   it so the acceptance record remains complete.
+2. **Finish question and fixture acceptance.** Review all twenty first-pass objectives
+   and forty revisits. Keep every question description free of SQL keywords, clauses,
+   operators and query fragments; put technique guidance in hints. Repair the known
+   false-positive fixtures for Ruins 01, 06 and 19, clarify null and tie behavior, add
+   targeted wrong-answer regressions, strengthen hidden data, and obtain blind human
+   solves. Regenerate versioned client, judge and revisit artifacts afterward. Track
+   decisions in [question review](question-review.md).
+3. **Verify authenticated economy and progression in the UI.** With real local
+   accounts, confirm survey and solve gains, hint and reveal deductions, player-anchored
+   green/red animations, sequential unlocking, gate state, map state, refresh recovery,
+   account switching, two-device behavior and the final completion state.
+4. **Run full local Supabase integration.** Exercise Auth, PostgREST, signup hooks,
+   row-level security, RPC grants, denied and revoked admin access, retries, concurrent
+   purchases and judge isolation on a disposable stack. The PostgreSQL and mocked-auth
+   suites do not replace this gate.
+5. **Harden grading execution.** Add result-byte and planner-cost controls, bound
+   admission and queue time, reconcile the grading lease with the longest permitted
+   execution, and test adversarial read-only submissions while preserving award and
+   purchase idempotency.
+6. **Measure and improve classroom performance.** Run sustained mixed-ruin workloads
+   locally and on an explicitly authorized hosted target. Measure background polling,
+   serial database round trips, PGlite payload/cache behavior, memory growth, GPU use
+   and campus-network preload behavior. Use the evidence in
+   [navigation and performance review](navigation-and-performance-review.md) as the
+   starting baseline.
+7. **Finish browser, device and accessibility QA.** Cover Chrome, Safari and Firefox
+   on baseline classroom hardware; keyboard-only play; fullscreen enter/exit; reduced
+   motion; audio toggle and context recovery; dialog focus; compact layouts; and pause
+   behavior when the editor or map is open.
+8. **Prepare operations and the release candidate.** Verify retention cleanup,
+   observability, alerting and rollback. Freeze the exact commit and migration set,
+   then obtain owner approval for the production release. Follow the documented order:
+   migrations → judge → web, followed by a signed-in production smoke test. See the
+   [deployment runbook](deployment-runbook.md).
 
-## Handoff
+## Development completion criteria
 
-[handoff](handoff.md) contains the current implementation baseline, tools, commands, source map, owner decisions, validation limits and authorization boundaries. The question-review ledger is the current collaboration starting point.
-
-The hosted handoff reports an older web build, Ruin 06 judge and Google External / Testing; these remote claims have not been independently rechecked. Do not reset credentials or create replacement projects to continue work. Custom auth-domain branding remains optional under the zero-cost constraint.
+Development is complete when the 1–20 walkthrough and content review have no open
+severity-one or progression-blocking findings, real local Supabase behavior matches the
+automated contracts, the target classroom hardware/network stays inside the agreed
+performance budget, required browsers and accessibility paths pass, and a reversible,
+observable release candidate is ready for owner approval.

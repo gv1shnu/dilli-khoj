@@ -37,9 +37,14 @@ the literal mechanic by which the world heals.
    can never be blocked from _finishing_, only from _skipping_.
 4. **No dead ends, no failure states.** A wrong submission costs nothing. There is
    no timer, no health, no losing. The only way forward is understanding.
-5. **Plain language over jargon.** Questions and hints describe the _data outcome_
-   in everyday words and name the exact columns to use. Technique (e.g. `HAVING`)
-   is suggested, never required — any safe query that returns the right rows passes.
+5. **Plain language over jargon.** Question descriptions describe the _data
+   outcome_ in everyday words and stay free of SQL keywords and query syntax.
+   Column and table identifiers may be named when the learner needs them. SQL
+   techniques belong in optional hints, the schema browser, and the editor. Any
+   safe query that returns the right rows passes.
+6. **Every ruin is a place.** A new archive must introduce a physically distinct
+   space, silhouette, traversal rhythm, prop family, light treatment, and ambience.
+   Recoloring or rearranging the previous ruin is not enough.
 
 ---
 
@@ -91,8 +96,9 @@ that unlock in sequence. Each district holds one band of the curriculum:
 
 ## 5. Core gameplay loop
 
-1. **Run** through the current ruin (WASD / arrows, drag to look, Shift to walk). The
-   amber trail points directly to that ruin's archive.
+1. **Run** through the current ruin (WASD / arrows, drag to look). Running is the
+   default pace; hold Shift for careful walking. The amber trail initially points
+   directly to that ruin's archive.
 2. **Arrive** at a ruin — a broken place with a glowing **amber** (the sealed
    archive) rising from it. Press **E** to open it.
 3. **Read** what the archive asks for: a plain-language description, the exact rows
@@ -103,12 +109,14 @@ that unlock in sequence. Each district holds one band of the curriculum:
 5. **Submit** when confident. The archive checks the query for real against hidden
    records you can't see. A wrong answer costs nothing.
 6. **Restore** on success: the ruin wakes, its lights return, the region is revealed
-   on your map, and its exit gate opens. The trail immediately turns toward the gate.
+   on your map, and its exit gate opens. A green `+20 XP` change rises over the
+   player's screen position and the trail defaults to the gate.
 7. **Cross** the open gate to enter the next ruin. The trail then turns toward the
    new ruin's amber. The world map remains available for revisiting restored places.
 
 Optional at any archive: **open a hint** (small XP cost) or, once all hints are
 opened, **reveal the full solution** (larger XP cost). Both are opt-in shortcuts.
+Their deductions rise over the player in red; gains use green.
 
 ---
 
@@ -125,16 +133,22 @@ ruin feels expansive while preserving a clear learning boundary.
 - **Physical gating.** Every ruin has one visible exit gate behind its arrival point.
   Its luminous bars remain sealed until that ruin's archive is restored. Walking
   through the open gate moves the player to the next ruin.
-- **Contextual amber trail.** Before a solve, floating arrows point only to the
-  nearest repeated copy of the current ruin's amber. After the solve, they point only
-  to its open exit. On arrival in the next ruin, they switch to that ruin's amber.
+- **Player-directed amber trail.** The mission card offers **Current amber** and
+  **Next gate**. Before restoration, the gate choice is disabled and the arrows lead
+  to the reachable amber inside the active ruin. Restoration enables the gate and
+  selects it by default. Entering a new ruin resets the trail to its amber; travelling
+  to a restored ruin from the map also defaults to its amber for a revisit. Ruin 20
+  has no onward gate choice.
 - **Per-level kits.** Each of the twenty locations is hand-authored with its own
   props, terrain and landmark silhouette (a stepwell descent, a cable bridge, a
   ridge ascent, market lanes, etc.), giving each ruin a recognisable identity.
-- **Sequential player map.** All twenty numbered stops remain visible in a gray
-  bottom-to-top zig-zag: 01 begins at the bottom and 20 ends at the top. Restored
-  stops become travel points; future stops remain gray and sealed. Admins retain a
-  separate full geographic atlas that never bypasses scoring.
+- **Sequential player map.** The field-atlas illustration shows the ridge, old city,
+  Yamuna, streets and vegetation behind an uneven bottom-to-top journey. Ruin 01
+  begins at the bottom and Ruin 20 ends at the top; gray route segments zig-zag
+  between them. Every ruin uses a different landmark icon silhouette. Restored stops
+  become travel points, the frontier is identified, and future stops remain gray and
+  sealed. The old redundant numbered strip is absent. Admins retain a separate full
+  geographic atlas that never bypasses scoring.
 
 ---
 
@@ -145,8 +159,9 @@ Every archive presents four things, in this order: **title**, **description**,
 separate panel, not part of the prompt.
 
 - **Descriptions** state the required data outcome in plain language and name the
-  exact columns and ordering to return — 12–35 words. They recommend a technique
-  where useful but never _require_ it.
+  exact columns and ordering to return — 12–35 words. They do not use SQL keywords,
+  clauses, operators, or query fragments. A useful technique may be explained in a
+  hint, but is never a required form of the answer.
 - **Sample output** shows fictional, clearly-fake rows (e.g. `sample_col_a`) so it
   can never be confused with the real answer.
 - **Hints** are short, concrete, and jargon-free. Ruins 1–10 have one hint; 11–20
@@ -213,6 +228,9 @@ Design consequences, by intent:
 - **A reveal solves nothing automatically.** Even after revealing, the learner must
   submit a passing query themselves. There is no path to the end without solving.
 - **Wrong answers are free**, so _Submit_ is safe to use as a probe.
+- **Feedback is spatial.** Positive XP changes animate in green and deductions in
+  red at the avatar's projected screen position. The development practice preview
+  can replay the green solve animation for review, but never changes official XP.
 
 ---
 
@@ -274,6 +292,8 @@ Integrity properties:
   the Run/Submit loop — deliberately saying nothing about "finishing."
 - **Controls:** WASD/arrows to run, drag to look, Shift to walk, **E** to open an
   archive, **M** to mute/unmute ambience.
+- **Mission card:** place, restoration count, current objective, amber-trail
+  direction control, archive action, and world-map action remain together.
 - **Archive panel:** prompt + sample output on one side, a SQL editor with **Run**
   and **Submit** on the other, and a separate schema browser.
 - **Maps:** the player's numbered bottom-to-top journey (restored stops are travel
@@ -285,10 +305,11 @@ Integrity properties:
 
 ## 14. Audio and art direction
 
-- **Per-ruin soundscapes.** Every ruin has a distinct generated mix, filter color,
-  pitch pattern and event cadence — river wind at the water gates, insects and birds
-  on the wooded ridge, water drops in the stepwell, rail resonance at the station,
-  and so on. Audio is procedural through the Web Audio API and toggled with **M**.
+- **Per-ruin soundscapes.** All twenty ruins have distinct generated mixes, filter
+  colors, pitch patterns, seeded detail cues, and event cadences — river wind at the
+  water gates, insects and birds on the wooded ridge, water drops in the stepwell,
+  rail resonance at the station, and so on. Profiles switch on ruin entry. Audio is
+  procedural through the Web Audio API and toggled with **M**.
 - **Art direction** is low-poly, quiet, and overgrown, with an animated character
   and hand-placed landmark silhouettes per ruin. Inspiration credited to _Exceletia_
   by edusatyaki; shipped assets are listed in `CREDITS.md`.
@@ -357,7 +378,63 @@ Authoring is also editable through a DEV-only **Question Studio** (`#admin`) and
 
 ---
 
-## 18. Non-goals and open items
+## 18. Current implementation snapshot
+
+The `open-world` branch now contains the complete physical framework for the
+twenty-ruin journey:
+
+- twenty individually built ruin environments, joined by sequential gates;
+- a repeating visual field around each active ruin so every direction feels open
+  while progression still returns the player to the current archive;
+- a player-controlled amber trail that can target the current archive or, after a
+  solve, the next gate;
+- an illustrated bottom-to-top journey map with an uneven zig-zag route and a
+  different landmark icon for every ruin;
+- twenty distinct procedural ambience profiles, run-first movement with
+  **Shift-to-walk**, and spatial green/red XP feedback over the player; and
+- twenty first-pass objectives plus forty alternating, non-scoring revisit
+  objectives.
+
+The automated suite, typecheck, production build, browser smoke tests and mocked
+authentication contracts pass in the development preview. These checks do not
+replace a slow human walkthrough of every route, gate, collision boundary, soundscape
+and question.
+
+---
+
+## 19. Completion plan
+
+1. **Finish the complete 1–20 walkthrough.** Record every traversal route, gate
+   transition, wrap boundary, collision, camera problem, map revisit, trail target,
+   ambience change and final-ruin state. The formal walkthrough log currently covers
+   Ruins 01–06.
+2. **Complete the content acceptance review.** Review all twenty first-pass objectives
+   and forty revisits; keep descriptions free of SQL keywords and query syntax; close
+   the known fixture loopholes in Ruins 01, 06 and 19; make null and tie behavior
+   explicit; and obtain blind human solves.
+3. **Exercise the real backend locally.** Use a disposable Supabase stack to verify
+   Google authentication, signup hooks, RPC grants, row-level security, account
+   switching, retry idempotency, help purchases, progression and judge isolation for
+   all twenty ruins.
+4. **Harden execution.** Add result-byte and query-cost controls, bound queue time,
+   reconcile execution limits with the grading lease, and test adversarial read-only
+   submissions without weakening award and purchase idempotency.
+5. **Establish the performance envelope.** Profile mixed later-ruin workloads on
+   baseline classroom hardware and an authorized hosted target; measure polling,
+   database round trips, PGlite download/cache behavior, memory growth and GPU use.
+6. **Finish compatibility and accessibility QA.** Cover Chrome, Safari and Firefox;
+   keyboard-only play; fullscreen; reduced motion; audio controls; dialog focus; and
+   refresh/recovery at each progression boundary.
+7. **Prepare release operations.** Verify retention cleanup, monitoring, alerting and
+   rollback, then review the exact commit and migration order. After owner approval,
+   release migrations, judge and web in that order and run a signed-in production
+   smoke test.
+
+The maintained, task-level checklist is in [next steps](next-steps.md).
+
+---
+
+## 20. Non-goals and open items
 
 - **No writes.** No `INSERT`/`UPDATE`/`DELETE`/DDL/DCL is ever executed by a player;
   write-family topics are taught read-only by design.
