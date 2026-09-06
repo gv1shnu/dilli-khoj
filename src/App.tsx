@@ -1056,7 +1056,12 @@ function GameShell({
       )}
       <footer className="world-label">
         <span>DILLI KHOJ · ARCHIVE NETWORK</span>
-        <span>Developed by Vishnu Gandarapu</span>
+        <span>
+          Developed by{" "}
+          <a href="https://vishnugandarapu.in" target="_blank" rel="noreferrer">
+            Vishnu Gandarapu
+          </a>
+        </span>
         <span>
           {import.meta.env.DEV && (
             <>
