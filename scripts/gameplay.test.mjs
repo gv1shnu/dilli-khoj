@@ -72,16 +72,16 @@ it("survey/hints/reveal are atomic, ordered and idempotent", async () => {
     await action("survey", 1, id);
     await action("survey", 1, id);
     await action("survey", 1);
-    expect((await state()).xp).toBe(105);
+    expect((await state()).xp).toBe(100);
     await expect(action("hint", 1, id, 1)).rejects.toThrow(/another operation/);
     await expect(action("reveal", 1)).rejects.toThrow(/all clues/);
     await action("hint", 1, randomUUID(), 1);
     await action("hint", 1, randomUUID(), 1);
-    expect((await state()).xp).toBe(105);
+    expect((await state()).xp).toBe(100);
     await action("reveal", 1);
     await action("reveal", 1);
     const s = await state();
-    expect(s.xp).toBe(90);
+    expect(s.xp).toBe(85);
     expect(s.cleared).toEqual([]);
     expect(s.progress[0].solution).toContain("SELECT");
     expect(s.progress[0].hints).toHaveLength(1);
@@ -91,12 +91,12 @@ it("survey/hints/reveal are atomic, ordered and idempotent", async () => {
     expect((await state()).xp).toBe(100);
   });
 });
-it("wrong answers are free; only one first-solve award survives retries", async () => {
-  expect((await solve(p, 1, false)).xp).toBe(90);
+it("wrong answers are free; revealed solves and retries award no XP", async () => {
+  expect((await solve(p, 1, false)).xp).toBe(85);
   const id = randomUUID();
-  expect((await solve(p, 1, true, id)).xp).toBe(110);
-  expect((await solve(p, 1, true, id)).xp).toBe(110);
-  expect((await solve(p, 1)).xp).toBe(110);
+  expect((await solve(p, 1, true, id)).xp).toBe(85);
+  expect((await solve(p, 1, true, id)).xp).toBe(85);
+  expect((await solve(p, 1)).xp).toBe(85);
   await asPlayer(p, async () => {
     expect((await state()).cleared).toEqual([1]);
   });
@@ -108,7 +108,7 @@ it("insufficient XP rolls back help and does not block solving", async () => {
     await expect(action("reveal", 1)).rejects.toThrow(/Not enough XP/);
     expect((await state()).progress[0].hintsOpened).toBe(1);
   });
-  expect((await solve(other, 1)).xp).toBe(25);
+  expect((await solve(other, 1)).xp).toBe(20);
 });
 it("revisits alternate deterministically, retry safely and never change scoring", async () => {
   await asPlayer(p, async () => {
@@ -125,7 +125,7 @@ it("revisits alternate deterministically, retry safely and never change scoring"
     const second = await visit(randomUUID());
     expect(second.variant).not.toBe(first.variant);
     expect(second.visit).toBe(2);
-    expect((await state()).xp).toBe(110);
+    expect((await state()).xp).toBe(85);
     await expect(visit(randomUUID(), 2)).rejects.toThrow(/Restore this ruin/);
   });
 });

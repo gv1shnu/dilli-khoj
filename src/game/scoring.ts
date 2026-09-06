@@ -12,8 +12,8 @@ import { RUIN_SEQUENCE, TOTAL_RUINS } from "./ruins";
 export const XP = {
   /** Starting balance for every new player. */
   START: 100,
-  /** First time a ruin's archive is surveyed (opened). */
-  SURVEY: 5,
+  /** Opening a ruin's archive is recorded but no longer awards XP. */
+  SURVEY: 0,
   /** First authoritative pass of a ruin. */
   SOLVE: 20,
   /** First clue in every ruin. */
@@ -54,14 +54,19 @@ export const TOTAL_HINTS = RUIN_SEQUENCE.reduce(
 export const MAX_XP =
   XP.START + TOTAL_RUINS * XP.SURVEY + TOTAL_RUINS * XP.SOLVE;
 
-/** Balance after taking every staged clue and reveal, then solving all ruins. */
+/**
+ * Balance if you take every staged clue and reveal on every ruin. Revealing
+ * forfeits the solve award, so this projection is negative — the "reveal
+ * everything" path is intentionally unsustainable and would leave a player
+ * unable to afford further reveals.
+ */
 export const FULL_HELP_END_XP = (() => {
   let xp: number = XP.START;
   for (const ruin of RUIN_SEQUENCE) {
     xp += XP.SURVEY;
     for (let h = 1; h <= ruin.hints; h += 1) xp -= hintCost(h);
     xp += XP.REVEAL;
-    xp += XP.SOLVE;
+    // Solving a revealed ruin awards no XP.
   }
   return xp;
 })();
@@ -88,11 +93,11 @@ export function compareCompletion(a: Scorecard, b: Scorecard): number {
 }
 
 if (import.meta.env.DEV) {
-  if (MAX_XP !== 600)
-    console.error(`XP math drifted: MAX_XP is ${MAX_XP}, expected 600.`);
+  if (MAX_XP !== 500)
+    console.error(`XP math drifted: MAX_XP is ${MAX_XP}, expected 500.`);
   if (TOTAL_HINTS !== 30)
     console.error(`Hint total drifted: ${TOTAL_HINTS}, expected 30.`);
-  if (FULL_HELP_END_XP !== 250)
+  if (FULL_HELP_END_XP !== -250)
     console.error(
       `Help economy drifted: full-help completion ends at ${FULL_HELP_END_XP} XP.`,
     );

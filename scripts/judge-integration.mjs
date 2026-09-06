@@ -101,7 +101,7 @@ try {
   const profile = (
     await pg.sql`select xp,ruins_solved,completed_at from public.profiles where id=${player}`
   )[0];
-  assert.equal(profile.xp, 600);
+  assert.equal(profile.xp, 500);
   assert.equal(profile.ruins_solved, 20);
   assert.ok(profile.completed_at);
   const retries = await Promise.all(
@@ -112,7 +112,7 @@ try {
   assert.ok(retries.every((r) => r.status === 200 && r.body.correct));
   assert.equal(
     (await pg.sql`select xp from public.profiles where id=${player}`)[0].xp,
-    600,
+    500,
   );
   assert.equal((await submit(questions[0], "SELECT 1", firstId)).status, 409);
   // Staged help: the first clue is free, and a competing paid action (the reveal)
@@ -150,7 +150,7 @@ try {
   assert.ok(profileCount >= 2, `expected several profiles, saw ${profileCount}`);
   assert.equal(state.explorers, profileCount);
   console.log(
-    `PostgreSQL 17 integration passed: 20 authenticated three-case submissions, 600 XP completion, concurrent retries and purchases, explorer count ${state.explorers}.`,
+    `PostgreSQL 17 integration passed: 20 authenticated three-case submissions, 500 XP completion, concurrent retries and purchases, explorer count ${state.explorers}.`,
   );
   if (process.argv.includes("--profile")) {
     // Only the disposable cluster: log server durations, then retain aggregates.
