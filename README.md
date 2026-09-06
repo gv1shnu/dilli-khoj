@@ -1,5 +1,16 @@
 # Dilli Khoj
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=three.js&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PGlite-4169E1?logo=postgresql&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)
+
 A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore a 3D world, restore twenty archives, and practise the DBMS curriculum through SQL.
 
 **Status: hosted preview, not yet cleared for a classroom-wide release.** All twenty server-graded questions, the full judge and trusted progression are now deployed to the hosted backend (Supabase) and web (Cloudflare); the earlier Ruin-06-only judge has been replaced. Native-browser and accessibility QA, sustained hosted-load validation and blind human review of every question remain before a classroom rollout.
