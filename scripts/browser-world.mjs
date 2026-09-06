@@ -36,6 +36,12 @@ export async function openNearbyArchive(page) {
   });
   if (await bypass.isVisible()) await bypass.click();
   await page.locator(".interact-prompt").click({ timeout: 30000 });
+  // A restored ruin first opens the revisit objective chooser; a fresh ruin goes
+  // straight to the terminal. Wait for whichever appears, then pick an objective
+  // if the chooser is what showed.
+  await page.waitForSelector(".revisit-choice, #sql-editor", { timeout: 30000 });
+  const choice = page.locator(".revisit-choice").first();
+  if (await choice.count()) await choice.click();
   await page.waitForFunction(() => {
     const e = document.querySelector("#sql-editor");
     return e && !e.disabled;
