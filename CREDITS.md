@@ -6,7 +6,7 @@ new asset, and keep any license text the asset requires.
 
 ## Art inspiration
 
-Art direction inspiration from [Exceletia by edusatyaki](https://github.com/edusatyaki/Exceletia). This credit does not replace the individual licenses for assets listed below.
+Character Art inspired from [Exceletia by edusatyaki](https://github.com/edusatyaki/Exceletia). This credit does not replace the individual licenses for assets listed below.
 
 ## Engine & libraries
 
