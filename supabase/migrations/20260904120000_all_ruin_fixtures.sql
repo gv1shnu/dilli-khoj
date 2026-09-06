@@ -63,19 +63,19 @@ create table game_private.question_help (
     revoke all on game_private.question_help from public, anon, authenticated, dilli_judge_executor, dilli_judge_progress;
 
 insert into game_private.questions (ruin_id, dataset_version, allowed_tables) values
-        (1, '2026-09-04.1', '["catalog_columns"]'::jsonb);
+        (1, '2026-09-04.1', '["record_fields"]'::jsonb);
 
 insert into game_private.question_help values
-        (1, '2026-09-04.1', 'Reading the Resident Records', 'Each row of `catalog_columns` describes one column of a table. List the `attribute` and `data_type` of every column belonging to the `resident` table, sorted alphabetically by `attribute`.', '["Keep the rows where `entity` = ''resident'', return `attribute` and `data_type`, and sort by `attribute`."]'::jsonb, 'SELECT attribute, data_type
-FROM catalog_columns
-WHERE entity = ''resident''
-ORDER BY attribute;');
+        (1, '2026-09-04.1', 'Reading the Resident Records', 'The `record_fields` catalogue names every record-book in the city, one field inside it, and what that field stores. List each `field` and what it `stores` for the `resident` book, in alphabetical order by `field`.', '["Keep the rows where `book` = ''resident'', return `field` and `stores`, and sort by `field`."]'::jsonb, 'SELECT field, stores
+FROM record_fields
+WHERE book = ''resident''
+ORDER BY field;');
 
 create schema fixture_r01_v20260904_1_visible;
 revoke all on schema fixture_r01_v20260904_1_visible from public, anon, authenticated;
 set search_path = fixture_r01_v20260904_1_visible, pg_catalog;
-CREATE TABLE "catalog_columns" ("entity" text, "attribute" text, "data_type" text, "is_key" boolean);
-INSERT INTO "catalog_columns" VALUES
+CREATE TABLE "record_fields" ("book" text, "field" text, "stores" text, "is_key" boolean);
+INSERT INTO "record_fields" VALUES
 ('resident', 'resident_id', 'integer', true),
 ('resident', 'name', 'text', false),
 ('shelter', 'capacity', 'integer', false),
@@ -85,16 +85,16 @@ reset search_path;
 revoke all on all tables in schema fixture_r01_v20260904_1_visible from public, anon, authenticated;
 grant usage on schema fixture_r01_v20260904_1_visible to dilli_judge_executor;
 grant select on all tables in schema fixture_r01_v20260904_1_visible to dilli_judge_executor;
-analyze fixture_r01_v20260904_1_visible."catalog_columns";
+analyze fixture_r01_v20260904_1_visible."record_fields";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (1, '2026-09-04.1-visible', 'fixture_r01_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["attribute","data_type"]'::jsonb, '[["home_id","integer"],["name","text"],["resident_id","integer"]]'::jsonb, '[25,25]'::jsonb);
+values (1, '2026-09-04.1-visible', 'fixture_r01_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["field","stores"]'::jsonb, '[["home_id","integer"],["name","text"],["resident_id","integer"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r01_v20260904_1_hidden_a;
 revoke all on schema fixture_r01_v20260904_1_hidden_a from public, anon, authenticated;
 set search_path = fixture_r01_v20260904_1_hidden_a, pg_catalog;
-CREATE TABLE "catalog_columns" ("entity" text, "attribute" text, "data_type" text, "is_key" boolean);
-INSERT INTO "catalog_columns" VALUES
+CREATE TABLE "record_fields" ("book" text, "field" text, "stores" text, "is_key" boolean);
+INSERT INTO "record_fields" VALUES
 (NULL, 'unknown-1', 'text', false),
 ('resident', 'home_id-1', 'integer', false),
 ('shelter', 'capacity-1', 'integer', false),
@@ -104,16 +104,16 @@ reset search_path;
 revoke all on all tables in schema fixture_r01_v20260904_1_hidden_a from public, anon, authenticated;
 grant usage on schema fixture_r01_v20260904_1_hidden_a to dilli_judge_executor;
 grant select on all tables in schema fixture_r01_v20260904_1_hidden_a to dilli_judge_executor;
-analyze fixture_r01_v20260904_1_hidden_a."catalog_columns";
+analyze fixture_r01_v20260904_1_hidden_a."record_fields";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (1, '2026-09-04.1-hidden_a', 'fixture_r01_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["attribute","data_type"]'::jsonb, '[["home_id-1","integer"],["name-1","text"],["resident_id-1","integer"]]'::jsonb, '[25,25]'::jsonb);
+values (1, '2026-09-04.1-hidden_a', 'fixture_r01_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["field","stores"]'::jsonb, '[["home_id-1","integer"],["name-1","text"],["resident_id-1","integer"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r01_v20260904_1_hidden_b;
 revoke all on schema fixture_r01_v20260904_1_hidden_b from public, anon, authenticated;
 set search_path = fixture_r01_v20260904_1_hidden_b, pg_catalog;
-CREATE TABLE "catalog_columns" ("entity" text, "attribute" text, "data_type" text, "is_key" boolean);
-INSERT INTO "catalog_columns" VALUES
+CREATE TABLE "record_fields" ("book" text, "field" text, "stores" text, "is_key" boolean);
+INSERT INTO "record_fields" VALUES
 (NULL, 'unknown-2', 'text', false),
 ('shelter', 'capacity-2', 'integer', false),
 ('resident', 'name-2', 'text', false),
@@ -122,94 +122,94 @@ reset search_path;
 revoke all on all tables in schema fixture_r01_v20260904_1_hidden_b from public, anon, authenticated;
 grant usage on schema fixture_r01_v20260904_1_hidden_b to dilli_judge_executor;
 grant select on all tables in schema fixture_r01_v20260904_1_hidden_b to dilli_judge_executor;
-analyze fixture_r01_v20260904_1_hidden_b."catalog_columns";
+analyze fixture_r01_v20260904_1_hidden_b."record_fields";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (1, '2026-09-04.1-hidden_b', 'fixture_r01_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["attribute","data_type"]'::jsonb, '[["name-2","text"],["resident_id-2","integer"]]'::jsonb, '[25,25]'::jsonb);
+values (1, '2026-09-04.1-hidden_b', 'fixture_r01_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["field","stores"]'::jsonb, '[["name-2","text"],["resident_id-2","integer"]]'::jsonb, '[25,25]'::jsonb);
 
 insert into game_private.questions (ruin_id, dataset_version, allowed_tables) values
-        (2, '2026-09-04.1', '["column_keys"]'::jsonb);
+        (2, '2026-09-04.1', '["id_tags"]'::jsonb);
 
 insert into game_private.question_help values
-        (2, '2026-09-04.1', 'Keys to the Bus Bay', 'Each row of `column_keys` marks how a column can identify a row. For the `bus` table, list the `attribute` of every column whose `key_kind` is ''primary'' or ''candidate'', sorted alphabetically.', '["Filter to `entity` = ''bus'' and `key_kind` in (''primary'', ''candidate''), then sort by `attribute`."]'::jsonb, 'SELECT attribute
-FROM column_keys
-WHERE entity = ''bus''
-  AND key_kind IN (''primary'', ''candidate'')
-ORDER BY attribute;');
+        (2, '2026-09-04.1', 'Keys to the Bus Bay', 'A field''s `tag` shows if it can pick out one record alone: `''main''` is the official identifier, `''spare''` also works alone, `''none''` can''t. For the `bus` book, list every `field` tagged `''main''` or `''spare''`, alphabetically.', '["Filter to `book` = ''bus'' and `tag` in (''main'', ''spare''), then sort by `field`."]'::jsonb, 'SELECT field
+FROM id_tags
+WHERE book = ''bus''
+  AND tag IN (''main'', ''spare'')
+ORDER BY field;');
 
 create schema fixture_r02_v20260904_1_visible;
 revoke all on schema fixture_r02_v20260904_1_visible from public, anon, authenticated;
 set search_path = fixture_r02_v20260904_1_visible, pg_catalog;
-CREATE TABLE "column_keys" ("entity" text, "attribute" text, "key_kind" text, "nullable" boolean);
-INSERT INTO "column_keys" VALUES
-('bus', 'bus_id', 'primary', false),
-('bus', 'registration', 'candidate', false),
-('bus', 'radio_code', 'unique', true),
-('bus', 'colour', 'none', false),
-('driver', 'licence', 'candidate', false),
-('bus', 'unknown', NULL, true);
+CREATE TABLE "id_tags" ("book" text, "field" text, "tag" text);
+INSERT INTO "id_tags" VALUES
+('bus', 'bus_id', 'main'),
+('bus', 'registration', 'spare'),
+('bus', 'radio_code', 'none'),
+('bus', 'colour', 'none'),
+('driver', 'licence', 'spare'),
+('bus', 'unknown', NULL);
 reset search_path;
 revoke all on all tables in schema fixture_r02_v20260904_1_visible from public, anon, authenticated;
 grant usage on schema fixture_r02_v20260904_1_visible to dilli_judge_executor;
 grant select on all tables in schema fixture_r02_v20260904_1_visible to dilli_judge_executor;
-analyze fixture_r02_v20260904_1_visible."column_keys";
+analyze fixture_r02_v20260904_1_visible."id_tags";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (2, '2026-09-04.1-visible', 'fixture_r02_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["attribute"]'::jsonb, '[["bus_id"],["registration"]]'::jsonb, '[25]'::jsonb);
+values (2, '2026-09-04.1-visible', 'fixture_r02_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["field"]'::jsonb, '[["bus_id"],["registration"]]'::jsonb, '[25]'::jsonb);
 
 create schema fixture_r02_v20260904_1_hidden_a;
 revoke all on schema fixture_r02_v20260904_1_hidden_a from public, anon, authenticated;
 set search_path = fixture_r02_v20260904_1_hidden_a, pg_catalog;
-CREATE TABLE "column_keys" ("entity" text, "attribute" text, "key_kind" text, "nullable" boolean);
-INSERT INTO "column_keys" VALUES
-('bus', 'unknown-1', NULL, true),
-('driver', 'licence-1', 'candidate', false),
-('bus', 'colour-1', 'none', false),
-('bus', 'radio_code-1', 'unique', true),
-('bus', 'registration-1', 'candidate', false),
-('bus', 'bus_id-1', 'primary', false);
+CREATE TABLE "id_tags" ("book" text, "field" text, "tag" text);
+INSERT INTO "id_tags" VALUES
+('bus', 'unknown-1', NULL),
+('driver', 'licence-1', 'spare'),
+('bus', 'colour-1', 'none'),
+('bus', 'radio_code-1', 'none'),
+('bus', 'registration-1', 'spare'),
+('bus', 'bus_id-1', 'main');
 reset search_path;
 revoke all on all tables in schema fixture_r02_v20260904_1_hidden_a from public, anon, authenticated;
 grant usage on schema fixture_r02_v20260904_1_hidden_a to dilli_judge_executor;
 grant select on all tables in schema fixture_r02_v20260904_1_hidden_a to dilli_judge_executor;
-analyze fixture_r02_v20260904_1_hidden_a."column_keys";
+analyze fixture_r02_v20260904_1_hidden_a."id_tags";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (2, '2026-09-04.1-hidden_a', 'fixture_r02_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["attribute"]'::jsonb, '[["bus_id-1"],["registration-1"]]'::jsonb, '[25]'::jsonb);
+values (2, '2026-09-04.1-hidden_a', 'fixture_r02_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["field"]'::jsonb, '[["bus_id-1"],["registration-1"]]'::jsonb, '[25]'::jsonb);
 
 create schema fixture_r02_v20260904_1_hidden_b;
 revoke all on schema fixture_r02_v20260904_1_hidden_b from public, anon, authenticated;
 set search_path = fixture_r02_v20260904_1_hidden_b, pg_catalog;
-CREATE TABLE "column_keys" ("entity" text, "attribute" text, "key_kind" text, "nullable" boolean);
-INSERT INTO "column_keys" VALUES
-('bus', 'unknown-2', NULL, true),
-('bus', 'colour-2', 'none', false),
-('bus', 'radio_code-2', 'unique', true),
-('bus', 'registration-2', 'candidate', false),
-('bus', 'bus_id-2', 'primary', false);
+CREATE TABLE "id_tags" ("book" text, "field" text, "tag" text);
+INSERT INTO "id_tags" VALUES
+('bus', 'unknown-2', NULL),
+('bus', 'colour-2', 'none'),
+('bus', 'radio_code-2', 'none'),
+('bus', 'registration-2', 'spare'),
+('bus', 'bus_id-2', 'main');
 reset search_path;
 revoke all on all tables in schema fixture_r02_v20260904_1_hidden_b from public, anon, authenticated;
 grant usage on schema fixture_r02_v20260904_1_hidden_b to dilli_judge_executor;
 grant select on all tables in schema fixture_r02_v20260904_1_hidden_b to dilli_judge_executor;
-analyze fixture_r02_v20260904_1_hidden_b."column_keys";
+analyze fixture_r02_v20260904_1_hidden_b."id_tags";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (2, '2026-09-04.1-hidden_b', 'fixture_r02_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["attribute"]'::jsonb, '[["bus_id-2"],["registration-2"]]'::jsonb, '[25]'::jsonb);
+values (2, '2026-09-04.1-hidden_b', 'fixture_r02_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["field"]'::jsonb, '[["bus_id-2"],["registration-2"]]'::jsonb, '[25]'::jsonb);
 
 insert into game_private.questions (ruin_id, dataset_version, allowed_tables) values
-        (3, '2026-09-04.1', '["foreign_keys"]'::jsonb);
+        (3, '2026-09-04.1', '["links"]'::jsonb);
 
 insert into game_private.question_help values
-        (3, '2026-09-04.1', 'Tracing the Family Links', 'Each row of `foreign_keys` records a column that points from one table to another. List the `child_entity` and `child_attribute` of every row whose `parent_entity` is ''family'', sorted by both columns.', '["Keep the rows where `parent_entity` = ''family'', then sort by `child_entity`, then `child_attribute`."]'::jsonb, 'SELECT child_entity, child_attribute
-FROM foreign_keys
-WHERE parent_entity = ''family''
-ORDER BY child_entity, child_attribute;');
+        (3, '2026-09-04.1', 'Tracing the Family Links', 'Each row of `links` points from one record-book to another. List the `from_book` and `from_field` of every link whose `to_book` is `family`, sorted by both.', '["Keep the rows where `to_book` = ''family'', then sort by `from_book`, then `from_field`."]'::jsonb, 'SELECT from_book, from_field
+FROM links
+WHERE to_book = ''family''
+ORDER BY from_book, from_field;');
 
 create schema fixture_r03_v20260904_1_visible;
 revoke all on schema fixture_r03_v20260904_1_visible from public, anon, authenticated;
 set search_path = fixture_r03_v20260904_1_visible, pg_catalog;
-CREATE TABLE "foreign_keys" ("child_entity" text, "child_attribute" text, "parent_entity" text, "parent_attribute" text);
-INSERT INTO "foreign_keys" VALUES
+CREATE TABLE "links" ("from_book" text, "from_field" text, "to_book" text, "to_field" text);
+INSERT INTO "links" VALUES
 ('residents', 'family_id', 'family', 'id'),
 ('ration_cards', 'household', 'family', 'id'),
 ('residents', 'shelter_id', 'shelter', 'id'),
@@ -218,16 +218,16 @@ reset search_path;
 revoke all on all tables in schema fixture_r03_v20260904_1_visible from public, anon, authenticated;
 grant usage on schema fixture_r03_v20260904_1_visible to dilli_judge_executor;
 grant select on all tables in schema fixture_r03_v20260904_1_visible to dilli_judge_executor;
-analyze fixture_r03_v20260904_1_visible."foreign_keys";
+analyze fixture_r03_v20260904_1_visible."links";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (3, '2026-09-04.1-visible', 'fixture_r03_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["child_entity","child_attribute"]'::jsonb, '[["ration_cards","household"],["residents","family_id"]]'::jsonb, '[25,25]'::jsonb);
+values (3, '2026-09-04.1-visible', 'fixture_r03_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["from_book","from_field"]'::jsonb, '[["ration_cards","household"],["residents","family_id"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r03_v20260904_1_hidden_a;
 revoke all on schema fixture_r03_v20260904_1_hidden_a from public, anon, authenticated;
 set search_path = fixture_r03_v20260904_1_hidden_a, pg_catalog;
-CREATE TABLE "foreign_keys" ("child_entity" text, "child_attribute" text, "parent_entity" text, "parent_attribute" text);
-INSERT INTO "foreign_keys" VALUES
+CREATE TABLE "links" ("from_book" text, "from_field" text, "to_book" text, "to_field" text);
+INSERT INTO "links" VALUES
 ('families-1', 'ward', 'ward', 'id'),
 ('residents-1', 'shelter_id', 'shelter', 'id'),
 ('ration_cards-1', 'household', 'family', 'id'),
@@ -236,16 +236,16 @@ reset search_path;
 revoke all on all tables in schema fixture_r03_v20260904_1_hidden_a from public, anon, authenticated;
 grant usage on schema fixture_r03_v20260904_1_hidden_a to dilli_judge_executor;
 grant select on all tables in schema fixture_r03_v20260904_1_hidden_a to dilli_judge_executor;
-analyze fixture_r03_v20260904_1_hidden_a."foreign_keys";
+analyze fixture_r03_v20260904_1_hidden_a."links";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (3, '2026-09-04.1-hidden_a', 'fixture_r03_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["child_entity","child_attribute"]'::jsonb, '[["ration_cards-1","household"],["residents-1","family_id"]]'::jsonb, '[25,25]'::jsonb);
+values (3, '2026-09-04.1-hidden_a', 'fixture_r03_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["from_book","from_field"]'::jsonb, '[["ration_cards-1","household"],["residents-1","family_id"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r03_v20260904_1_hidden_b;
 revoke all on schema fixture_r03_v20260904_1_hidden_b from public, anon, authenticated;
 set search_path = fixture_r03_v20260904_1_hidden_b, pg_catalog;
-CREATE TABLE "foreign_keys" ("child_entity" text, "child_attribute" text, "parent_entity" text, "parent_attribute" text);
-INSERT INTO "foreign_keys" VALUES
+CREATE TABLE "links" ("from_book" text, "from_field" text, "to_book" text, "to_field" text);
+INSERT INTO "links" VALUES
 ('families-2', 'ward', 'ward', 'id'),
 ('ration_cards-2', 'household', 'family', 'id'),
 ('residents-2', 'family_id', 'family', 'id');
@@ -253,29 +253,29 @@ reset search_path;
 revoke all on all tables in schema fixture_r03_v20260904_1_hidden_b from public, anon, authenticated;
 grant usage on schema fixture_r03_v20260904_1_hidden_b to dilli_judge_executor;
 grant select on all tables in schema fixture_r03_v20260904_1_hidden_b to dilli_judge_executor;
-analyze fixture_r03_v20260904_1_hidden_b."foreign_keys";
+analyze fixture_r03_v20260904_1_hidden_b."links";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (3, '2026-09-04.1-hidden_b', 'fixture_r03_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["child_entity","child_attribute"]'::jsonb, '[["ration_cards-2","household"],["residents-2","family_id"]]'::jsonb, '[25,25]'::jsonb);
+values (3, '2026-09-04.1-hidden_b', 'fixture_r03_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["from_book","from_field"]'::jsonb, '[["ration_cards-2","household"],["residents-2","family_id"]]'::jsonb, '[25,25]'::jsonb);
 
 insert into game_private.questions (ruin_id, dataset_version, allowed_tables) values
         (4, '2026-09-04.1', '["change_log"]'::jsonb);
 
 insert into game_private.question_help values
-        (4, '2026-09-04.1', 'Evidence of the Rebuild', 'The `change_log` records edits to stored records. Show the `object_name` and `op` for changes to their structure, with the newest `changed_at` first.', '["Keep the rows where `op_kind` = ''DDL'', then order by `changed_at` from newest to oldest."]'::jsonb, 'SELECT object_name, op
+        (4, '2026-09-04.1', 'Evidence of the Rebuild', 'The `change_log` records every edit to the archives — some change a book''s structure, others its contents. Show the `target` and `edit` for rows whose `change_type` is `structure`, newest `changed_at` first.', '["Keep the rows where `change_type` = ''structure'', then order by `changed_at` from newest to oldest."]'::jsonb, 'SELECT target, edit
 FROM change_log
-WHERE op_kind = ''DDL''
+WHERE change_type = ''structure''
 ORDER BY changed_at DESC;');
 
 create schema fixture_r04_v20260904_1_visible;
 revoke all on schema fixture_r04_v20260904_1_visible from public, anon, authenticated;
 set search_path = fixture_r04_v20260904_1_visible, pg_catalog;
-CREATE TABLE "change_log" ("op" text, "object_name" text, "op_kind" text, "changed_at" timestamp);
+CREATE TABLE "change_log" ("edit" text, "target" text, "change_type" text, "changed_at" timestamp);
 INSERT INTO "change_log" VALUES
-('CREATE TABLE', 'shelters', 'DDL', '2042-01-02 10:00:00'),
-('INSERT', 'residents', 'DML', '2042-01-04 10:00:00'),
-('ALTER TABLE', 'pumps', 'DDL', '2042-01-03 10:00:00'),
-('UPDATE', 'pumps', 'DML', NULL);
+('built the book', 'shelters', 'structure', '2042-01-02 10:00:00'),
+('added records', 'residents', 'contents', '2042-01-04 10:00:00'),
+('renamed a field', 'pumps', 'structure', '2042-01-03 10:00:00'),
+('edited records', 'pumps', 'contents', NULL);
 reset search_path;
 revoke all on all tables in schema fixture_r04_v20260904_1_visible from public, anon, authenticated;
 grant usage on schema fixture_r04_v20260904_1_visible to dilli_judge_executor;
@@ -283,17 +283,17 @@ grant select on all tables in schema fixture_r04_v20260904_1_visible to dilli_ju
 analyze fixture_r04_v20260904_1_visible."change_log";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (4, '2026-09-04.1-visible', 'fixture_r04_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["object_name","op"]'::jsonb, '[["pumps","ALTER TABLE"],["shelters","CREATE TABLE"]]'::jsonb, '[25,25]'::jsonb);
+values (4, '2026-09-04.1-visible', 'fixture_r04_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["target","edit"]'::jsonb, '[["pumps","renamed a field"],["shelters","built the book"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r04_v20260904_1_hidden_a;
 revoke all on schema fixture_r04_v20260904_1_hidden_a from public, anon, authenticated;
 set search_path = fixture_r04_v20260904_1_hidden_a, pg_catalog;
-CREATE TABLE "change_log" ("op" text, "object_name" text, "op_kind" text, "changed_at" timestamp);
+CREATE TABLE "change_log" ("edit" text, "target" text, "change_type" text, "changed_at" timestamp);
 INSERT INTO "change_log" VALUES
-('UPDATE', 'pumps-1', 'DML', NULL),
-('ALTER TABLE', 'pumps-1', 'DDL', '2042-01-03 10:00:00'),
-('INSERT', 'residents-1', 'DML', '2042-01-04 10:00:00'),
-('CREATE TABLE', 'shelters-1', 'DDL', '2042-01-02 10:00:00');
+('edited records', 'pumps-1', 'contents', NULL),
+('renamed a field', 'pumps-1', 'structure', '2042-01-03 10:00:00'),
+('added records', 'residents-1', 'contents', '2042-01-04 10:00:00'),
+('built the book', 'shelters-1', 'structure', '2042-01-02 10:00:00');
 reset search_path;
 revoke all on all tables in schema fixture_r04_v20260904_1_hidden_a from public, anon, authenticated;
 grant usage on schema fixture_r04_v20260904_1_hidden_a to dilli_judge_executor;
@@ -301,16 +301,16 @@ grant select on all tables in schema fixture_r04_v20260904_1_hidden_a to dilli_j
 analyze fixture_r04_v20260904_1_hidden_a."change_log";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (4, '2026-09-04.1-hidden_a', 'fixture_r04_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["object_name","op"]'::jsonb, '[["pumps-1","ALTER TABLE"],["shelters-1","CREATE TABLE"]]'::jsonb, '[25,25]'::jsonb);
+values (4, '2026-09-04.1-hidden_a', 'fixture_r04_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["target","edit"]'::jsonb, '[["pumps-1","renamed a field"],["shelters-1","built the book"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r04_v20260904_1_hidden_b;
 revoke all on schema fixture_r04_v20260904_1_hidden_b from public, anon, authenticated;
 set search_path = fixture_r04_v20260904_1_hidden_b, pg_catalog;
-CREATE TABLE "change_log" ("op" text, "object_name" text, "op_kind" text, "changed_at" timestamp);
+CREATE TABLE "change_log" ("edit" text, "target" text, "change_type" text, "changed_at" timestamp);
 INSERT INTO "change_log" VALUES
-('UPDATE', 'pumps-2', 'DML', NULL),
-('INSERT', 'residents-2', 'DML', '2042-01-04 10:00:00'),
-('CREATE TABLE', 'shelters-2', 'DDL', '2042-01-02 10:00:00');
+('edited records', 'pumps-2', 'contents', NULL),
+('added records', 'residents-2', 'contents', '2042-01-04 10:00:00'),
+('built the book', 'shelters-2', 'structure', '2042-01-02 10:00:00');
 reset search_path;
 revoke all on all tables in schema fixture_r04_v20260904_1_hidden_b from public, anon, authenticated;
 grant usage on schema fixture_r04_v20260904_1_hidden_b to dilli_judge_executor;
@@ -318,76 +318,76 @@ grant select on all tables in schema fixture_r04_v20260904_1_hidden_b to dilli_j
 analyze fixture_r04_v20260904_1_hidden_b."change_log";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (4, '2026-09-04.1-hidden_b', 'fixture_r04_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["object_name","op"]'::jsonb, '[["shelters-2","CREATE TABLE"]]'::jsonb, '[25,25]'::jsonb);
+values (4, '2026-09-04.1-hidden_b', 'fixture_r04_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["target","edit"]'::jsonb, '[["shelters-2","built the book"]]'::jsonb, '[25,25]'::jsonb);
 
 insert into game_private.questions (ruin_id, dataset_version, allowed_tables) values
-        (5, '2026-09-04.1', '["access_grants"]'::jsonb);
+        (5, '2026-09-04.1', '["permissions"]'::jsonb);
 
 insert into game_private.question_help values
-        (5, '2026-09-04.1', 'Who Holds the Keys', 'The `access_grants` records who may perform each action. Show the `grantee` and `object_name` for granted permission to read, sorted by both.', '["Keep rows where `privilege` = ''SELECT'' and `granted` is true, then sort by `grantee`, then `object_name`."]'::jsonb, 'SELECT grantee, object_name
-FROM access_grants
-WHERE privilege = ''SELECT''
-  AND granted
-ORDER BY grantee, object_name;');
+        (5, '2026-09-04.1', 'Who Holds the Keys', 'The `permissions` book records who may do what to each record-book. Show the `who` and `record_book` for every row where the `action` is `''read''` and it is `allowed`, sorted by both.', '["Keep rows where `action` = ''read'' and `allowed` is true, then sort by `who`, then `record_book`."]'::jsonb, 'SELECT who, record_book
+FROM permissions
+WHERE action = ''read''
+  AND allowed
+ORDER BY who, record_book;');
 
 create schema fixture_r05_v20260904_1_visible;
 revoke all on schema fixture_r05_v20260904_1_visible from public, anon, authenticated;
 set search_path = fixture_r05_v20260904_1_visible, pg_catalog;
-CREATE TABLE "access_grants" ("grantee" text, "object_name" text, "privilege" text, "granted" boolean);
-INSERT INTO "access_grants" VALUES
-('scout', 'shelters', 'SELECT', true),
-('archivist', 'records', 'SELECT', true),
-('archivist', 'maps', 'SELECT', true),
-('porter', 'crates', 'SELECT', false),
-('builder', 'repairs', 'INSERT', true),
-('unknown', 'maps', 'SELECT', NULL);
+CREATE TABLE "permissions" ("who" text, "record_book" text, "action" text, "allowed" boolean);
+INSERT INTO "permissions" VALUES
+('scout', 'shelters', 'read', true),
+('archivist', 'records', 'read', true),
+('archivist', 'maps', 'read', true),
+('porter', 'crates', 'read', false),
+('builder', 'repairs', 'write', true),
+('unknown', 'maps', 'read', NULL);
 reset search_path;
 revoke all on all tables in schema fixture_r05_v20260904_1_visible from public, anon, authenticated;
 grant usage on schema fixture_r05_v20260904_1_visible to dilli_judge_executor;
 grant select on all tables in schema fixture_r05_v20260904_1_visible to dilli_judge_executor;
-analyze fixture_r05_v20260904_1_visible."access_grants";
+analyze fixture_r05_v20260904_1_visible."permissions";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (5, '2026-09-04.1-visible', 'fixture_r05_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["grantee","object_name"]'::jsonb, '[["archivist","maps"],["archivist","records"],["scout","shelters"]]'::jsonb, '[25,25]'::jsonb);
+values (5, '2026-09-04.1-visible', 'fixture_r05_v20260904_1_visible', '2026-09-04.1', false, 'ordered', '["who","record_book"]'::jsonb, '[["archivist","maps"],["archivist","records"],["scout","shelters"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r05_v20260904_1_hidden_a;
 revoke all on schema fixture_r05_v20260904_1_hidden_a from public, anon, authenticated;
 set search_path = fixture_r05_v20260904_1_hidden_a, pg_catalog;
-CREATE TABLE "access_grants" ("grantee" text, "object_name" text, "privilege" text, "granted" boolean);
-INSERT INTO "access_grants" VALUES
-('unknown-1', 'maps', 'SELECT', NULL),
-('builder-1', 'repairs', 'INSERT', true),
-('porter-1', 'crates', 'SELECT', false),
-('archivist-1', 'maps', 'SELECT', true),
-('archivist-1', 'records', 'SELECT', true),
-('scout-1', 'shelters', 'SELECT', true);
+CREATE TABLE "permissions" ("who" text, "record_book" text, "action" text, "allowed" boolean);
+INSERT INTO "permissions" VALUES
+('unknown-1', 'maps', 'read', NULL),
+('builder-1', 'repairs', 'write', true),
+('porter-1', 'crates', 'read', false),
+('archivist-1', 'maps', 'read', true),
+('archivist-1', 'records', 'read', true),
+('scout-1', 'shelters', 'read', true);
 reset search_path;
 revoke all on all tables in schema fixture_r05_v20260904_1_hidden_a from public, anon, authenticated;
 grant usage on schema fixture_r05_v20260904_1_hidden_a to dilli_judge_executor;
 grant select on all tables in schema fixture_r05_v20260904_1_hidden_a to dilli_judge_executor;
-analyze fixture_r05_v20260904_1_hidden_a."access_grants";
+analyze fixture_r05_v20260904_1_hidden_a."permissions";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (5, '2026-09-04.1-hidden_a', 'fixture_r05_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["grantee","object_name"]'::jsonb, '[["archivist-1","maps"],["archivist-1","records"],["scout-1","shelters"]]'::jsonb, '[25,25]'::jsonb);
+values (5, '2026-09-04.1-hidden_a', 'fixture_r05_v20260904_1_hidden_a', '2026-09-04.1', true, 'ordered', '["who","record_book"]'::jsonb, '[["archivist-1","maps"],["archivist-1","records"],["scout-1","shelters"]]'::jsonb, '[25,25]'::jsonb);
 
 create schema fixture_r05_v20260904_1_hidden_b;
 revoke all on schema fixture_r05_v20260904_1_hidden_b from public, anon, authenticated;
 set search_path = fixture_r05_v20260904_1_hidden_b, pg_catalog;
-CREATE TABLE "access_grants" ("grantee" text, "object_name" text, "privilege" text, "granted" boolean);
-INSERT INTO "access_grants" VALUES
-('unknown-2', 'maps', 'SELECT', NULL),
-('porter-2', 'crates', 'SELECT', false),
-('archivist-2', 'maps', 'SELECT', true),
-('archivist-2', 'records', 'SELECT', true),
-('scout-2', 'shelters', 'SELECT', true);
+CREATE TABLE "permissions" ("who" text, "record_book" text, "action" text, "allowed" boolean);
+INSERT INTO "permissions" VALUES
+('unknown-2', 'maps', 'read', NULL),
+('porter-2', 'crates', 'read', false),
+('archivist-2', 'maps', 'read', true),
+('archivist-2', 'records', 'read', true),
+('scout-2', 'shelters', 'read', true);
 reset search_path;
 revoke all on all tables in schema fixture_r05_v20260904_1_hidden_b from public, anon, authenticated;
 grant usage on schema fixture_r05_v20260904_1_hidden_b to dilli_judge_executor;
 grant select on all tables in schema fixture_r05_v20260904_1_hidden_b to dilli_judge_executor;
-analyze fixture_r05_v20260904_1_hidden_b."access_grants";
+analyze fixture_r05_v20260904_1_hidden_b."permissions";
 insert into game_private.question_cases
 (ruin_id, case_id, fixture_schema, dataset_version, hidden, comparison, expected_columns, expected_rows, expected_types)
-values (5, '2026-09-04.1-hidden_b', 'fixture_r05_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["grantee","object_name"]'::jsonb, '[["archivist-2","maps"],["archivist-2","records"],["scout-2","shelters"]]'::jsonb, '[25,25]'::jsonb);
+values (5, '2026-09-04.1-hidden_b', 'fixture_r05_v20260904_1_hidden_b', '2026-09-04.1', true, 'ordered', '["who","record_book"]'::jsonb, '[["archivist-2","maps"],["archivist-2","records"],["scout-2","shelters"]]'::jsonb, '[25,25]'::jsonb);
 
 insert into game_private.questions (ruin_id, dataset_version, allowed_tables) values
         (6, '2026-09-04.1', '["stalls"]'::jsonb);

@@ -112,7 +112,7 @@ try {
   assert.match(await page.locator(".terminal-header").innerText(), /REVISIT/);
   assert.equal(await editor.inputValue(), "-- write your query here\n");
   await editor.fill(
-    "WITH removed AS (DELETE FROM catalog_columns RETURNING *) SELECT * FROM removed",
+    "WITH removed AS (DELETE FROM record_fields RETURNING *) SELECT * FROM removed",
   );
   await run.click();
   await page.locator(".status-error").waitFor();

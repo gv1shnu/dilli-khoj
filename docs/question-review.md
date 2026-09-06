@@ -57,13 +57,15 @@ Current prompt:
 
 > The gate catalog lists every attribute of each entity. Return `attribute` and `data_type` for the `resident` entity, sorted by `attribute`.
 
-Available table: `catalog_columns(entity text, attribute text, data_type text, is_key boolean)`.
+Available table (at time of review): `catalog_columns(entity text, attribute text, data_type text, is_key boolean)`.
 
 Suggested wording (pending owner review):
 
 > From `catalog_columns`, return `attribute` and `data_type` where `entity` is `resident`. Sort by `attribute` ascending.
 
-Initial assessment: suitable as a short warm-up, but it tests reading catalog rows using filtering rather than inferring a schema from a story. Keep the learning objective modest, strengthen hidden entity distractors and replace superficial solution variants. No content change is approved/applied by this ledger.
+Initial assessment: suitable as a short warm-up, but it tests reading catalog rows using filtering rather than inferring a schema from a story. Keep the learning objective modest, strengthen hidden entity distractors and replace superficial solution variants.
+
+**Superseded (2026-09-06):** ruins 1–5 were rewritten to strip all database jargon. The table is now `record_fields(book, field, stores, is_key)` and the prompt names plain columns; see `src/questions/catalog.ts`.
 
 **Decision needed:** retain this gentle schema-reading warm-up, or make the opening task require more inference? Record the owner's choice here before revising the catalog.
 

@@ -32,9 +32,10 @@ the literal mechanic by which the world heals.
 2. **Experiment freely, commit deliberately.** Practising a query is unlimited and
    free (local Postgres in the browser). Only the authoritative _Submit_ touches
    the hidden grader. Curiosity is never taxed.
-3. **Debt rations shortcuts, never learning.** Hints and full reveals cost XP and
-   are gated by balance. Solving is always free and always available — so a player
-   can never be blocked from _finishing_, only from _skipping_.
+3. **Help unfolds in stages, learning stays free.** The first clue on every archive
+   is free; a deeper clue and the full solution cost a little XP. Solving is always
+   free and always available, and a reveal never solves for you — so help is a gentle
+   nudge, never a wall, and no one can skip the learning.
 4. **No dead ends, no failure states.** A wrong submission costs nothing. There is
    no timer, no health, no losing. The only way forward is understanding.
 5. **Plain language over jargon.** Question descriptions describe the _data
@@ -184,19 +185,24 @@ separate panel, not part of the prompt.
 
 Modules 1–2 are about schema, keys, constraints and the SQL command families —
 topics that normally imply writes and grants. Dilli Khoj teaches them through
-**evidence tables** the player only reads:
+**evidence tables** the player only reads, and — crucially — those tables use
+**plain, everyday column names** rather than formal database vocabulary, so a
+beginner meets the concept before the jargon:
 
-- `catalog_columns` — one row per column of some table (`entity`, `attribute`,
-  `data_type`, `is_key`).
-- `column_keys` — how each column can identify a row (`key_kind`:
-  primary / candidate / unique / none).
-- `foreign_keys` — columns that point from a child table to a parent.
-- `change_log` — audit of edits, tagged `DDL` (structure) vs `DML` (contents).
-- `access_grants` — who may do what to each table.
+- `record_fields` — one row per field of some record-book (`book`, `field`,
+  `stores`, `is_key`).
+- `id_tags` — whether a field can pick out one record alone (`tag`:
+  `main` / `spare` / `none`).
+- `links` — fields that point from one book to another (`from_book`, `from_field`,
+  `to_book`, `to_field`).
+- `change_log` — a log of edits, each tagged `structure` vs `contents` (`edit`,
+  `target`, `change_type`, `changed_at`).
+- `permissions` — who is `allowed` to `read` or `write` each `record_book`.
 
-This is why the questions and hints for these ruins name real columns like `entity`
-and `attribute`: those are the actual identifiers the player sees in the schema
-browser and types into the query, not abstract theory terms.
+The formal terms (entity, attribute, foreign key, DDL/DML, grant) are the module's
+*learning targets*, but the questions never make the student parse them — the story
+and the plain column names carry the concept; the vocabulary is introduced in class
+and hints.
 
 ---
 
@@ -233,7 +239,7 @@ Design consequences, by intent:
   remains a score tradeoff, and taking every clue and reveal produces a final balance
   of `FULL_HELP_END_XP` = 250.
 - **Solving is always free and always available.** Debt never blocks _learning_;
-  only _shortcuts_ are rationed.
+  heavier help simply trims a little of your score.
 - **A reveal solves nothing automatically.** Even after revealing, the learner must
   submit a passing query themselves. There is no path to the end without solving.
 - **Wrong answers are free**, so _Submit_ is safe to use as a probe.

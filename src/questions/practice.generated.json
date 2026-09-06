@@ -2,39 +2,40 @@
   {
     "id": 1,
     "title": "Reading the Resident Records",
-    "description": "Each row of `catalog_columns` describes one column of a table. List the `attribute` and `data_type` of every column belonging to the `resident` table, sorted alphabetically by `attribute`.",
+    "description": "The `record_fields` catalogue names every record-book in the city, one field inside it, and what that field stores. List each `field` and what it `stores` for the `resident` book, in alphabetical order by `field`.",
     "sampleColumns": [
-      "attribute",
-      "data_type"
+      "field",
+      "stores"
     ],
     "sampleRows": [
       [
-        "sample_col_a",
+        "sample_field_a",
         "text"
       ],
       [
-        "sample_col_b",
+        "sample_field_b",
         "integer"
       ]
     ],
     "ordered": true,
     "schema": [
       {
-        "name": "catalog_columns",
+        "name": "record_fields",
         "columns": [
           {
-            "name": "entity",
+            "name": "book",
             "type": "text",
-            "note": "name of the table described by this record"
+            "note": "which record-book this field belongs to"
           },
           {
-            "name": "attribute",
+            "name": "field",
             "type": "text",
-            "note": "column name"
+            "note": "a field inside that book"
           },
           {
-            "name": "data_type",
-            "type": "text"
+            "name": "stores",
+            "type": "text",
+            "note": "the kind of value the field stores"
           },
           {
             "name": "is_key",
@@ -63,27 +64,27 @@
         ]
       }
     ],
-    "starterSql": "SELECT attribute, data_type\nFROM catalog_columns\nORDER BY attribute;",
+    "starterSql": "SELECT field, stores\nFROM record_fields\nORDER BY field;",
     "status": "drafted",
     "hintCount": 1,
-    "fixtureSql": "CREATE TABLE \"catalog_columns\" (\"entity\" text, \"attribute\" text, \"data_type\" text, \"is_key\" boolean);\nINSERT INTO \"catalog_columns\" VALUES\n('resident', 'resident_id', 'integer', true),\n('resident', 'name', 'text', false),\n('shelter', 'capacity', 'integer', false),\n('resident', 'home_id', 'integer', false),\n(NULL, 'unknown', 'text', false);",
+    "fixtureSql": "CREATE TABLE \"record_fields\" (\"book\" text, \"field\" text, \"stores\" text, \"is_key\" boolean);\nINSERT INTO \"record_fields\" VALUES\n('resident', 'resident_id', 'integer', true),\n('resident', 'name', 'text', false),\n('shelter', 'capacity', 'integer', false),\n('resident', 'home_id', 'integer', false),\n(NULL, 'unknown', 'text', false);",
     "expected": {
       "columns": [
-        "attribute",
-        "data_type"
+        "field",
+        "stores"
       ],
       "rows": [
         {
-          "attribute": "home_id",
-          "data_type": "integer"
+          "field": "home_id",
+          "stores": "integer"
         },
         {
-          "attribute": "name",
-          "data_type": "text"
+          "field": "name",
+          "stores": "text"
         },
         {
-          "attribute": "resident_id",
-          "data_type": "integer"
+          "field": "resident_id",
+          "stores": "integer"
         }
       ]
     }
@@ -91,77 +92,71 @@
   {
     "id": 2,
     "title": "Keys to the Bus Bay",
-    "description": "Each row of `column_keys` marks how a column can identify a row. For the `bus` table, list the `attribute` of every column whose `key_kind` is 'primary' or 'candidate', sorted alphabetically.",
+    "description": "A field's `tag` shows if it can pick out one record alone: `'main'` is the official identifier, `'spare'` also works alone, `'none'` can't. For the `bus` book, list every `field` tagged `'main'` or `'spare'`, alphabetically.",
     "sampleColumns": [
-      "attribute"
+      "field"
     ],
     "sampleRows": [
       [
-        "sample_key_1"
+        "sample_field_1"
       ],
       [
-        "sample_key_2"
+        "sample_field_2"
       ]
     ],
     "ordered": true,
     "schema": [
       {
-        "name": "column_keys",
+        "name": "id_tags",
         "columns": [
           {
-            "name": "entity",
-            "type": "text"
-          },
-          {
-            "name": "attribute",
-            "type": "text"
-          },
-          {
-            "name": "key_kind",
+            "name": "book",
             "type": "text",
-            "note": "primary | candidate | unique | none"
+            "note": "which record-book this field belongs to"
           },
           {
-            "name": "nullable",
-            "type": "boolean"
+            "name": "field",
+            "type": "text"
+          },
+          {
+            "name": "tag",
+            "type": "text",
+            "note": "main | spare | none"
           }
         ],
         "sampleRows": [
           [
             "bus",
             "bus_id",
-            "primary",
-            false
+            "main"
           ],
           [
             "bus",
             "plate_no",
-            "candidate",
-            false
+            "spare"
           ],
           [
             "bus",
             "colour",
-            "none",
-            true
+            "none"
           ]
         ]
       }
     ],
-    "starterSql": "SELECT attribute\nFROM column_keys\nWHERE entity = 'bus'\nORDER BY attribute;",
+    "starterSql": "SELECT field\nFROM id_tags\nWHERE book = 'bus'\nORDER BY field;",
     "status": "drafted",
     "hintCount": 1,
-    "fixtureSql": "CREATE TABLE \"column_keys\" (\"entity\" text, \"attribute\" text, \"key_kind\" text, \"nullable\" boolean);\nINSERT INTO \"column_keys\" VALUES\n('bus', 'bus_id', 'primary', false),\n('bus', 'registration', 'candidate', false),\n('bus', 'radio_code', 'unique', true),\n('bus', 'colour', 'none', false),\n('driver', 'licence', 'candidate', false),\n('bus', 'unknown', NULL, true);",
+    "fixtureSql": "CREATE TABLE \"id_tags\" (\"book\" text, \"field\" text, \"tag\" text);\nINSERT INTO \"id_tags\" VALUES\n('bus', 'bus_id', 'main'),\n('bus', 'registration', 'spare'),\n('bus', 'radio_code', 'none'),\n('bus', 'colour', 'none'),\n('driver', 'licence', 'spare'),\n('bus', 'unknown', NULL);",
     "expected": {
       "columns": [
-        "attribute"
+        "field"
       ],
       "rows": [
         {
-          "attribute": "bus_id"
+          "field": "bus_id"
         },
         {
-          "attribute": "registration"
+          "field": "registration"
         }
       ]
     }
@@ -169,40 +164,43 @@
   {
     "id": 3,
     "title": "Tracing the Family Links",
-    "description": "Each row of `foreign_keys` records a column that points from one table to another. List the `child_entity` and `child_attribute` of every row whose `parent_entity` is 'family', sorted by both columns.",
+    "description": "Each row of `links` points from one record-book to another. List the `from_book` and `from_field` of every link whose `to_book` is `family`, sorted by both.",
     "sampleColumns": [
-      "child_entity",
-      "child_attribute"
+      "from_book",
+      "from_field"
     ],
     "sampleRows": [
       [
-        "sample_child",
-        "sample_ref_col"
+        "sample_book",
+        "sample_field"
       ],
       [
-        "sample_child_2",
-        "sample_ref_col_2"
+        "sample_book_2",
+        "sample_field_2"
       ]
     ],
     "ordered": true,
     "schema": [
       {
-        "name": "foreign_keys",
+        "name": "links",
         "columns": [
           {
-            "name": "child_entity",
-            "type": "text"
+            "name": "from_book",
+            "type": "text",
+            "note": "the record-book the link starts at"
           },
           {
-            "name": "child_attribute",
-            "type": "text"
+            "name": "from_field",
+            "type": "text",
+            "note": "the field that points away"
           },
           {
-            "name": "parent_entity",
-            "type": "text"
+            "name": "to_book",
+            "type": "text",
+            "note": "the record-book it points to"
           },
           {
-            "name": "parent_attribute",
+            "name": "to_field",
             "type": "text"
           }
         ],
@@ -228,23 +226,23 @@
         ]
       }
     ],
-    "starterSql": "SELECT child_entity, child_attribute\nFROM foreign_keys\nORDER BY child_entity, child_attribute;",
+    "starterSql": "SELECT from_book, from_field\nFROM links\nORDER BY from_book, from_field;",
     "status": "drafted",
     "hintCount": 1,
-    "fixtureSql": "CREATE TABLE \"foreign_keys\" (\"child_entity\" text, \"child_attribute\" text, \"parent_entity\" text, \"parent_attribute\" text);\nINSERT INTO \"foreign_keys\" VALUES\n('residents', 'family_id', 'family', 'id'),\n('ration_cards', 'household', 'family', 'id'),\n('residents', 'shelter_id', 'shelter', 'id'),\n('families', 'ward', 'ward', 'id');",
+    "fixtureSql": "CREATE TABLE \"links\" (\"from_book\" text, \"from_field\" text, \"to_book\" text, \"to_field\" text);\nINSERT INTO \"links\" VALUES\n('residents', 'family_id', 'family', 'id'),\n('ration_cards', 'household', 'family', 'id'),\n('residents', 'shelter_id', 'shelter', 'id'),\n('families', 'ward', 'ward', 'id');",
     "expected": {
       "columns": [
-        "child_entity",
-        "child_attribute"
+        "from_book",
+        "from_field"
       ],
       "rows": [
         {
-          "child_entity": "ration_cards",
-          "child_attribute": "household"
+          "from_book": "ration_cards",
+          "from_field": "household"
         },
         {
-          "child_entity": "residents",
-          "child_attribute": "family_id"
+          "from_book": "residents",
+          "from_field": "family_id"
         }
       ]
     }
@@ -252,19 +250,19 @@
   {
     "id": 4,
     "title": "Evidence of the Rebuild",
-    "description": "The `change_log` records edits to stored records. Show the `object_name` and `op` for changes to their structure, with the newest `changed_at` first.",
+    "description": "The `change_log` records every edit to the archives — some change a book's structure, others its contents. Show the `target` and `edit` for rows whose `change_type` is `structure`, newest `changed_at` first.",
     "sampleColumns": [
-      "object_name",
-      "op"
+      "target",
+      "edit"
     ],
     "sampleRows": [
       [
-        "sample_table",
-        "CREATE TABLE"
+        "sample_book",
+        "built the book"
       ],
       [
-        "sample_index",
-        "ALTER TABLE"
+        "sample_field",
+        "renamed a field"
       ]
     ],
     "ordered": true,
@@ -273,18 +271,19 @@
         "name": "change_log",
         "columns": [
           {
-            "name": "op",
+            "name": "edit",
             "type": "text",
-            "note": "e.g. CREATE TABLE, INSERT"
+            "note": "what was done, e.g. built the book, added records"
           },
           {
-            "name": "object_name",
-            "type": "text"
+            "name": "target",
+            "type": "text",
+            "note": "the record-book affected"
           },
           {
-            "name": "op_kind",
+            "name": "change_type",
             "type": "text",
-            "note": "DDL: changes to record structure; DML: changes to record contents"
+            "note": "structure: changes the book's shape; contents: changes its records"
           },
           {
             "name": "changed_at",
@@ -293,43 +292,43 @@
         ],
         "sampleRows": [
           [
-            "CREATE TABLE",
+            "built the book",
             "shelters",
-            "DDL",
+            "structure",
             "2042-01-02 10:00:00"
           ],
           [
-            "ALTER TABLE",
+            "renamed a field",
             "pumps",
-            "DDL",
+            "structure",
             "2042-01-03 10:00:00"
           ],
           [
-            "INSERT",
+            "added records",
             "residents",
-            "DML",
+            "contents",
             "2042-01-04 10:00:00"
           ]
         ]
       }
     ],
-    "starterSql": "SELECT object_name, op\nFROM change_log\nORDER BY changed_at DESC;",
+    "starterSql": "SELECT target, edit\nFROM change_log\nORDER BY changed_at DESC;",
     "status": "drafted",
     "hintCount": 1,
-    "fixtureSql": "CREATE TABLE \"change_log\" (\"op\" text, \"object_name\" text, \"op_kind\" text, \"changed_at\" timestamp);\nINSERT INTO \"change_log\" VALUES\n('CREATE TABLE', 'shelters', 'DDL', '2042-01-02 10:00:00'),\n('INSERT', 'residents', 'DML', '2042-01-04 10:00:00'),\n('ALTER TABLE', 'pumps', 'DDL', '2042-01-03 10:00:00'),\n('UPDATE', 'pumps', 'DML', NULL);",
+    "fixtureSql": "CREATE TABLE \"change_log\" (\"edit\" text, \"target\" text, \"change_type\" text, \"changed_at\" timestamp);\nINSERT INTO \"change_log\" VALUES\n('built the book', 'shelters', 'structure', '2042-01-02 10:00:00'),\n('added records', 'residents', 'contents', '2042-01-04 10:00:00'),\n('renamed a field', 'pumps', 'structure', '2042-01-03 10:00:00'),\n('edited records', 'pumps', 'contents', NULL);",
     "expected": {
       "columns": [
-        "object_name",
-        "op"
+        "target",
+        "edit"
       ],
       "rows": [
         {
-          "object_name": "pumps",
-          "op": "ALTER TABLE"
+          "target": "pumps",
+          "edit": "renamed a field"
         },
         {
-          "object_name": "shelters",
-          "op": "CREATE TABLE"
+          "target": "shelters",
+          "edit": "built the book"
         }
       ]
     }
@@ -337,42 +336,42 @@
   {
     "id": 5,
     "title": "Who Holds the Keys",
-    "description": "The `access_grants` records who may perform each action. Show the `grantee` and `object_name` for granted permission to read, sorted by both.",
+    "description": "The `permissions` book records who may do what to each record-book. Show the `who` and `record_book` for every row where the `action` is `'read'` and it is `allowed`, sorted by both.",
     "sampleColumns": [
-      "grantee",
-      "object_name"
+      "who",
+      "record_book"
     ],
     "sampleRows": [
       [
-        "sample_role",
-        "sample_object"
+        "sample_person",
+        "sample_book"
       ],
       [
-        "sample_role_2",
-        "sample_object_2"
+        "sample_person_2",
+        "sample_book_2"
       ]
     ],
     "ordered": true,
     "schema": [
       {
-        "name": "access_grants",
+        "name": "permissions",
         "columns": [
           {
-            "name": "grantee",
+            "name": "who",
             "type": "text",
-            "note": "role name"
+            "note": "the person or role"
           },
           {
-            "name": "object_name",
+            "name": "record_book",
             "type": "text"
           },
           {
-            "name": "privilege",
+            "name": "action",
             "type": "text",
-            "note": "SELECT | INSERT | ..."
+            "note": "read | write"
           },
           {
-            "name": "granted",
+            "name": "allowed",
             "type": "boolean"
           }
         ],
@@ -380,45 +379,45 @@
           [
             "scout",
             "shelters",
-            "SELECT",
+            "read",
             true
           ],
           [
             "porter",
             "crates",
-            "SELECT",
+            "read",
             false
           ],
           [
             "builder",
             "repairs",
-            "INSERT",
+            "write",
             true
           ]
         ]
       }
     ],
-    "starterSql": "SELECT grantee, object_name\nFROM access_grants\nORDER BY grantee;",
+    "starterSql": "SELECT who, record_book\nFROM permissions\nORDER BY who;",
     "status": "drafted",
     "hintCount": 1,
-    "fixtureSql": "CREATE TABLE \"access_grants\" (\"grantee\" text, \"object_name\" text, \"privilege\" text, \"granted\" boolean);\nINSERT INTO \"access_grants\" VALUES\n('scout', 'shelters', 'SELECT', true),\n('archivist', 'records', 'SELECT', true),\n('archivist', 'maps', 'SELECT', true),\n('porter', 'crates', 'SELECT', false),\n('builder', 'repairs', 'INSERT', true),\n('unknown', 'maps', 'SELECT', NULL);",
+    "fixtureSql": "CREATE TABLE \"permissions\" (\"who\" text, \"record_book\" text, \"action\" text, \"allowed\" boolean);\nINSERT INTO \"permissions\" VALUES\n('scout', 'shelters', 'read', true),\n('archivist', 'records', 'read', true),\n('archivist', 'maps', 'read', true),\n('porter', 'crates', 'read', false),\n('builder', 'repairs', 'write', true),\n('unknown', 'maps', 'read', NULL);",
     "expected": {
       "columns": [
-        "grantee",
-        "object_name"
+        "who",
+        "record_book"
       ],
       "rows": [
         {
-          "grantee": "archivist",
-          "object_name": "maps"
+          "who": "archivist",
+          "record_book": "maps"
         },
         {
-          "grantee": "archivist",
-          "object_name": "records"
+          "who": "archivist",
+          "record_book": "records"
         },
         {
-          "grantee": "scout",
-          "object_name": "shelters"
+          "who": "scout",
+          "record_book": "shelters"
         }
       ]
     }

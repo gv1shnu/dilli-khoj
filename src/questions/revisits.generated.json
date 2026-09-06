@@ -3,16 +3,16 @@
     "ruin": 1,
     "variant": 0,
     "title": "Archive 1 · Revisit 1",
-    "description": "Find the fields belonging to shelter records. Show their names and value types, alphabetically by field name.",
+    "description": "Find the fields belonging to the shelter book. Show each field and what it stores, alphabetically by field.",
     "expected": {
       "columns": [
-        "attribute",
-        "data_type"
+        "field",
+        "stores"
       ],
       "rows": [
         {
-          "attribute": "capacity",
-          "data_type": "integer"
+          "field": "capacity",
+          "stores": "integer"
         }
       ]
     }
@@ -21,16 +21,16 @@
     "ruin": 1,
     "variant": 1,
     "title": "Archive 1 · Revisit 2",
-    "description": "Find fields marked as identifiers. Show each table and field name, alphabetically by table, then field.",
+    "description": "Find the fields marked as an identifier. Show each book and field, alphabetically by book, then field.",
     "expected": {
       "columns": [
-        "entity",
-        "attribute"
+        "book",
+        "field"
       ],
       "rows": [
         {
-          "entity": "resident",
-          "attribute": "resident_id"
+          "book": "resident",
+          "field": "resident_id"
         }
       ]
     }
@@ -39,17 +39,17 @@
     "ruin": 2,
     "variant": 0,
     "title": "Archive 2 · Revisit 1",
-    "description": "Find bus fields that allow missing values. List their names alphabetically.",
+    "description": "Find the bus fields tagged 'none' — they can't pick out a record alone. List their names alphabetically.",
     "expected": {
       "columns": [
-        "attribute"
+        "field"
       ],
       "rows": [
         {
-          "attribute": "radio_code"
+          "field": "colour"
         },
         {
-          "attribute": "unknown"
+          "field": "radio_code"
         }
       ]
     }
@@ -58,14 +58,20 @@
     "ruin": 2,
     "variant": 1,
     "title": "Archive 2 · Revisit 2",
-    "description": "Find bus fields that require a value but are not identifiers. List their names alphabetically.",
+    "description": "Find every field tagged 'spare', a backup identifier. Show its book and field, alphabetically by book, then field.",
     "expected": {
       "columns": [
-        "attribute"
+        "book",
+        "field"
       ],
       "rows": [
         {
-          "attribute": "colour"
+          "book": "bus",
+          "field": "registration"
+        },
+        {
+          "book": "driver",
+          "field": "licence"
         }
       ]
     }
@@ -74,16 +80,16 @@
     "ruin": 3,
     "variant": 0,
     "title": "Archive 3 · Revisit 1",
-    "description": "Find links pointing to shelter records. Show their originating table and field, alphabetically by table, then field.",
+    "description": "Find links pointing to the shelter book. Show each link's from_book and from_field, alphabetically by both.",
     "expected": {
       "columns": [
-        "child_entity",
-        "child_attribute"
+        "from_book",
+        "from_field"
       ],
       "rows": [
         {
-          "child_entity": "residents",
-          "child_attribute": "shelter_id"
+          "from_book": "residents",
+          "from_field": "shelter_id"
         }
       ]
     }
@@ -92,16 +98,16 @@
     "ruin": 3,
     "variant": 1,
     "title": "Archive 3 · Revisit 2",
-    "description": "Find links pointing to ward records. Show their originating table and field, alphabetically by table, then field.",
+    "description": "Find links pointing to the ward book. Show each link's from_book and from_field, alphabetically by both.",
     "expected": {
       "columns": [
-        "child_entity",
-        "child_attribute"
+        "from_book",
+        "from_field"
       ],
       "rows": [
         {
-          "child_entity": "families",
-          "child_attribute": "ward"
+          "from_book": "families",
+          "from_field": "ward"
         }
       ]
     }
@@ -110,20 +116,20 @@
     "ruin": 4,
     "variant": 0,
     "title": "Archive 4 · Revisit 1",
-    "description": "Find changes to record contents. Show the affected object’s name and action, newest first; undated changes come last.",
+    "description": "Find edits that changed a book's contents. Show the target and edit, newest first; undated edits come last.",
     "expected": {
       "columns": [
-        "object_name",
-        "op"
+        "target",
+        "edit"
       ],
       "rows": [
         {
-          "object_name": "residents",
-          "op": "INSERT"
+          "target": "residents",
+          "edit": "added records"
         },
         {
-          "object_name": "pumps",
-          "op": "UPDATE"
+          "target": "pumps",
+          "edit": "edited records"
         }
       ]
     }
@@ -132,16 +138,16 @@
     "ruin": 4,
     "variant": 1,
     "title": "Archive 4 · Revisit 2",
-    "description": "Find entries recording the creation of a table. Show the table name and recorded action, alphabetically by name.",
+    "description": "Find edits that built a book. Show the target and edit, alphabetically by target.",
     "expected": {
       "columns": [
-        "object_name",
-        "op"
+        "target",
+        "edit"
       ],
       "rows": [
         {
-          "object_name": "shelters",
-          "op": "CREATE TABLE"
+          "target": "shelters",
+          "edit": "built the book"
         }
       ]
     }
@@ -150,16 +156,16 @@
     "ruin": 5,
     "variant": 0,
     "title": "Archive 5 · Revisit 1",
-    "description": "Find explicitly withdrawn permission to read records. Show the holder and record-set name, alphabetically by holder, then name.",
+    "description": "Find where read access is explicitly refused. Show the who and record_book, alphabetically by both.",
     "expected": {
       "columns": [
-        "grantee",
-        "object_name"
+        "who",
+        "record_book"
       ],
       "rows": [
         {
-          "grantee": "porter",
-          "object_name": "crates"
+          "who": "porter",
+          "record_book": "crates"
         }
       ]
     }
@@ -168,16 +174,16 @@
     "ruin": 5,
     "variant": 1,
     "title": "Archive 5 · Revisit 2",
-    "description": "Find granted permission to add records. Show the holder and record-set name, alphabetically by holder, then name.",
+    "description": "Find who is allowed to write. Show the who and record_book, alphabetically by both.",
     "expected": {
       "columns": [
-        "grantee",
-        "object_name"
+        "who",
+        "record_book"
       ],
       "rows": [
         {
-          "grantee": "builder",
-          "object_name": "repairs"
+          "who": "builder",
+          "record_book": "repairs"
         }
       ]
     }

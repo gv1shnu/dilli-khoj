@@ -4,40 +4,40 @@ export function fixtureTables(id, variant) {
   const n = variant * 100;
   const label = (text) => `${text}${variant ? `-${variant}` : ""}`;
   const tables = {
-    1: { catalog_columns: [
+    1: { record_fields: [
       ["resident", label("resident_id"), "integer", true],
       ["resident", label("name"), "text", false],
       ["shelter", label("capacity"), "integer", false],
       ["resident", label("home_id"), "integer", false],
       [null, label("unknown"), "text", false],
     ] },
-    2: { column_keys: [
-      ["bus", label("bus_id"), "primary", false],
-      ["bus", label("registration"), "candidate", false],
-      ["bus", label("radio_code"), "unique", true],
-      ["bus", label("colour"), "none", false],
-      ["driver", label("licence"), "candidate", false],
-      ["bus", label("unknown"), null, true],
+    2: { id_tags: [
+      ["bus", label("bus_id"), "main"],
+      ["bus", label("registration"), "spare"],
+      ["bus", label("radio_code"), "none"],
+      ["bus", label("colour"), "none"],
+      ["driver", label("licence"), "spare"],
+      ["bus", label("unknown"), null],
     ] },
-    3: { foreign_keys: [
+    3: { links: [
       [label("residents"), "family_id", "family", "id"],
       [label("ration_cards"), "household", "family", "id"],
       [label("residents"), "shelter_id", "shelter", "id"],
       [label("families"), "ward", "ward", "id"],
     ] },
     4: { change_log: [
-      ["CREATE TABLE", label("shelters"), "DDL", "2042-01-02 10:00:00"],
-      ["INSERT", label("residents"), "DML", "2042-01-04 10:00:00"],
-      ["ALTER TABLE", label("pumps"), "DDL", "2042-01-03 10:00:00"],
-      ["UPDATE", label("pumps"), "DML", null],
+      ["built the book", label("shelters"), "structure", "2042-01-02 10:00:00"],
+      ["added records", label("residents"), "contents", "2042-01-04 10:00:00"],
+      ["renamed a field", label("pumps"), "structure", "2042-01-03 10:00:00"],
+      ["edited records", label("pumps"), "contents", null],
     ] },
-    5: { access_grants: [
-      [label("scout"), "shelters", "SELECT", true],
-      [label("archivist"), "records", "SELECT", true],
-      [label("archivist"), "maps", "SELECT", true],
-      [label("porter"), "crates", "SELECT", false],
-      [label("builder"), "repairs", "INSERT", true],
-      [label("unknown"), "maps", "SELECT", null],
+    5: { permissions: [
+      [label("scout"), "shelters", "read", true],
+      [label("archivist"), "records", "read", true],
+      [label("archivist"), "maps", "read", true],
+      [label("porter"), "crates", "read", false],
+      [label("builder"), "repairs", "write", true],
+      [label("unknown"), "maps", "read", null],
     ] },
     6: { stalls: [
       [101+n, "Copper Kettle", "K-7", "closed", 0],

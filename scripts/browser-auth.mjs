@@ -191,7 +191,7 @@ try {
   );
   await page.getByRole("button", { name: "Close map", exact: true }).click();
   await editor.fill(
-    "SELECT attribute,data_type FROM catalog_columns WHERE entity='resident' ORDER BY attribute",
+    "SELECT field,stores FROM record_fields WHERE book='resident' ORDER BY field",
   );
   await run.click();
   await page
@@ -275,7 +275,7 @@ try {
   assert.match(await page.locator(".mission-progress").innerText(), /0 \/ 20/);
   assert.notEqual(
     await editor.inputValue(),
-    "SELECT attribute,data_type FROM catalog_columns WHERE entity='resident' ORDER BY attribute",
+    "SELECT field,stores FROM record_fields WHERE book='resident' ORDER BY field",
   );
   assert.equal(
     await page.getByText("Server-purchased solution", { exact: true }).count(),
