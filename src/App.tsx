@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ResultTable, formatCell } from "./components/ResultTable";
+import { ResultTable } from "./components/ResultTable";
 import { FullscreenButton } from "./components/FullscreenButton";
 import {
   preparePracticeDatabase,
@@ -137,6 +137,10 @@ function GameShell({
   } | null>(null);
   // Ruin id whose revisit objective the player is currently choosing.
   const [revisitChoice, setRevisitChoice] = useState<number | null>(null);
+  // Real rows of each schema table, read from the practice fixture for display.
+  const [sampleTables, setSampleTables] = useState<
+    Record<string, Awaited<ReturnType<typeof runPracticeQuery>>>
+  >({});
   const [devHints, setDevHints] = useState<string[]>([]);
   const alive = useRef(true);
   const refreshRevision = useRef(0);
@@ -395,6 +399,35 @@ function GameShell({
       operation.current += 1;
     };
   }, [question.id, nearTerminal, terminalOpen]);
+
+  // Load the real rows of each schema table so the panel can show a genuine
+  // sample table (the same fixture the visible case runs against).
+  useEffect(() => {
+    if (!terminalOpen) return;
+    let active = true;
+    const tables = question.schema.map((table) => table.name);
+    void (async () => {
+      const collected: Record<
+        string,
+        Awaited<ReturnType<typeof runPracticeQuery>>
+      > = {};
+      for (const name of tables) {
+        try {
+          collected[name] = await runPracticeQuery(
+            `SELECT * FROM "${name}"`,
+            question.id,
+          );
+        } catch {
+          // A table we cannot read is simply omitted from the sample display.
+        }
+      }
+      if (active) setSampleTables(collected);
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.id, terminalOpen]);
 
   // Warm the practice engine during browser idle time so the ~10 MB download starts
   // after the world is interactive, not in competition with it.
@@ -959,57 +992,28 @@ function GameShell({
             </button>
           </div>
           <p className="question-copy">{question.description}</p>
-          <div className="sample-block">
-            <span>
-              Sample output · {question.ordered ? "order matters" : "any order"}
-            </span>
-          </div>
-          <ResultTable
-            result={{
-              columns: question.sampleColumns,
-              rows: question.sampleRows.map((row) =>
-                Object.fromEntries(
-                  question.sampleColumns.map((column, index) => [
-                    column,
-                    row[index],
-                  ]),
-                ),
-              ),
-            }}
-          />
-          <details className="schema-block">
-            <summary>
-              Schema · {question.schema.map((table) => table.name).join(", ")}
-            </summary>
+          {/* Schema — table structure, shown right after the description */}
+          <div className="schema-block schema-open">
             {question.schema.map((table) => (
               <div className="archive-schema" key={table.name}>
-                <strong>{table.name}</strong>
-                {table.columns.map((column) => (
-                  <code key={column.name}>
-                    {column.name} · {column.type}
-                    {column.note ? ` · ${column.note}` : ""}
-                  </code>
-                ))}
-                <span className="schema-sample-label">
-                  Sample rows · illustrative
-                </span>
+                <span className="sample-label">Schema · {table.name}</span>
                 <div className="schema-sample-scroll">
                   <table className="schema-sample">
                     <thead>
                       <tr>
-                        {table.columns.map((column) => (
-                          <th key={column.name}>{column.name}</th>
-                        ))}
+                        <th>column</th>
+                        <th>type</th>
+                        <th>notes</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {table.sampleRows.map((row, rowIndex) => (
-                        <tr key={rowIndex}>
-                          {table.columns.map((column, colIndex) => (
-                            <td key={column.name}>
-                              {formatCell(row[colIndex])}
-                            </td>
-                          ))}
+                      {table.columns.map((column) => (
+                        <tr key={column.name}>
+                          <td>
+                            <code>{column.name}</code>
+                          </td>
+                          <td>{column.type}</td>
+                          <td>{column.note ?? "—"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1017,7 +1021,28 @@ function GameShell({
                 </div>
               </div>
             ))}
-          </details>
+          </div>
+          {/* Sample table — the real rows the correct query runs against */}
+          {question.schema.map((table) =>
+            sampleTables[table.name] ? (
+              <div className="sample-section" key={table.name}>
+                <span className="sample-label">Sample table · {table.name}</span>
+                <ResultTable result={sampleTables[table.name]} />
+              </div>
+            ) : null,
+          )}
+          {/* Sample output — the correct output of the right query on the sample table */}
+          <div className="sample-section">
+            <span className="sample-label">
+              Sample output · {question.ordered ? "order matters" : "any order"}
+            </span>
+            <ResultTable
+              result={{
+                columns: question.expected.columns,
+                rows: question.expected.rows,
+              }}
+            />
+          </div>
           <label className="editor-label" htmlFor="sql-editor">
             Query
             {!storageAvailable && (

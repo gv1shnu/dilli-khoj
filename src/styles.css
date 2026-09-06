@@ -325,6 +325,30 @@ h2 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.sample-section {
+  margin-bottom: 13px;
+}
+/* Sample tables are small and known; give them more room before scrolling than
+   the query result box (.result-scroll defaults to 150px). */
+.sample-section .result-scroll {
+  max-height: 260px;
+}
+.sample-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.schema-open {
+  margin-bottom: 13px;
+  padding: 8px 11px;
+  background: rgba(101, 225, 189, 0.055);
+}
+.schema-open .archive-schema {
+  padding: 0;
+}
 .schema-sample-scroll {
   overflow-x: auto;
   border: 1px solid var(--line);
