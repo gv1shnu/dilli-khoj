@@ -159,7 +159,6 @@ Run browser, PGlite and load suites sequentially so they do not distort one anot
 | [Submission architecture](docs/submission-architecture.md)                 | Judge design and trust boundaries                      |
 | [Navigation/performance review](docs/navigation-and-performance-review.md) | UI routes, maps and engineering tradeoffs              |
 | [Deployment runbook](docs/deployment-runbook.md)                           | Release order, rollback and approval boundary          |
-| [Review handoff](docs/review-handoff.md)                            | Copy-ready independent review prompt and exact range   |
 
 Generated HTML in `docs/artifacts/` and `docs/deck/` is presentation output. Edit its
 documented source or template and rebuild it rather than using it as the product source
