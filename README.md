@@ -2,7 +2,7 @@
 
 A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore a 3D world, restore twenty archives, and practise the DBMS curriculum through SQL.
 
-**Status: development preview, not ready for a classroom-wide release.** This branch implements all twenty server-graded questions and trusted progression. The hosted handoff reports an older Ruin 06-only judge; the new implementation has not been deployed.
+**Status: hosted preview, not yet cleared for a classroom-wide release.** All twenty server-graded questions, the full judge and trusted progression are now deployed to the hosted backend (Supabase) and web (Cloudflare); the earlier Ruin-06-only judge has been replaced. Native-browser and accessibility QA, sustained hosted-load validation and blind human review of every question remain before a classroom rollout.
 
 ## Scope
 
@@ -10,7 +10,7 @@ A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore
 - Read-only SQL: `SELECT` and `WITH … SELECT`, including aggregates, windows, subqueries and joins.
 - Unlimited local practice in browser PostgreSQL (PGlite).
 - Hidden-case server grading, sequential progression and an XP economy.
-- Topic-matched revisits, completers-only leaderboard and restricted read-only administration.
+- Topic-matched revisits, a live explorer count, completers-only leaderboard and restricted read-only administration.
 - Target cohort: up to 3,000 students on modern Mac browsers; ₹0 operating target.
 
 See [credits](CREDITS.md) for shipped assets and attribution.
@@ -20,7 +20,7 @@ See [credits](CREDITS.md) for shipped assets and attribution.
 See [setup instructions](docs/setup.md) for prerequisites, browser configuration, checks and troubleshooting.
 
 ```bash
-git clone --branch open-world https://github.com/gv1shnu/treasure-hunt.git
+git clone https://github.com/gv1shnu/treasure-hunt.git
 cd treasure-hunt
 nvm install
 nvm use
@@ -40,14 +40,14 @@ Open **http://localhost:5173**. Development supports offline practice and a loca
 | Questions          | All 20 playable locally; three generated test datasets per question                                         |
 | Authorization      | Shared three-domain/admin policy tested locally; real OAuth and rollout pending                             |
 | Server grading     | All 20 implemented and exercised against local PostgreSQL; three cases per question                         |
-| Progress and XP    | Server transactions own unlocks, awards and purchases; local Run is untrusted                               |
+| Progress and XP    | Server transactions own unlocks, awards and purchases; local Run is untrusted; the HUD shows a live explorer count |
 | Drafts             | Browser-local, scoped by account; no cross-device synchronization                                           |
 | Help and revisits  | Paid server help; two non-scoring alternate objectives per ruin                                             |
 | Map access         | Cleared regions only for players; full atlas for admin inspection                                           |
 | Administration     | Audited server-protected reads; content editing through DEV studio and reviewed source                      |
-| Release validation | 152 tests plus Chrome/WebKit MacBook checks pass; full Supabase and sustained hosted-load validation remain |
+| Release validation | 157 tests plus Chrome/WebKit MacBook checks pass; full Supabase and sustained hosted-load validation remain |
 
-The live site may serve an older build. A working preview does not establish capacity for 3,000 simultaneous students. PGlite's WASM/data payload is substantial; campus download capacity and free database compute need measurement.
+The hosted build now serves the full twenty-question judge. A working preview does not establish capacity for 3,000 simultaneous students. PGlite's WASM/data payload is substantial; campus download capacity and free database compute need measurement.
 
 ## Architecture
 

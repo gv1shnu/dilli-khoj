@@ -1,8 +1,11 @@
 # Next steps
 
-The twenty-ruin game is implemented on `open-world` as a development preview. No
-hosted rollout has been performed. See [implementation status](implementation-status.md)
-for verification evidence and [setup](setup.md) to reproduce it.
+The twenty-ruin game is implemented on `main` and deployed as a hosted preview: the
+full twenty-question judge, the game migrations and the web build are live on the
+authorized backend, replacing the earlier Ruin-06-only judge. A classroom-wide
+rollout has not been performed — the remaining validation below still gates it. See
+[implementation status](implementation-status.md) for verification evidence and
+[setup](setup.md) to reproduce it locally.
 
 ## Current baseline
 
@@ -18,7 +21,7 @@ for verification evidence and [setup](setup.md) to reproduce it.
   Practice can replay the solve animation without awarding official XP.
 - All twenty first-pass objectives and forty alternating revisit objectives are wired
   to the generated client and server content pipeline.
-- The current automated baseline is **152 passing tests**, with typecheck, production
+- The current automated baseline is **157 passing tests**, with typecheck, production
   build, browser smoke and mocked authentication contracts also passing.
 - Ruins are constructed on first entry, cutting the latest measured Ruin 01 development
   heap from about 122 MB to 36.3 MB while active play remained at 60 FPS. Covered scenes

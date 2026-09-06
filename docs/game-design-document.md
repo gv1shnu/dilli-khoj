@@ -2,7 +2,7 @@
 
 _A PostgreSQL learning game set in a fictional, overgrown Delhi._
 
-Version: 2026-09-05 · Branch: `open-world` · Status: development preview (not yet deployed)
+Version: 2026-09-06 · Branch: `main` · Status: hosted preview (backend, judge and web deployed; classroom rollout pending)
 
 ---
 
@@ -310,6 +310,10 @@ Integrity properties:
   the Run/Submit loop — deliberately saying nothing about "finishing."
 - **Controls:** WASD/arrows to run, drag to look, Shift to walk, **E** to open an
   archive, **M** to mute/unmute ambience.
+- **Top bar:** the place eyebrow and title on the left; on the right, the world-map,
+  help and leaderboard controls, the player's current **XP** and a live **explorer
+  count** — the total number of players restoring Delhi, read from the authoritative
+  game state. The explorer count is shown only in signed-in play, not offline practice.
 - **Mission card:** place, restoration count, current objective, amber-trail
   direction control, archive action, and world-map action remain together.
 - **Archive panel:** prompt + sample output on one side, a SQL editor with **Run**
@@ -398,7 +402,7 @@ Authoring is also editable through a DEV-only **Question Studio** (`#admin`) and
 
 ## 18. Current implementation snapshot
 
-The `open-world` branch now contains the complete physical framework for the
+The `main` branch now contains the complete physical framework for the
 twenty-ruin journey:
 
 - twenty individually built ruin environments, joined by sequential gates;
@@ -413,7 +417,7 @@ twenty-ruin journey:
 - twenty first-pass objectives plus forty alternating, non-scoring revisit
   objectives.
 
-The 152-test automated suite, typecheck, production build, browser smoke tests and
+The 157-test automated suite, typecheck, production build, browser smoke tests and
 mocked authentication contracts pass in the development preview. The slow physical
 walkthrough covers all twenty archives, nineteen sequential gates, map revisits and
 the final state. Ruins are constructed on first entry, covered scenes render at 12 FPS,
@@ -459,9 +463,11 @@ The maintained, task-level checklist is in [next steps](next-steps.md).
   write-family topics are taught read-only by design.
 - **No multiplayer, combat, or timers.** The only competitive surface is the
   completers-only leaderboard.
-- **Not yet deployed.** This branch implements all twenty server-graded questions and
-  trusted progression; the current hosted build still reports an older Ruin-06-only
-  judge. Shipping requires pushing the new migrations and redeploying the judge.
+- **Deployed as a hosted preview, not classroom-released.** All twenty server-graded
+  questions, the full judge and trusted progression are live on the hosted backend
+  and web, replacing the older Ruin-06-only judge. A classroom-wide rollout still
+  depends on native-browser/accessibility QA, sustained hosted-load validation and
+  blind human review of every question.
 - **Blind human review** of each drafted question remains a production step before a
   classroom-wide release.
 
