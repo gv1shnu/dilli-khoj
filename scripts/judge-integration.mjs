@@ -115,19 +115,25 @@ try {
     600,
   );
   assert.equal((await submit(questions[0], "SELECT 1", firstId)).status, 409);
-  // Competing purchases on a fresh account must charge exactly once.
+  // Staged help: the first clue is free, and a competing paid action (the reveal)
+  // must charge exactly once. Ruin 1 has a single clue, so opening it unlocks reveal.
   const buyer = randomUUID();
   await addPlayer(pg.db, buyer, "buyer@partner.example");
-  const purchase = () =>
+  const act = (action, hintIndex) =>
     pg.sql.begin(async (tx) => {
       await tx`select set_config('request.jwt.claim.sub',${buyer},true)`;
       await tx`set local role authenticated`;
-      return tx`select public.game_action('hint',1::smallint,${randomUUID()}::uuid,1)`;
+      return tx`select public.game_action(${action}::text,1::smallint,${randomUUID()}::uuid,${hintIndex})`;
     });
-  await Promise.all(Array.from({ length: 12 }, purchase));
+  await act("hint", 1); // free first clue; balance unchanged at 100
   assert.equal(
     (await pg.sql`select xp from public.profiles where id=${buyer}`)[0].xp,
-    90,
+    100,
+  );
+  await Promise.all(Array.from({ length: 12 }, () => act("reveal", null)));
+  assert.equal(
+    (await pg.sql`select xp from public.profiles where id=${buyer}`)[0].xp,
+    85, // 100 - 15 reveal, charged once despite 12 concurrent reveals
   );
   console.log(
     "PostgreSQL 17 integration passed: 20 authenticated three-case submissions, 600 XP completion, concurrent retries and purchases.",
