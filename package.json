@@ -23,6 +23,7 @@
     "test:integration": "TZ=Asia/Kolkata node scripts/judge-integration.mjs",
     "test:load": "TZ=Asia/Kolkata node scripts/judge-integration.mjs --load",
     "test:browser:auth": "node scripts/browser-auth.mjs",
+    "test:browser:profile": "node scripts/browser-profile.mjs",
     "test:assets": "node scripts/check-production-assets.mjs",
     "test:profile": "TZ=Asia/Kolkata node scripts/judge-integration.mjs --profile"
   },

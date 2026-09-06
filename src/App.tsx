@@ -16,8 +16,10 @@ import {
 import { RuinScene, type TrailTarget } from "./game/RuinScene";
 import { IntroOverlay } from "./game/IntroOverlay";
 import { CompletionOverlay } from "./game/CompletionOverlay";
+import { RevisitChooser } from "./game/RevisitChooser";
 import { PlayerMap } from "./game/PlayerMap";
 import { GameEntry, type PlayerIdentity } from "./game/GameEntry";
+import { PlayerProfile } from "./game/PlayerProfile";
 import { CommunityPanel } from "./game/CommunityPanel";
 import {
   fetchGameState,
@@ -124,6 +126,7 @@ function GameShell({
   const signedInName = player?.name ?? null;
   const [server, setServer] = useState<GameState | null>(null);
   const [serverError, setServerError] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
   const [adminRuin, setAdminRuin] = useState(1);
   const [community, setCommunity] = useState<"leaderboard" | "admin" | null>(
     null,
@@ -132,6 +135,8 @@ function GameShell({
     ruin: number;
     variant: number;
   } | null>(null);
+  // Ruin id whose revisit objective the player is currently choosing.
+  const [revisitChoice, setRevisitChoice] = useState<number | null>(null);
   const [devHints, setDevHints] = useState<string[]>([]);
   const alive = useRef(true);
   const refreshRevision = useRef(0);
@@ -425,40 +430,57 @@ function GameShell({
         nearTerminal &&
         !showIntro &&
         !showMap &&
-        !community
+        !community &&
+        !showProfile
       )
         openNearby.current();
       if (event.code === "Escape") setTerminalOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [nearTerminal, showIntro, showMap, community]);
+  }, [nearTerminal, showIntro, showMap, community, showProfile]);
 
   const selectArchive = async (id: number) => {
     if (busy.current) return;
     if (!isUnlocked(id, cleared) || id !== nearArchive) return; // Must stand at this unlocked archive.
+    // A restored ruin opens the revisit chooser; the objective starts on choice.
+    if (cleared.includes(id)) {
+      setRevisitChoice(id);
+      return;
+    }
     busy.current = true;
     setRevisit(null);
     setResult(null);
     try {
-      if (cleared.includes(id)) {
-        try {
-          const next = offline
-            ? { variant: Date.now() % 2 }
-            : await gameRpc<{ variant: number }>("begin_revisit", {
-                ruin: id,
-                request_id: crypto.randomUUID(),
-              });
-          if (!alive.current) return;
-          setRevisit({ ruin: id, variant: next.variant });
-          setRevisitDraft(BLANK_QUERY);
-        } catch (e) {
-          setStatus({ kind: "error", message: getErrorMessage(e) });
-          return;
-        }
-      }
       setSession((current) => ({ ...current, selectedId: id }));
       setTerminalOpen(true);
+    } finally {
+      busy.current = false;
+    }
+  };
+
+  const startRevisit = async (id: number, variant: number) => {
+    if (busy.current) return;
+    busy.current = true;
+    setRevisit(null);
+    setResult(null);
+    try {
+      const next = offline
+        ? { variant }
+        : await gameRpc<{ variant: number }>("begin_revisit", {
+            ruin: id,
+            request_id: crypto.randomUUID(),
+            chosen_variant: variant,
+          });
+      if (!alive.current) return;
+      setRevisit({ ruin: id, variant: next.variant });
+      setRevisitDraft(BLANK_QUERY);
+      setRevisitChoice(null);
+      setSession((current) => ({ ...current, selectedId: id }));
+      setTerminalOpen(true);
+    } catch (e) {
+      setStatus({ kind: "error", message: getErrorMessage(e) });
+      setRevisitChoice(null);
     } finally {
       busy.current = false;
     }
@@ -627,7 +649,8 @@ function GameShell({
           showIntro ||
           showMap ||
           showCompletion ||
-          Boolean(community)
+          Boolean(community) ||
+          showProfile
         }
         autoWalk={walkthrough}
         trailTarget={trailTarget}
@@ -674,6 +697,13 @@ function GameShell({
         </aside>
       )}
       {showIntro && <IntroOverlay onClose={dismissIntro} />}
+      {revisitChoice !== null && (
+        <RevisitChooser
+          options={revisits.filter((v) => v.ruin === revisitChoice)}
+          onChoose={(variant) => void startRevisit(revisitChoice, variant)}
+          onClose={() => setRevisitChoice(null)}
+        />
+      )}
       {showCompletion && (
         <CompletionOverlay
           canViewLeaderboard={!offline}
@@ -686,6 +716,15 @@ function GameShell({
             setShowMap(true);
           }}
           onClose={() => setShowCompletion(false)}
+        />
+      )}
+      {showProfile && player && (
+        <PlayerProfile
+          onClose={() => setShowProfile(false)}
+          onRevisit={(ruin) => {
+            setShowProfile(false);
+            setRevisitChoice(ruin);
+          }}
         />
       )}
       {community && (
@@ -772,7 +811,19 @@ function GameShell({
               {server.explorers}
             </span>
           )}
-          {signedInName && <span className="identity">{signedInName}</span>}
+          {signedInName && (
+            <button
+              className="ghost-button profile-entry"
+              aria-label="Your profile"
+              onClick={(event) => {
+                event.currentTarget.focus();
+                setShowProfile(true);
+              }}
+            >
+              <span className="profile-entry-name">{signedInName}</span>
+              <span className="profile-entry-short">Profile</span>
+            </button>
+          )}
           <button className="ghost-button" onClick={onExit}>
             {offline ? "Exit local preview" : "Sign out"}
           </button>
@@ -1045,7 +1096,13 @@ function GameShell({
                 className="primary-button"
                 onClick={() => void handleSubmit()}
                 disabled={loading || offline || Boolean(revisitQuestion)}
-                title="Server grading requires sign-in"
+                title={
+                  offline
+                    ? "Sign in for server grading"
+                    : revisitQuestion
+                      ? "Revisits are practice only — not graded"
+                      : undefined
+                }
               >
                 Submit
               </button>

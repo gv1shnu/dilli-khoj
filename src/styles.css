@@ -887,6 +887,48 @@ button:disabled {
   margin: 22px 0 8px;
 }
 
+.revisit-choices {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.revisit-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  text-align: left;
+  border: 1px solid rgba(244, 173, 69, 0.28);
+  border-radius: 4px;
+  background: rgba(28, 24, 16, 0.6);
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.revisit-choice:hover,
+.revisit-choice:focus-visible {
+  border-color: var(--amber);
+  background: rgba(40, 33, 18, 0.85);
+  transform: translateY(-1px);
+}
+
+.revisit-choice-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--amber);
+}
+
+.revisit-choice-desc {
+  color: #d8d3c7;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 .intro-section--wide {
   grid-column: 1 / -1;
 }
