@@ -1,0 +1,128 @@
+{
+  "testedAt": "2026-09-06T12-48-33.860Z",
+  "scope": "Disposable PostgreSQL 17; one real Node judge instance, two single-connection pools; in-process Requests, no HTTP, GoTrue, PostgREST, hosted pooler or browser rendering",
+  "limits": {
+    "p95Ms": 2000,
+    "maxErrorFraction": 0.01,
+    "maxOutstanding": 2000
+  },
+  "players": 3000,
+  "requestsSent": 185500,
+  "results": [
+    {
+      "name": "confirmation-600",
+      "targetRate": 600,
+      "seconds": 300,
+      "burst": null,
+      "sent": 180000,
+      "correct": 180000,
+      "statuses": {
+        "200-correct": 180000
+      },
+      "peakOutstanding": 72,
+      "stoppedAtBacklogLimit": false,
+      "dispatchMs": 299998,
+      "elapsedMs": 300074,
+      "completedPerSecond": 600,
+      "p50Ms": 2,
+      "p95Ms": 3,
+      "p99Ms": 19,
+      "maxMs": 126,
+      "dispatchLagP95Ms": 0,
+      "nodeRssMB": 407,
+      "pass": true
+    },
+    {
+      "name": "recovery-100",
+      "targetRate": 100,
+      "seconds": 15,
+      "burst": null,
+      "sent": 1500,
+      "correct": 1500,
+      "statuses": {
+        "200-correct": 1500
+      },
+      "peakOutstanding": 1,
+      "stoppedAtBacklogLimit": false,
+      "dispatchMs": 14990,
+      "elapsedMs": 14994,
+      "completedPerSecond": 100,
+      "p50Ms": 4,
+      "p95Ms": 5,
+      "p99Ms": 6,
+      "maxMs": 9,
+      "dispatchLagP95Ms": 1,
+      "nodeRssMB": 305,
+      "pass": true
+    },
+    {
+      "name": "burst-500",
+      "targetRate": null,
+      "seconds": null,
+      "burst": 500,
+      "sent": 500,
+      "correct": 500,
+      "statuses": {
+        "200-correct": 500
+      },
+      "peakOutstanding": 500,
+      "stoppedAtBacklogLimit": false,
+      "dispatchMs": 13,
+      "elapsedMs": 717,
+      "completedPerSecond": 698,
+      "p50Ms": 615,
+      "p95Ms": 708,
+      "p99Ms": 715,
+      "maxMs": 717,
+      "dispatchLagP95Ms": 12,
+      "nodeRssMB": 306,
+      "pass": true
+    },
+    {
+      "name": "burst-2000",
+      "targetRate": null,
+      "seconds": null,
+      "burst": 2000,
+      "sent": 2000,
+      "correct": 2000,
+      "statuses": {
+        "200-correct": 2000
+      },
+      "peakOutstanding": 2000,
+      "stoppedAtBacklogLimit": false,
+      "dispatchMs": 53,
+      "elapsedMs": 2993,
+      "completedPerSecond": 668,
+      "p50Ms": 2512,
+      "p95Ms": 2950,
+      "p99Ms": 2985,
+      "maxMs": 2993,
+      "dispatchLagP95Ms": 50,
+      "nodeRssMB": 377,
+      "pass": false
+    },
+    {
+      "name": "post-burst-recovery-100",
+      "targetRate": 100,
+      "seconds": 15,
+      "burst": null,
+      "sent": 1500,
+      "correct": 1500,
+      "statuses": {
+        "200-correct": 1500
+      },
+      "peakOutstanding": 1,
+      "stoppedAtBacklogLimit": false,
+      "dispatchMs": 14991,
+      "elapsedMs": 14995,
+      "completedPerSecond": 100,
+      "p50Ms": 4,
+      "p95Ms": 6,
+      "p99Ms": 6,
+      "maxMs": 8,
+      "dispatchLagP95Ms": 1,
+      "nodeRssMB": 278,
+      "pass": true
+    }
+  ]
+}

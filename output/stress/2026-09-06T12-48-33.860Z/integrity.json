@@ -1,0 +1,13 @@
+{
+  "audit": {
+    "players": 3000,
+    "wrong_xp": 0,
+    "missing_solves": 0
+  },
+  "awards": {
+    "recorded": 185500,
+    "awarded": 60000
+  },
+  "successful": 185500,
+  "pass": true
+}

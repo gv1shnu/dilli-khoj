@@ -22,6 +22,7 @@
     "test:browser:webkit": "BROWSER_ENGINE=webkit node scripts/browser-smoke.mjs",
     "test:integration": "TZ=Asia/Kolkata node scripts/judge-integration.mjs",
     "test:load": "TZ=Asia/Kolkata node scripts/judge-integration.mjs --load",
+    "test:stress": "TZ=Asia/Kolkata node scripts/stress-test.mjs",
     "test:browser:auth": "node scripts/browser-auth.mjs",
     "test:browser:profile": "node scripts/browser-profile.mjs",
     "test:assets": "node scripts/check-production-assets.mjs",

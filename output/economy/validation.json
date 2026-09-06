@@ -1,0 +1,632 @@
+{
+  "testedAt": "2026-09-06T12:34:00.095Z",
+  "backend": "disposable PostgreSQL 17",
+  "scenarios": 100,
+  "ruins": [
+    {
+      "ruin": 1,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 2,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 3,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 4,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 5,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 6,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 7,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 8,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 9,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 10,
+      "hints": 1,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "reveal": {
+          "helpCost": 15,
+          "solveAward": 0,
+          "finalXp": 85
+        }
+      }
+    },
+    {
+      "ruin": 11,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 12,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 13,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 14,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 15,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 16,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 17,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 18,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 19,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    },
+    {
+      "ruin": 20,
+      "hints": 2,
+      "scenarios": {
+        "auto-survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "survey": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "hint1": {
+          "helpCost": 0,
+          "solveAward": 20,
+          "finalXp": 120
+        },
+        "all-hints": {
+          "helpCost": 5,
+          "solveAward": 20,
+          "finalXp": 115
+        },
+        "reveal": {
+          "helpCost": 20,
+          "solveAward": 0,
+          "finalXp": 80
+        }
+      }
+    }
+  ],
+  "affordability": {
+    "balanceAfterSixRevealedSolves": 10,
+    "seventhReveal": "rejected without charge",
+    "balanceAfterUnrevealedSeventhSolve": 30
+  }
+}
