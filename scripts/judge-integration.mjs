@@ -135,8 +135,22 @@ try {
     (await pg.sql`select xp from public.profiles where id=${buyer}`)[0].xp,
     85, // 100 - 15 reveal, charged once despite 12 concurrent reveals
   );
+  // game_state reports a total explorer count for the HUD; it must match the
+  // profiles table and see every player past row-level security.
+  const state = (
+    await pg.sql.begin(async (tx) => {
+      await tx`select set_config('request.jwt.claim.sub',${player},true)`;
+      await tx`set local role authenticated`;
+      return tx`select public.game_state() as state`;
+    })
+  )[0].state;
+  const profileCount = Number(
+    (await pg.sql`select count(*)::int as n from public.profiles`)[0].n,
+  );
+  assert.ok(profileCount >= 2, `expected several profiles, saw ${profileCount}`);
+  assert.equal(state.explorers, profileCount);
   console.log(
-    "PostgreSQL 17 integration passed: 20 authenticated three-case submissions, 600 XP completion, concurrent retries and purchases.",
+    `PostgreSQL 17 integration passed: 20 authenticated three-case submissions, 600 XP completion, concurrent retries and purchases, explorer count ${state.explorers}.`,
   );
   if (process.argv.includes("--profile")) {
     // Only the disposable cluster: log server durations, then retain aggregates.

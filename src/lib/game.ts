@@ -13,6 +13,8 @@ export interface GameState {
   completedAt: string | null;
   signedUpAt: string;
   isAdmin: boolean;
+  /** Total registered explorers, counted server-side across all players. */
+  explorers: number;
   cleared: number[];
   progress: RuinProgress[];
 }

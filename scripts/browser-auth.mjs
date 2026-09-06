@@ -44,6 +44,7 @@ const blank = (id) => ({
   completedAt: null,
   signedUpAt: new Date().toISOString(),
   isAdmin: false,
+  explorers: 2,
   cleared: [],
   progress: [],
 });
