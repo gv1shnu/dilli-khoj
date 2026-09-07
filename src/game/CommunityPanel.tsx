@@ -17,14 +17,16 @@ interface Question {
   dataset_version: string;
 }
 export function CommunityPanel({
-  admin,
+  view,
   onClose,
   initialRuin = 1,
 }: {
-  admin: boolean;
+  view: "leaderboard" | "admin" | "players";
   initialRuin?: number;
   onClose: () => void;
 }) {
+  const admin = view === "admin";
+  const playersView = view === "players";
   const [adminVerified, setAdminVerified] = useState(false);
   const [board, setBoard] = useState<Leaderboard | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -39,20 +41,23 @@ export function CommunityPanel({
     setError("");
     setQuestion(null);
     setPlayers([]);
-    const load = admin
-      ? Promise.all([
-          gameRpc<Player[]>("admin_players", { page }),
-          gameRpc<Question>("admin_question", { ruin }),
-        ]).then(([p, q]) => {
+    const load = playersView
+      ? gameRpc<Player[]>("admin_players", { page }).then((p) => {
           if (active) {
             setAdminVerified(true);
             setPlayers(p);
-            setQuestion(q);
           }
         })
-      : gameRpc<Leaderboard>("completion_leaderboard").then((b) => {
-          if (active) setBoard(b);
-        });
+      : admin
+        ? gameRpc<Question>("admin_question", { ruin }).then((q) => {
+            if (active) {
+              setAdminVerified(true);
+              setQuestion(q);
+            }
+          })
+        : gameRpc<Leaderboard>("completion_leaderboard").then((b) => {
+            if (active) setBoard(b);
+          });
     void load
       .catch((e) => {
         if (active) setError(e.message);
@@ -63,7 +68,7 @@ export function CommunityPanel({
     return () => {
       active = false;
     };
-  }, [admin, page, ruin]);
+  }, [view, admin, playersView, page, ruin]);
   const time = (ms: number) =>
     `${Math.floor(ms / 3600000)}h ${Math.floor(ms / 60000) % 60}m ${Math.floor(ms / 1000) % 60}s`;
   return (
@@ -71,7 +76,13 @@ export function CommunityPanel({
       className="pmap-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label={admin ? "Administration" : "Completion leaderboard"}
+      aria-label={
+        playersView
+          ? "Players"
+          : admin
+            ? "Administration"
+            : "Completion leaderboard"
+      }
     >
       <div className="pmap-card community-card">
         <button
@@ -81,7 +92,13 @@ export function CommunityPanel({
         >
           ×
         </button>
-        <h2>{admin ? "Administration" : "Completion leaderboard"}</h2>
+        <h2>
+          {playersView
+            ? "Players"
+            : admin
+              ? "Administration"
+              : "Completion leaderboard"}
+        </h2>
         {error && <p role="alert">{error}</p>}
         {loading && <p>Loading…</p>}
         {!admin && board && (
@@ -124,20 +141,12 @@ export function CommunityPanel({
             )}
           </>
         )}
-        {admin && !error && (
+        {playersView && !error && adminVerified && (
           <>
             <p>
-              Read-only player and content review. Access is checked by the
-              server and recorded in the audit log.
+              Read-only player roster. Access is checked by the server and
+              recorded in the audit log.
             </p>
-            {adminVerified && (
-              <GeographicMap
-                cleared={[]}
-                fullAccess
-                selectedId={ruin}
-                onSelect={setRuin}
-              />
-            )}
             <h3>Players</h3>
             <table>
               <thead>
@@ -171,6 +180,22 @@ export function CommunityPanel({
             >
               Next page
             </button>
+          </>
+        )}
+        {admin && !error && (
+          <>
+            <p>
+              Read-only player and content review. Access is checked by the
+              server and recorded in the audit log.
+            </p>
+            {adminVerified && (
+              <GeographicMap
+                cleared={[]}
+                fullAccess
+                selectedId={ruin}
+                onSelect={setRuin}
+              />
+            )}
             <h3>Question review</h3>
             <label>
               Ruin{" "}
