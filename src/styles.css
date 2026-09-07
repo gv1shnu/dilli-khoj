@@ -1105,6 +1105,59 @@ button:disabled {
   text-align: center;
 }
 
+.gate-card--error {
+  border-color: rgba(255, 120, 105, 0.4);
+  border-top-color: var(--red);
+}
+
+.error-details {
+  margin: 16px 0 0;
+  text-align: left;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.error-details summary {
+  cursor: pointer;
+  color: var(--muted);
+  font:
+    500 0.68rem/1 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.04em;
+}
+
+.error-details pre {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  max-height: 180px;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: #c8cbc5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font:
+    0.66rem/1.5 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.status-meta {
+  margin-left: auto;
+  cursor: help;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  font:
+    0.62rem/1 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
 .gate-mark {
   width: 64px;
   height: 64px;

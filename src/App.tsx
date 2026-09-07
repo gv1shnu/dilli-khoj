@@ -28,6 +28,7 @@ import {
   type GameState,
 } from "./lib/game";
 import revisits from "./questions/revisits.generated.json";
+import { toFriendlyError, type FriendlyError } from "./lib/errors";
 import { ruinById } from "./game/ruins";
 import {
   parsePracticeSession,
@@ -62,7 +63,17 @@ const WorldStudio = import.meta.env.DEV
 type Status = {
   kind: "idle" | "loading" | "pass" | "fail" | "error";
   message: string;
+  /** Raw technical text, revealed behind a "details" marker on error banners. */
+  detail?: string | null;
 };
+
+// Player-facing error status; keeps the raw message for the details marker and
+// logs the original error so developers still get full diagnostics.
+function errorStatus(error: unknown): Status {
+  console.error(error);
+  const friendly = toFriendlyError(error);
+  return { kind: "error", message: friendly.message, detail: friendly.detail };
+}
 const INTRO_SEEN_KEY = "dk_intro_seen_v1";
 // The editor opens empty apart from a nudge; students write the whole query.
 const BLANK_QUERY = "-- write your query here\n";
@@ -125,7 +136,11 @@ function GameShell({
   const storageKey = practiceStorageKey(player?.id ?? null);
   const signedInName = player?.name ?? null;
   const [server, setServer] = useState<GameState | null>(null);
-  const [serverError, setServerError] = useState("");
+  const [serverError, setServerError] = useState<FriendlyError | null>(null);
+  const failServer = useCallback((error: unknown) => {
+    console.error(error);
+    setServerError(toFriendlyError(error));
+  }, []);
   const [showProfile, setShowProfile] = useState(false);
   const [adminRuin, setAdminRuin] = useState(1);
   const [community, setCommunity] = useState<
@@ -157,15 +172,15 @@ function GameShell({
       const next = await fetchGameState();
       if (alive.current && revision === refreshRevision.current) {
         setServer(next);
-        setServerError("");
+        setServerError(null);
       }
       return next;
     } catch (error) {
       if (alive.current && revision === refreshRevision.current)
-        setServerError(getErrorMessage(error));
+        failServer(error);
       return null;
     }
-  }, [offline]);
+  }, [offline, failServer]);
   useEffect(() => {
     if (offline) return;
     let timer = 0;
@@ -184,7 +199,7 @@ function GameShell({
       if (now - lastRequestedAt < 1_000) return;
       lastRequestedAt = now;
       void refresh().catch((e) => {
-        if (alive.current) setServerError(e.message);
+        if (alive.current) failServer(e);
       });
       schedule();
     };
@@ -203,7 +218,9 @@ function GameShell({
   const [session, setSession] = useState(() => {
     try {
       return parsePracticeSession(localStorage.getItem(storageKey));
-    } catch {
+    } catch (error) {
+      // Corrupt or unreadable saved session: start fresh, but leave a trail.
+      console.warn("Could not read saved practice session; starting fresh.", error);
       return parsePracticeSession(null);
     }
   });
@@ -307,7 +324,9 @@ function GameShell({
     try {
       localStorage.setItem(storageKey, JSON.stringify(session));
       setStorageAvailable(true);
-    } catch {
+    } catch (error) {
+      // Storage blocked (private mode, quota): the UI already warns via the flag.
+      console.warn("Local storage unavailable; progress won't persist.", error);
       setStorageAvailable(false);
     }
   }, [session, storageKey]);
@@ -330,7 +349,7 @@ function GameShell({
         void gameAction("survey", question.id)
           .then(refresh)
           .catch((e) => {
-            if (alive.current) setServerError(e.message);
+            if (alive.current) failServer(e);
           });
       return;
     }
@@ -390,7 +409,7 @@ function GameShell({
       })
       .catch((error: unknown) => {
         if (operation.current === request)
-          setStatus({ kind: "error", message: getErrorMessage(error) });
+          setStatus(errorStatus(error));
       })
       .finally(() => {
         if (operation.current === request) busy.current = false;
@@ -417,8 +436,9 @@ function GameShell({
             `SELECT * FROM "${name}"`,
             question.id,
           );
-        } catch {
+        } catch (error) {
           // A table we cannot read is simply omitted from the sample display.
+          console.debug(`Skipping sample for table "${name}".`, error);
         }
       }
       if (active) setSampleTables(collected);
@@ -445,8 +465,9 @@ function GameShell({
     setShowIntro(false);
     try {
       localStorage.setItem(INTRO_SEEN_KEY, "1");
-    } catch {
-      /* session-only */
+    } catch (error) {
+      // Storage blocked: the intro will show again next session, which is fine.
+      console.debug("Could not persist intro-seen flag.", error);
     }
   }, []);
 
@@ -512,7 +533,7 @@ function GameShell({
       setSession((current) => ({ ...current, selectedId: id }));
       setTerminalOpen(true);
     } catch (e) {
-      setStatus({ kind: "error", message: getErrorMessage(e) });
+      setStatus(errorStatus(e));
       setRevisitChoice(null);
     } finally {
       busy.current = false;
@@ -569,7 +590,7 @@ function GameShell({
     } catch (error) {
       if (operation.current !== request) return;
       setResult(null);
-      setStatus({ kind: "error", message: getErrorMessage(error) });
+      setStatus(errorStatus(error));
     } finally {
       if (operation.current === request) busy.current = false;
     }
@@ -607,7 +628,7 @@ function GameShell({
       });
     } catch (error) {
       if (operation.current === request)
-        setStatus({ kind: "error", message: getErrorMessage(error) });
+        setStatus(errorStatus(error));
     } finally {
       if (operation.current === request) busy.current = false;
     }
@@ -633,7 +654,7 @@ function GameShell({
         });
     } catch (e) {
       if (alive.current)
-        setStatus({ kind: "error", message: getErrorMessage(e) });
+        setStatus(errorStatus(e));
     } finally {
       busy.current = false;
     }
@@ -643,21 +664,24 @@ function GameShell({
   if (!offline && (!server || serverError))
     return (
       <main className="gate-backdrop">
-        <div className="gate-card">
+        <div className={`gate-card${serverError ? " gate-card--error" : ""}`}>
           <h1>
-            {serverError ? "Server play unavailable" : "Loading your progress…"}
+            {serverError ? "Can't load the game" : "Loading your progress…"}
           </h1>
           <p role="alert">
-            {serverError || "Checking account access and saved progress."}
+            {serverError?.message ??
+              "Checking account access and saved progress."}
           </p>
-          <button
-            onClick={() =>
-              void refresh().catch((e) => setServerError(e.message))
-            }
-          >
-            Retry
+          <button onClick={() => void refresh().catch(failServer)}>
+            Try again
           </button>
           <button onClick={onExit}>Sign out</button>
+          {serverError?.detail && (
+            <details className="error-details">
+              <summary>Details</summary>
+              <pre>{serverError.detail}</pre>
+            </details>
+          )}
         </div>
       </main>
     );
@@ -1173,7 +1197,12 @@ function GameShell({
           )}
           <div className={`status-banner status-${status.kind}`} role="status">
             <span className="status-light" />
-            {status.message}
+            <span>{status.message}</span>
+            {status.kind === "error" && status.detail && (
+              <span className="status-meta" title={status.detail}>
+                details
+              </span>
+            )}
           </div>
           {result && <ResultTable result={result} />}
           <p className="dev-note">
@@ -1207,10 +1236,4 @@ function GameShell({
       </footer>
     </main>
   );
-}
-
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : "Something went wrong. Try again.";
 }
