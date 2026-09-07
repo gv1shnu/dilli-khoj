@@ -128,9 +128,9 @@ function GameShell({
   const [serverError, setServerError] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [adminRuin, setAdminRuin] = useState(1);
-  const [community, setCommunity] = useState<"leaderboard" | "admin" | null>(
-    null,
-  );
+  const [community, setCommunity] = useState<
+    "leaderboard" | "admin" | "players" | null
+  >(null);
   const [revisit, setRevisit] = useState<{
     ruin: number;
     variant: number;
@@ -762,7 +762,7 @@ function GameShell({
       )}
       {community && (
         <CommunityPanel
-          admin={community === "admin"}
+          view={community}
           initialRuin={adminRuin}
           onClose={() => setCommunity(null)}
         />
@@ -822,28 +822,55 @@ function GameShell({
           <span className="xp-chip">
             {xp === null ? "Practice mode" : `${xp} XP`}
           </span>
-          {server?.explorers != null && (
-            <span
-              className="explorer-chip"
-              title={`${server.explorers} explorers`}
-              aria-label={`${server.explorers} explorers`}
-            >
-              <svg
-                className="explorer-chip__icon"
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                aria-hidden="true"
-                focusable="false"
+          {server?.explorers != null &&
+            (server.isAdmin ? (
+              <button
+                type="button"
+                className="explorer-chip explorer-chip--button"
+                title={`${server.explorers} explorers · view players`}
+                aria-label={`${server.explorers} explorers, view players`}
+                onClick={(event) => {
+                  event.currentTarget.focus();
+                  setCommunity("players");
+                }}
               >
-                <path
-                  fill="currentColor"
-                  d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.31 0-6 2.24-6 5v1h12v-1c0-2.76-2.69-5-6-5Zm7.5-2A3.5 3.5 0 1 0 16 4.05a5.5 5.5 0 0 1 0 6.9c.16.03.33.05.5.05Zm.5 2c-.5 0-.98.06-1.43.16A6.9 6.9 0 0 1 17 18v1h4v-1c0-2.76-2.69-5-6-5Z"
-                />
-              </svg>
-              {server.explorers}
-            </span>
-          )}
+                <svg
+                  className="explorer-chip__icon"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.31 0-6 2.24-6 5v1h12v-1c0-2.76-2.69-5-6-5Zm7.5-2A3.5 3.5 0 1 0 16 4.05a5.5 5.5 0 0 1 0 6.9c.16.03.33.05.5.05Zm.5 2c-.5 0-.98.06-1.43.16A6.9 6.9 0 0 1 17 18v1h4v-1c0-2.76-2.69-5-6-5Z"
+                  />
+                </svg>
+                {server.explorers}
+              </button>
+            ) : (
+              <span
+                className="explorer-chip"
+                title={`${server.explorers} explorers`}
+                aria-label={`${server.explorers} explorers`}
+              >
+                <svg
+                  className="explorer-chip__icon"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.31 0-6 2.24-6 5v1h12v-1c0-2.76-2.69-5-6-5Zm7.5-2A3.5 3.5 0 1 0 16 4.05a5.5 5.5 0 0 1 0 6.9c.16.03.33.05.5.05Zm.5 2c-.5 0-.98.06-1.43.16A6.9 6.9 0 0 1 17 18v1h4v-1c0-2.76-2.69-5-6-5Z"
+                  />
+                </svg>
+                {server.explorers}
+              </span>
+            ))}
           {signedInName && (
             <button
               className="ghost-button profile-entry"

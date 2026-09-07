@@ -194,6 +194,19 @@ h2 {
   flex: none;
 }
 
+.explorer-chip--button {
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.explorer-chip--button:hover,
+.explorer-chip--button:focus-visible {
+  color: var(--mint);
+  border-color: var(--mint);
+}
+
 .mission-card {
   position: absolute;
   top: 108px;
