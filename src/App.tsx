@@ -146,6 +146,10 @@ function GameShell({
   const [community, setCommunity] = useState<
     "leaderboard" | "admin" | "players" | null
   >(null);
+  const [viewPlayer, setViewPlayer] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [revisit, setRevisit] = useState<{
     ruin: number;
     variant: number;
@@ -788,7 +792,15 @@ function GameShell({
         <CommunityPanel
           view={community}
           initialRuin={adminRuin}
+          onOpenPlayer={setViewPlayer}
           onClose={() => setCommunity(null)}
+        />
+      )}
+      {viewPlayer && (
+        <PlayerProfile
+          target={viewPlayer}
+          onClose={() => setViewPlayer(null)}
+          onRevisit={() => setViewPlayer(null)}
         />
       )}
       {showMap && (
