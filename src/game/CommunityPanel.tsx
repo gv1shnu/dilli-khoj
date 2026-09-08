@@ -19,11 +19,14 @@ interface Question {
 export function CommunityPanel({
   view,
   onClose,
+  onOpenPlayer,
   initialRuin = 1,
 }: {
   view: "leaderboard" | "admin" | "players";
   initialRuin?: number;
   onClose: () => void;
+  /** Admin roster: open a single explorer's read-only profile. */
+  onOpenPlayer?: (player: { id: string; name: string }) => void;
 }) {
   const admin = view === "admin";
   const playersView = view === "players";
@@ -160,7 +163,22 @@ export function CommunityPanel({
               <tbody>
                 {players.map((p) => (
                   <tr key={p.id}>
-                    <td>{p.display_name}</td>
+                    <td>
+                      {onOpenPlayer ? (
+                        <button
+                          type="button"
+                          className="roster-link"
+                          onClick={() =>
+                            onOpenPlayer({ id: p.id, name: p.display_name })
+                          }
+                          aria-label={`View ${p.display_name}'s profile`}
+                        >
+                          {p.display_name}
+                        </button>
+                      ) : (
+                        p.display_name
+                      )}
+                    </td>
                     <td>{p.email}</td>
                     <td>{p.xp}</td>
                     <td>{p.ruins_solved}/20</td>

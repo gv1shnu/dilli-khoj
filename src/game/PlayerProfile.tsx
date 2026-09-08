@@ -60,10 +60,14 @@ const date = (value: string) =>
 export function PlayerProfile({
   onClose,
   onRevisit,
+  target,
 }: {
   onClose: () => void;
   onRevisit: (ruin: number) => void;
+  /** When set, an admin is viewing this explorer's record read-only. */
+  target?: { id: string; name: string };
 }) {
+  const adminView = Boolean(target);
   const dialog = useRef<HTMLDialogElement>(null);
   const returnFocus = useRef(document.activeElement);
   const [data, setData] = useState<ProfileData | null>(null);
@@ -84,7 +88,10 @@ export function PlayerProfile({
   useEffect(() => {
     let active = true;
     setError("");
-    void gameRpc<ProfileData>("player_profile")
+    void gameRpc<ProfileData>(
+      target ? "admin_player_profile" : "player_profile",
+      target ? { target: target.id } : {},
+    )
       .then((p) => {
         if (active) setData(p);
       })
@@ -94,7 +101,7 @@ export function PlayerProfile({
     return () => {
       active = false;
     };
-  }, [reload]);
+  }, [reload, target?.id]);
   const signature = playerSignature(data?.id ?? "explorer");
   const solved = data?.ruins.filter((r) => r.solvedAt) ?? [];
   const sum = (key: "attempts" | "incorrectAttempts" | "revisits") =>
@@ -131,7 +138,13 @@ export function PlayerProfile({
       aria-labelledby={
         data ? (confirm ? "delete-title" : "profile-title") : undefined
       }
-      aria-label={data ? undefined : "Your profile"}
+      aria-label={
+        data
+          ? undefined
+          : adminView
+            ? `${target?.name ?? "Explorer"}'s profile`
+            : "Your profile"
+      }
       style={
         {
           "--profile-hue": signature.hue,
@@ -152,7 +165,7 @@ export function PlayerProfile({
         <nav className="profile-nav">
           <span>DILLI KHOJ / EXPLORER RECORDS</span>
           <button autoFocus onClick={onClose} disabled={deleting}>
-            Back to the city ↗
+            {adminView ? "Back to roster ↗" : "Back to the city ↗"}
           </button>
         </nav>
         {error && (
@@ -165,7 +178,9 @@ export function PlayerProfile({
         )}
         {!data && !error && (
           <h1 id="profile-title" role="status">
-            Opening your field journal…
+            {adminView
+              ? `Opening ${target?.name ?? "explorer"}'s record…`
+              : "Opening your field journal…"}
           </h1>
         )}
         {data &&
@@ -212,7 +227,11 @@ export function PlayerProfile({
             <>
               <header className="profile-hero">
                 <div>
-                  <p className="profile-kicker">YOUR PERSONAL FIELD JOURNAL</p>
+                  <p className="profile-kicker">
+                    {adminView
+                      ? "EXPLORER RECORD · ADMIN VIEW"
+                      : "YOUR PERSONAL FIELD JOURNAL"}
+                  </p>
                   <p className="profile-alias">{signature.name}</p>
                   <h1 id="profile-title">{data.name}</h1>
                   <p className="profile-email">{data.email}</p>
@@ -380,7 +399,7 @@ export function PlayerProfile({
                       <span className="profile-attempts">
                         {r.attempts} attempts
                       </span>
-                      {r.solvedAt && (
+                      {r.solvedAt && !adminView && (
                         <button
                           onClick={() => onRevisit(r.ruin)}
                           aria-label={`Revisit ruin ${r.ruin}`}
@@ -393,17 +412,23 @@ export function PlayerProfile({
                 </ol>
               </section>
               <footer className="profile-footer">
-                <button
-                  className="profile-delete"
-                  onClick={() => {
-                    setConfirm(true);
-                    setTyped("");
-                    setError("");
-                  }}
-                >
-                  Delete account
-                </button>
-                <span>Your journal, your journey.</span>
+                {adminView ? (
+                  <span>Read-only · this view is recorded in the audit log.</span>
+                ) : (
+                  <>
+                    <button
+                      className="profile-delete"
+                      onClick={() => {
+                        setConfirm(true);
+                        setTyped("");
+                        setError("");
+                      }}
+                    >
+                      Delete account
+                    </button>
+                    <span>Your journal, your journey.</span>
+                  </>
+                )}
               </footer>
             </>
           ))}
