@@ -1070,6 +1070,22 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+.intro-legal {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.intro-legal a {
+  color: var(--muted);
+  text-underline-offset: 2px;
+}
+
+.intro-legal a:hover {
+  color: var(--mint);
+}
+
 @media (max-width: 640px) {
   .intro-sections {
     grid-template-columns: 1fr;
