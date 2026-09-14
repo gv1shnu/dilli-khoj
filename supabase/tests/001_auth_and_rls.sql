@@ -27,9 +27,9 @@ select is(
 select is(
   public.hook_restrict_dilli_khoj_signup(
     '{"user":{"email":"student@gmail.com","app_metadata":{"provider":"google"}}}'::jsonb
-  ) -> 'error' ->> 'http_code',
-  '403',
-  'unapproved domain is rejected'
+  ),
+  '{}'::jsonb,
+  'any Google account is accepted'
 );
 
 select * from finish();

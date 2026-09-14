@@ -6,8 +6,8 @@ interface SignInGateProps {
 }
 
 // Mandatory sign-in wall shown right after the how-to-play explanation. Google
-// sign-in is required to play: it keeps the world to legitimate approved-domain
-// users, saves each player's progress, and lets admins see it.
+// sign-in is required to play: any Google account may enter, and signing in
+// saves each player's progress and lets admins see it.
 export function SignInGate({ onSignIn, error, onDevBypass }: SignInGateProps) {
   return (
     <div
@@ -25,11 +25,11 @@ export function SignInGate({ onSignIn, error, onDevBypass }: SignInGateProps) {
         <p className="eyebrow">DILLI KHOJ</p>
         <h2 className="gate-title">Sign in to enter the ruins</h2>
         <p className="gate-lead">
-          The city only opens to signed-in explorers. Sign in with your approved
-          Google account — it keeps your progress, and it is required to play.
+          The city only opens to signed-in explorers. Sign in with your Google
+          account — it keeps your progress, and it is required to play.
         </p>
         <ul className="gate-points">
-          <li>Only approved college accounts can enter.</li>
+          <li>Any Google account can enter.</li>
           <li>Your restored ruins and XP are saved to your account.</li>
           <li>No passwords — Google handles sign-in.</li>
         </ul>
