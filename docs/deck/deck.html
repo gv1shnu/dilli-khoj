@@ -227,10 +227,10 @@
     <div class="grid narrow-media">
       <div class="stack">
         <h2>A course, disguised as an expedition.</h2>
-        <p class="body">Dilli Khoj teaches the NST DBMS 2026 topic tree as a game. Each ruin guards a sealed archive; reading it means writing the SQL the archive asks for. Get it right and the ruin wakes, unlocking the next. The curriculum is the map.</p>
+        <p class="body">Dilli Khoj teaches a full introductory PostgreSQL curriculum as a game. Each ruin guards a sealed archive; reading it means writing the SQL the archive asks for. Get it right and the ruin wakes, unlocking the next. The curriculum is the map.</p>
         <ul class="ticks">
           <li><strong>Twenty authored questions</strong>, one per ruin, in a fixed teaching order from schema-reading to multi-table joins.</li>
-          <li><strong>Sign-in required.</strong> Only approved institutional Google accounts may play, so the world stays to real students.</li>
+          <li><strong>Sign in with any Google account.</strong> Sign-in is required to play — it saves your progress and identifies you on the leaderboard.</li>
           <li><strong>Every query is real PostgreSQL</strong> — read-only, run against a live database, graded on the server.</li>
         </ul>
       </div>
@@ -345,18 +345,18 @@
     <div class="grid narrow-media">
       <div class="stack">
         <h2>Help costs; solving never does.</h2>
-        <p class="body">A wrong Submit is free, so students submit fearlessly. Solving is always available. But <strong>help must be paid for</strong> — and you can't reveal your way to the end.</p>
+        <p class="body">A wrong Submit is free, so students submit fearlessly. Solving is always available. But <strong>help must be paid for</strong> — and a reveal is a scoring dead end.</p>
         <ul class="ticks">
-          <li>A maximum-help player runs out of affordable help around <strong>ruin 13–14 of 20</strong> and must solve the rest unaided.</li>
-          <li>A no-help player tops out at <strong>600 XP</strong>. Only players who clear all twenty appear on the leaderboard.</li>
+          <li><strong>A reveal awards no XP for the solve that follows</strong> — you can't reveal your way up the leaderboard.</li>
+          <li>A no-help player tops out at <strong>500 XP</strong> (100 start + 20 solves × 20). Only players who clear all twenty appear on the leaderboard.</li>
         </ul>
       </div>
       <div class="tiles">
         <div class="tile"><div class="k">Start</div><div class="v">100</div></div>
-        <div class="tile"><div class="k">Survey</div><div class="v pos">+5</div><small>first open</small></div>
-        <div class="tile"><div class="k">Solve</div><div class="v pos">+20</div><small>first pass</small></div>
-        <div class="tile"><div class="k">Hint</div><div class="v neg">−10</div><small>must afford</small></div>
-        <div class="tile"><div class="k">Reveal</div><div class="v neg">−20</div><small>after all hints</small></div>
+        <div class="tile"><div class="k">Survey</div><div class="v">0</div><small>free to open</small></div>
+        <div class="tile"><div class="k">Solve</div><div class="v pos">+20</div><small>0 if revealed</small></div>
+        <div class="tile"><div class="k">Clue 1 / Clue 2</div><div class="v neg">0 / −5</div><small>first clue free</small></div>
+        <div class="tile"><div class="k">Reveal</div><div class="v neg">−15</div><small>after all hints</small></div>
         <div class="tile"><div class="k">Wrong Submit</div><div class="v">0</div><small>always free</small></div>
       </div>
     </div>
@@ -422,7 +422,7 @@
       <rect class="box mint" x="440" y="24" width="320" height="120" rx="12" />
       <text class="tag" x="460" y="54" style="fill:#65e1bd">AUTH</text>
       <text class="lbl" x="460" y="86">Google OAuth (PKCE)</text>
-      <text class="sub" x="460" y="110">approved-domain sign-up hook</text>
+      <text class="sub" x="460" y="110">any Google account · sign-up hook</text>
       <text class="sub" x="460" y="130">admin allowlist · RLS identities</text>
 
       <!-- Supabase RPC -->
@@ -465,7 +465,7 @@
     <div class="grid">
       <ul class="ticks">
         <li><strong>Google OAuth with PKCE</strong> — the app never sees a password; sign-in happens on Google.</li>
-        <li><strong>Approved domains + admin allowlist</strong> enforced by a before-user-created hook. The allowlist lives in <code>game_private.admin_emails</code> — the single server-side source of truth.</li>
+        <li><strong>Any Google account may play</strong>, enforced by a before-user-created hook. Admin identity is separate: the allowlist in <code>game_private.admin_emails</code> is the single server-side source of truth.</li>
         <li><strong>Admin status is server-computed</strong> and returned by <code>game_state()</code>; the client never asserts it.</li>
         <li><strong>Admin reads are gated and audited</strong> — <code>require_admin()</code> guards every privileged RPC and logs it.</li>
         <li><strong>Solutions never ship to students</strong> — the authoring studio is a dev-only bundle, absent from production.</li>
@@ -533,8 +533,8 @@
       </div>
       <div class="tiles">
         <div class="tile"><div class="k">Origin</div><div class="v amber" style="font-size:1rem;word-break:break-all">dilli-khoj<wbr />.workers.dev</div></div>
-        <div class="tile"><div class="k">Ruin 6</div><div class="v pos">Live</div><small>graded end-to-end</small></div>
-        <div class="tile"><div class="k">Ruins 1–5, 7–20</div><div class="v amber">Drafted</div><small>content authored</small></div>
+        <div class="tile"><div class="k">All 20 ruins</div><div class="v pos">Live</div><small>graded end-to-end</small></div>
+        <div class="tile"><div class="k">Sign-in</div><div class="v pos">Open</div><small>any Google account</small></div>
         <div class="tile"><div class="k">Revisits</div><div class="v">40</div><small>2 per ruin</small></div>
       </div>
     </div>
@@ -545,17 +545,17 @@
     <p class="eyebrow"><span class="num">14</span> Status &amp; what's next</p>
     <div class="grid">
       <div class="stack">
-        <h2>Honest about the gaps.</h2>
-        <p class="body">Ruin 6 is the fully-graded vertical slice. The rest are authored and reviewable, but their hidden fixtures, computed expected rows, near-miss tests and a blind human review are the production step before they ship. Review already found real gaps — incorrect conditions that pass every current fixture in ruins 01, 06 and 19.</p>
+        <h2>Live, and honest about what's next.</h2>
+        <p class="body">All twenty ruins are deployed and graded end-to-end on Cloudflare and Supabase, and sign-in is open to any Google account. The judge accepts the canonical solutions for all 20 with 3/3 cases. The remaining work is depth and durability, not first launch — stronger hidden fixtures and a blind human review across every question and revisit.</p>
       </div>
       <ol class="ticks" style="counter-reset:none">
-        <li><strong>Review all 20 questions</strong>, then their revisits.</li>
+        <li><strong>Deepen review</strong> of all 20 questions and their 40 revisits.</li>
         <li><strong>Strengthen hidden fixtures</strong> and genuinely different accepted solutions.</li>
-        <li><strong>Validate</strong> the full local Supabase stack end-to-end.</li>
         <li><strong>Harden</strong> expensive-query limits, queues and retries.</li>
         <li><strong>Test</strong> sustained mixed-question performance; improve polling and rendering.</li>
-        <li><strong>Finish</strong> browser, hardware and campus-network testing.</li>
-        <li><strong>Prepare</strong> retention, monitoring and rollback — deploy only after approval.</li>
+        <li><strong>Add abuse guardrails</strong> — CAPTCHA and rate limits now that signup is open.</li>
+        <li><strong>Widen</strong> browser and hardware compatibility testing.</li>
+        <li><strong>Maintain</strong> retention, monitoring and rollback.</li>
       </ol>
     </div>
   </section>

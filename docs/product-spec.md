@@ -22,7 +22,7 @@ Use a distinct Dilli Khoj visual identity. The official Example School of Techno
 ## Player loop
 
 1. Read the how-to-play explanation.
-2. **Sign in with Google — required before any play.** Sign-in is mandatory (not optional) immediately after the explanation. This reduces anonymous traffic, ensures only legitimate approved-domain users play, and lets admins access each player's progress.
+2. **Sign in with Google — required before any play.** Sign-in is mandatory (not optional) immediately after the explanation. Any Google account may play; sign-in saves each player's progress and lets admins access it.
 3. Roam the currently unlocked area.
 4. Survey the current ruin and open its SQL terminal.
 5. Use **Run** for unlimited local practice.
@@ -115,7 +115,7 @@ The absence of a deadline is not a technical problem. It does create scope-drift
 
 - all twenty questions meet the authoring standard;
 - all fixtures and near-miss tests pass;
-- authentication and Submit work for all three approved domains and the server admin allowlist;
+- authentication and Submit work for any Google account, including the server admin allowlist;
 - a synthetic load test passes the agreed latency target;
 - the game completes on a baseline MacBook Air in current Chrome;
 - the production build and visible dataset are preloaded before the class-wide start.

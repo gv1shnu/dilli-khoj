@@ -225,7 +225,8 @@ Scoring lives in `src/game/scoring.ts`. The economy is a single, closing budget:
 | -------------------------- | ------: |
 | Starting balance           | **100** |
 | First completion of a ruin | **+20** |
-| First survey of a ruin     |  **+5** |
+| First completion after a reveal | **0** |
+| Survey of a ruin           |   **0** |
 | Open the first clue        |   **0** |
 | Open a deeper clue         |  **−5** |
 | Reveal the full solution   | **−15** |
@@ -234,10 +235,11 @@ Scoring lives in `src/game/scoring.ts`. The economy is a single, closing budget:
 
 Design consequences, by intent:
 
-- **A no-help run tops out at `MAX_XP` = 600.** (100 start + 20×20 solves + surveys.)
+- **A no-help run tops out at `MAX_XP` = 500.** (100 start + 20×20 solves; surveying
+  no longer awards XP.)
 - **Help is staged rather than punitive.** The first clue is free. Stronger help
-  remains a score tradeoff, and taking every clue and reveal produces a final balance
-  of `FULL_HELP_END_XP` = 250.
+  remains a score tradeoff, and a reveal forfeits the solve award — solving a revealed
+  ruin adds nothing, so "reveal everything" is intentionally unsustainable.
 - **Solving is always free and always available.** Debt never blocks _learning_;
   heavier help simply trims a little of your score.
 - **A reveal solves nothing automatically.** Even after revealing, the learner must
@@ -343,7 +345,7 @@ Integrity properties:
 - **Client:** Vite + React 19 + TypeScript, 3D via Three.js. Hosted as static assets
   on **Cloudflare Workers**.
 - **Local practice DB:** PGlite (Postgres in WebAssembly) in a Web Worker.
-- **Backend:** Supabase — Google auth (approved-domain allow-list), Postgres for
+- **Backend:** Supabase — Google auth (open to any Google account; admin allow-list), Postgres for
   authoritative state, and an **Edge Function judge**. Game state and grading are
   exposed only through RPCs; answer/help/fixture data is server-private.
 - **CI/CD:** GitHub Actions; `main` auto-deploys. Timezone is pinned to

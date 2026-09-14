@@ -44,7 +44,7 @@ Apply database migrations **before** deploying code that calls new functions. Th
 
 The judge uses two existing Supavisor transaction-pooler secrets on port 6543: `JUDGE_EXECUTOR_DATABASE_URL` and `JUDGE_PROGRESS_DATABASE_URL`. The executor reads fixtures; the progress role calls fixed functions. Never replace either with the database owner identity. Passwords and connection URLs stay server-side.
 
-Verify Google provider, Before User Created hook, approved domains/admins, redirects, and disabled Email/Anonymous providers. See [auth configuration](setup-supabase-google.md). Google audience must accommodate both institutions; confirm current console requirements before changing its rollout status.
+Verify Google provider, Before User Created hook (admits any Google account), redirects, and disabled Email/Anonymous providers. See [auth configuration](setup-supabase-google.md). The Google audience must be External + published so any Google account can sign in; confirm current console requirements before changing its rollout status.
 
 ## Approved web rollout
 

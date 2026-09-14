@@ -5,13 +5,13 @@
 | Area | Decision |
 | --- | --- |
 | Curriculum source | Supplied `NST DBMS 2026.xlsx`, Modules 1–8 |
-| Email domains | `example.edu`, `students.example.edu`, `partner.example` |
+| Access | Any Google account (domain restriction removed 2026-09-14) |
 | Identity fields | Fetch Google display name and email; use Supabase UUID as primary identity |
 | Supabase | Project `your-project-ref` |
 | Repository | Private GitHub repository `gv1shnu/treasure-hunt` |
 | Static hosting | Cloudflare Workers Static Assets at `dilli-khoj.example.workers.dev` |
 | Cloudflare account | Owner-confirmed `a34c3ecff69a697ae99c602e883ddb53`; pinned in `wrangler.jsonc` |
-| Google Workspace | The two university domains share an organization; `partner.example` requires External Google OAuth |
+| Google Workspace | OAuth app is **External + published** so any Google account (not one org) can sign in |
 | Development access | Local repository write access granted; use the owner's Git identity |
 | Deadline | No date; release by readiness gate |
 | Content size | Twenty ruins |
@@ -35,8 +35,8 @@
 | Content boundaries | Stay on educational game development; no unrelated issues |
 | Question structure | Title → description → sample output → schema with sample rows → hints |
 | Academic approval | Team discussion; no single external approver named |
-| Admin allowlist | `former.admin@example.edu` (single source of truth: `game_private.admin_emails`; the client learns admin status only from the server-computed `game_state().isAdmin`). Admins are also players |
-| Player domains | `example.edu`, `students.example.edu`, and `partner.example` (added 2026-09-04, owner decision). Allowing `partner.example` **requires the Google OAuth app to be External + published** (Internal blocks its different-org accounts) |
+| Admin allowlist | `admin@example.com` (reassigned 2026-09-14; single source of truth: `game_private.admin_emails`; the client learns admin status only from the server-computed `game_state().isAdmin`). Admins are also players |
+| Player access | Any Google account (domain restriction removed 2026-09-14, owner decision). **Requires the Google OAuth app to be External + published** so non-org accounts are not blocked before the signup hook runs |
 | Release cohort | All students at once |
 | Network | Campus Wi-Fi, approximately 2–5 MB/s observed |
 | Launch owner | Project owner/user |

@@ -49,7 +49,7 @@ Open **http://localhost:5173**. Development supports offline practice and a loca
 | ------------------ | ----------------------------------------------------------------------------------------------------------- |
 | World              | Infinite tiled landscape, animated Soldier, navigation, ambience and an animated geographic atlas           |
 | Questions          | All 20 playable locally; three generated test datasets per question                                         |
-| Authorization      | Shared three-domain/admin policy tested locally; real OAuth and rollout pending                             |
+| Authorization      | Open to any Google account; admin identity via server allowlist; live on production OAuth                    |
 | Server grading     | All 20 implemented and exercised against local PostgreSQL; three cases per question                         |
 | Progress and XP    | Server transactions own unlocks, awards and purchases; local Run is untrusted; the HUD shows a live explorer count |
 | Drafts             | Browser-local, scoped by account; no cross-device synchronization                                           |
