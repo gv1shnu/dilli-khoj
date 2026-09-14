@@ -82,7 +82,7 @@ export default {
     const player = context.userClaims;
     if (!player?.id || player.appMetadata?.provider !== "google") {
       return Response.json(
-        { message: "Use an approved university Google account." },
+        { message: "Sign in with a Google account." },
         { status: 403 },
       );
     }
@@ -96,7 +96,7 @@ export default {
       `;
       if (rows[0]?.approved !== true) {
         return Response.json(
-          { message: "Use a verified approved university Google account." },
+          { message: "Sign in with a verified Google account." },
           { status: 403 },
         );
       }

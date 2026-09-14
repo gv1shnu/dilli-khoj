@@ -16,6 +16,8 @@ beforeAll(async () => {
     insert into game_private.admin_emails values ('owner@example.org');
   `);
   await db.exec(await readFile(new URL('../supabase/migrations/20260904110000_shared_identity_policy.sql', import.meta.url), 'utf8'));
+  // Open access: any Google account is an approved player (2026-09-14).
+  await db.exec(await readFile(new URL('../supabase/migrations/20260914010000_open_to_any_google.sql', import.meta.url), 'utf8'));
 });
 afterAll(() => db.close());
 
@@ -33,12 +35,13 @@ async function signup(email, provider = 'google') {
 
 describe('shared signup and judge database policy', () => {
   it.each(['student@example.edu', 'student@students.example.edu', 'student@partner.example',
-    'OWNER@example.org', 'Student@PARTNER.EXAMPLE'])('allows confirmed Google identity %s', async email => {
+    'student@gmail.com', 'anyone@example.com', 'OWNER@example.org', 'Student@GMAIL.COM'])(
+    'allows confirmed Google identity %s', async email => {
     expect(await signup(email)).toEqual({});
     expect(await authorize(email)).toBe(true);
   });
-  it.each(['student@gmail.com', 'student@partner.example.evil.org', 'student@evil@partner.example',
-    '@partner.example', ' student@partner.example', '', null])('rejects email %s', async email => {
+  it.each(['student@evil@partner.example', '@partner.example', ' student@partner.example',
+    'nodomain', '', null])('rejects malformed email %s', async email => {
     expect((await signup(email)).error.http_code).toBe(403);
     expect(await authorize(email)).toBe(false);
   });
@@ -51,11 +54,11 @@ describe('shared signup and judge database policy', () => {
     expect(await authorize('owner@example.org', 'google', true, true)).toBe(false);
     expect((await db.query('select game_private.is_approved_player(null) as approved')).rows[0].approved).toBe(false);
   });
-  it('honors allowlist revocation on the next submission', async () => {
-    expect(await authorize('owner@example.org')).toBe(true);
-    await db.exec("delete from game_private.admin_emails where email = 'owner@example.org'");
-    expect(await authorize('owner@example.org')).toBe(false);
-    expect((await signup('owner@example.org')).error.http_code).toBe(403);
+  it('approves any Google account without an allowlist entry', async () => {
+    // With open access the admin allowlist no longer gates play: a brand-new,
+    // never-listed email is approved for both signup and submission.
+    expect(await signup('random.person@somewhere.io')).toEqual({});
+    expect(await authorize('random.person@somewhere.io')).toBe(true);
   });
   it('exposes only the fixed authorization function to the progress role', async () => {
     for (const role of ['anon', 'authenticated', 'dilli_judge_executor', 'supabase_auth_admin']) {
@@ -63,7 +66,10 @@ describe('shared signup and judge database policy', () => {
     }
     await db.exec('set role dilli_judge_progress');
     try {
-      expect((await db.query('select game_private.is_approved_player($1) as approved', [player])).rows[0].approved).toBe(false);
+      // The progress role may execute the fixed authorization function (the player
+      // row left by earlier tests is an approved Google account) but cannot read the
+      // underlying tables directly.
+      expect((await db.query('select game_private.is_approved_player($1) as approved', [player])).rows[0].approved).toBe(true);
       await expect(db.query('select * from auth.users')).rejects.toThrow(/permission denied/);
       await expect(db.query('select * from game_private.admin_emails')).rejects.toThrow(/permission denied/);
     } finally { await db.exec('reset role'); }
