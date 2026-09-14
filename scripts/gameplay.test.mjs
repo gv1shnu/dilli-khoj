@@ -9,7 +9,7 @@ beforeAll(async () => {
   db = await localDatabase();
   await addPlayer(db, p);
   await addPlayer(db, other, "other@example.edu");
-  await addPlayer(db, admin, "former.admin@example.edu");
+  await addPlayer(db, admin, "admin@example.com");
 }, 30000);
 afterAll(async () => {
   await db?.close();
@@ -182,7 +182,7 @@ it("admin RPCs check current allowlist and audit access; ordinary players are de
       .rows[0].n,
   ).toBe(2);
   await db.query("delete from game_private.admin_emails where email=$1", [
-    "former.admin@example.edu",
+    "admin@example.com",
   ]);
   await asPlayer(admin, async () => {
     await expect(db.query("select public.admin_players()")).rejects.toThrow(
