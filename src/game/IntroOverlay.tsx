@@ -116,6 +116,20 @@ export function IntroOverlay({ onClose }: IntroOverlayProps) {
         <button className="primary-button intro-begin" onClick={onClose}>
           Step into the ruins
         </button>
+
+        <p className="intro-legal">
+          <a href="/credits.html" target="_blank" rel="noreferrer">
+            Credits
+          </a>
+          {" · "}
+          <a href="/privacy.html" target="_blank" rel="noreferrer">
+            Privacy
+          </a>
+          {" · "}
+          <a href="/terms.html" target="_blank" rel="noreferrer">
+            Terms
+          </a>
+        </p>
       </div>
     </div>
   );
