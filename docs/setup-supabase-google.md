@@ -4,15 +4,11 @@ Project URL: `https://your-project-ref.supabase.co`
 
 Project reference: `your-project-ref`
 
-Approved domains:
-
-- `example.edu`
-- `students.example.edu`
-- `partner.example`
+Access: **any Google account** (no domain restriction, opened 2026-09-14). See [Access gate](#access-gate).
 
 ## Current setup snapshot
 
-The 4 September maintainer handoff reports the publishable key, Google provider/redirects, migrations and judge deployment configured, and Google sign-in tested successfully. Google is reported External / Testing; hook enablement and disabling unused Email signup still need confirmation. The guide below is a reference for checking or recreating setup, not a requirement to redo it on another laptop. The judge's separate domain check has not yet been updated for `partner.example`; see [next steps](next-steps.md).
+The Google OAuth client is owned by the maintainer's personal Google Cloud project, set to **External** audience. Sign-in is open to any Google account; the database signup hook and judge admit any confirmed, non-anonymous Google account. Admin identity is governed separately by `game_private.admin_emails`. The guide below is a reference for checking or recreating setup, not a requirement to redo it on another laptop.
 
 ## Values needed on a new laptop
 
@@ -21,7 +17,7 @@ The 4 September maintainer handoff reports the publishable key, Google provider/
 
 Confirmed production origin: `https://dilli-khoj.example.workers.dev`
 
-The university domains share one Google Workspace organization, but `partner.example` is a separate organization. Because that domain is allowed, the Google app must use an **External** audience (Internal would block `partner.example` accounts), and it must be **published** to production so it is not capped at 100 test users. The requested scopes (`openid`, `email`, `profile`) are non-sensitive, so publishing an External app does not trigger Google's security review.
+Because the game admits any Google account (not just one Workspace organization), the Google app must use an **External** audience and be **published** to production — Internal would block accounts outside the owner's org, and an unpublished app is capped at 100 test users. The requested scopes (`openid`, `email`, `profile`) are non-sensitive, so publishing an External app does not trigger Google's security review.
 
 ## Supabase project preparation
 
@@ -38,7 +34,7 @@ The university domains share one Google Workspace organization, but `partner.exa
 8. Go to **Authentication → Providers → Google**. Leave this page open; it displays the Supabase callback URL needed by Google.
 9. After Google setup, paste the Google Client ID and Client Secret here and enable the provider.
 10. Disable authentication methods the game does not use, especially anonymous and password sign-up.
-11. Verify the **Before User Created** hook allows the three approved domains or server-allowlisted admin emails, and only Google-created accounts.
+11. Verify the **Before User Created** hook admits any Google-created account (and rejects non-Google providers).
 12. Create the profile trigger that copies Google display name and email into the game profile while using the Supabase user UUID as the permanent identifier.
 13. Run the database migrations, RLS tests and judge-role attack tests before adding production content.
 
@@ -58,7 +54,7 @@ Official references:
    - App name: `Dilli Khoj`.
    - User support email: an account you monitor.
    - Developer contact: your email.
-4. Choose the **External** audience (a `partner.example` account is a different Workspace org, which Internal would reject), then **publish** the app to production.
+4. Choose the **External** audience (Internal would reject accounts outside the owner's Workspace org), then **publish** the app to production.
 5. Request only `openid`, `email` and `profile` scopes. The game does not need Google Drive, Calendar or contacts.
 6. Create a client with application type **Web application**.
 7. Add authorized JavaScript origins:
@@ -70,25 +66,29 @@ Official references:
 
 9. Create the client.
 10. Copy its Client ID and Client Secret directly into **Supabase → Authentication → Providers → Google**.
-11. Test all three approved domains and a non-approved Gmail account.
+11. Test sign-in with a personal Gmail account (any Google account should be admitted).
 12. Confirm that Google returns display name and email and that the non-approved account is rejected by the server-side hook.
 
 Google states that email alone should not be treated as the permanent account identifier. Use the Supabase UUID/Google subject for identity and verify the hosted-domain claim when restricting Workspace membership:
 
 - https://developers.google.com/identity/openid-connect/reference
 
-## Domain gate
+## Access gate
 
-Do not rely on a client-side email suffix check. The server-side creation hook should require:
+As of 2026-09-14 the game is **open to any Google account** — there is no email-domain
+restriction. The server-side creation hook (`hook_restrict_dilli_khoj_signup`) requires:
 
 - OAuth provider is Google;
-- email is verified;
-- normalized domain is exactly `example.edu`, `students.example.edu` or `partner.example`, **or** the email is in `game_private.admin_emails` (the admin allowlist);
-- where available, Google's hosted-domain claim agrees with the approved organization.
+- a well-formed email (checked again, with email-confirmed and non-anonymous, by
+  `game_private.is_approved_player` for gameplay authorization in the judge).
 
-The UI may provide a friendly error, but database and judge authorization must independently reject other accounts.
+Admin identity is separate from play access: the `game_private.admin_emails` table is the
+single source of truth for who is an admin, and no longer gates whether an account may play.
 
-Approved domains are `example.edu`, `students.example.edu`, and `partner.example` (in `hook_restrict_dilli_khoj_signup`). The `game_private.admin_emails` table additionally lets specific admin emails in regardless of domain. Google's audience applies first: because `partner.example` is a different Workspace org, the OAuth app **must be External and published**, or those accounts are blocked before the hook runs.
+Google's audience applies first: to admit non-org Google accounts, the OAuth app **must be
+External and published**, or Google blocks them before the hook runs. The requested scopes
+(`openid`, `email`, `profile`) are non-sensitive, so publishing does not trigger Google's
+security review.
 
 ## Local and deployment linkage
 
