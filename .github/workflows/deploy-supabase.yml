@@ -2,11 +2,8 @@ name: Deploy Supabase (migrations + judge)
 
 # Applies database migrations and deploys the judge Edge Function.
 #
-# Runs automatically on pushes to `main` that touch supabase/ (migrations, the
-# judge function, or config), so backend changes ship without a manual step. It
-# also stays available as a manual run (with per-step checkboxes) for reruns or
-# ad-hoc deploys. CI (typecheck + migration/gameplay tests) runs on every push
-# first, so a broken migration should fail there before it can reach `main`.
+# Manual only (Actions tab), with per-step checkboxes. Run CI first so a broken
+# migration fails there before it reaches your project.
 #
 # Requires these repository secrets:
 #   SUPABASE_ACCESS_TOKEN  - personal access token from the Supabase dashboard
@@ -21,12 +18,7 @@ name: Deploy Supabase (migrations + judge)
 # See docs/setup-supabase-google.md.
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "supabase/migrations/**"
-      - "supabase/functions/**"
-      - "supabase/config.toml"
+  # Manual only: run from the Actions tab after configuring your own secrets.
   workflow_dispatch:
     inputs:
       push_migrations:

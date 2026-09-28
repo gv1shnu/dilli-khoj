@@ -13,7 +13,9 @@
 
 A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore a 3D world, restore twenty archives, and practise the DBMS curriculum through SQL.
 
-**Status: hosted preview, not yet cleared for a classroom-wide release.** All twenty server-graded questions, the full judge and trusted progression are now deployed to the hosted backend (Supabase) and web (Cloudflare); the earlier Ruin-06-only judge has been replaced. Native-browser and accessibility QA, sustained hosted-load validation and blind human review of every question remain before a classroom rollout.
+![Dilli Khoj — exploring a ruin and solving its SQL archive](docs/deck/img/03-scene.jpg)
+
+**Status: open-source release.** All twenty server-graded questions, the full judge and trusted progression are complete. The original hosted deployment has been retired; follow the setup below to run your own Supabase + Cloudflare instance. Native-browser and accessibility QA, sustained hosted-load validation and blind human review of every question are still open before any classroom rollout.
 
 ## Scope
 
@@ -154,8 +156,5 @@ Feature-branch pushes run CI. Merging to `main` triggers the web deployment work
 
 ## License
 
-Dilli Khoj is released under the [PolyForm Noncommercial License 1.0.0](LICENSE):
-free to use, study, modify, and share for any noncommercial purpose (including
-educational and research use) with attribution. Commercial use is reserved to
-the copyright holder — contact them for a commercial license. Third-party assets
-keep their own licenses; see [CREDITS.md](CREDITS.md).
+Dilli Khoj is released under the [MIT License](LICENSE). Third-party assets keep
+their own licenses; see [CREDITS.md](CREDITS.md).

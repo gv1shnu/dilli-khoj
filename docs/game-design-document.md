@@ -348,7 +348,7 @@ Integrity properties:
 - **Backend:** Supabase — Google auth (open to any Google account; admin allow-list), Postgres for
   authoritative state, and an **Edge Function judge**. Game state and grading are
   exposed only through RPCs; answer/help/fixture data is server-private.
-- **CI/CD:** GitHub Actions; `main` auto-deploys. Timezone is pinned to
+- **CI/CD:** GitHub Actions; deploys run manually from the Actions tab. Timezone is pinned to
   `Asia/Kolkata` across content and test scripts for deterministic timestamps.
 
 ---

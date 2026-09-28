@@ -18,7 +18,7 @@ repository remains with development.
    extended fullscreen test and confirm the acceptable load-time and frame-rate budget.
 4. **Enable native-browser automation or supervise the manual pass.** Safari currently
    has **Allow remote automation** disabled, and macOS Computer Use
-   permission for native-app control. Enable those settings for repeatable Safari and
+   permission for native-app control is not granted. Enable those settings for repeatable Safari and
    Firefox interaction testing, or perform the final native-browser checklist with
    development observing.
 5. **Schedule the content revision.** The twenty primary questions and forty revisits

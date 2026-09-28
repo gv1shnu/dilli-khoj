@@ -8,8 +8,7 @@ Institutional context: Example School of Technology at Example University.
 
 Tone: fun, classroom-friendly and playful, with limited humour. The setting remains fictional and educational. Do not introduce political commentary, real-world conflict, religious commentary or unrelated social issues.
 
-Use a distinct Dilli Khoj visual identity. The official Example School of Technology site states that its trademarks and logos require prior written permission, so production should use text attribution or approved assets rather than scraping and redistributing logo files. Official references:
-
+Use a distinct Dilli Khoj visual identity; do not use any institution's logos or trademarks.
 
 ## Audience and platform
 

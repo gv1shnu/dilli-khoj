@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "MIT",
   "scripts": {
     "content:generate": "TZ=Asia/Kolkata node scripts/generate-practice.mjs",
     "dev": "vite",
