@@ -343,7 +343,7 @@ Integrity properties:
 ## 15. Technical architecture
 
 - **Client:** Vite + React 19 + TypeScript, 3D via Three.js. Hosted as static assets
-  on **Cloudflare Workers**.
+  on **GitHub Pages**.
 - **Local practice DB:** PGlite (Postgres in WebAssembly) in a Web Worker.
 - **Backend:** Supabase — Google auth (open to any Google account; admin allow-list), Postgres for
   authoritative state, and an **Edge Function judge**. Game state and grading are

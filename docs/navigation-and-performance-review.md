@@ -18,7 +18,7 @@ This is a single-page application without a route library. There are no separate
 
 Supabase receives `POST /functions/v1/judge-query`. Browser gameplay uses `/rest/v1/rpc/game_state`, `game_action`, `begin_revisit`, `completion_leaderboard`, `admin_players` and `admin_question`. These are Supabase API paths, not pages on the static web host. Google login returns to the web origin.
 
-Cloudflare is configured with SPA fallback: an unknown web path may load the app shell, but it does not create a distinct route. `#admin` is only a DEV authoring switch; it does not grant production administrator access.
+GitHub Pages serves only real files; routing is hash-based, so unknown paths 404 rather than loading the app shell. `#admin` is only a DEV authoring switch; it does not grant production administrator access.
 
 ## Repository paths
 

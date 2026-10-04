@@ -13,7 +13,7 @@ major_version = 17
 
 [auth]
 enabled = true
-site_url = "https://dilli-khoj.example.workers.dev"
+site_url = "https://www.vishnugandarapu.in/dilli-khoj/"
 additional_redirect_urls = ["http://localhost:5173/**"]
 enable_signup = true
 enable_anonymous_sign_ins = false

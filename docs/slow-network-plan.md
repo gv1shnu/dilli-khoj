@@ -12,7 +12,7 @@ The production bundle's dominant cost is the browser PostgreSQL engine (PGlite):
 | Soldier model | ~2.16 MB | ~1.37 MB |
 
 A cold load is **~10 MB gzip**. For ~3,000 students hitting a campus network together,
-the risk is not host bandwidth (Cloudflare serves static assets from the edge) — it is
+the risk is not host bandwidth (GitHub Pages serves static assets from a CDN) — it is
 **time-to-play on the slowest client**, especially if the 10 MB PGlite payload competes
 with the world's assets during the first seconds.
 
