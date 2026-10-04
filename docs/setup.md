@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Git and access to the private `gv1shnu/treasure-hunt` repository.
+- Git. The repository `gv1shnu/dilli-khoj` is public.
 - Node **22.23.2**, pinned in `.nvmrc` (CI uses Node 22).
 - pnpm **11.19.0**, pinned in `package.json`.
 - A modern browser; Chrome is the primary support target.
@@ -10,8 +10,8 @@
 With nvm installed:
 
 ```bash
-git clone --branch open-world https://github.com/gv1shnu/treasure-hunt.git
-cd treasure-hunt
+git clone https://github.com/gv1shnu/dilli-khoj.git
+cd dilli-khoj
 nvm install
 nvm use
 npm install --global pnpm@11.19.0
@@ -33,7 +33,7 @@ Offline development does not need hosted credentials. If a sign-in gate appears,
 
 For real Google login, open your Supabase project (`your-project-ref`) and copy its browser **publishable** key into `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. The example already supplies the project URL. Restart Vite after changing configuration. Never place a Supabase secret/service-role key, database password or OAuth secret in a `VITE_` variable. Do not print environment files or commit them.
 
-A new laptop does not require recreating the database, OAuth client, Cloudflare site or server secrets. Maintainers should use [auth configuration](setup-supabase-google.md) only when those settings actually need review.
+A new laptop does not require recreating the database, OAuth client, GitHub Pages site or server secrets. Maintainers should use [auth configuration](setup-supabase-google.md) only when those settings actually need review.
 
 ## Verify your checkout
 

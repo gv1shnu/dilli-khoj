@@ -19,7 +19,7 @@ export function SignInGate({ onSignIn, error, onDevBypass }: SignInGateProps) {
       <div className="gate-card">
         <img
           className="gate-mark"
-          src="/favicon.svg"
+          src={`${import.meta.env.BASE_URL}favicon.svg`}
           alt="Dilli Khoj helm logo"
         />
         <p className="eyebrow">DILLI KHOJ</p>

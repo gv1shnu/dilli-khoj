@@ -15,7 +15,7 @@ The Google OAuth client is owned by the maintainer's personal Google Cloud proje
 - A Supabase publishable key for browser configuration. Retrieve it from **Connect** or **Settings → API Keys**. Prefer `sb_publishable_...`; legacy `anon` keys are being deprecated.
 - Google OAuth configured in the dashboard. Keep its client secret out of chat and Git.
 
-Confirmed production origin: `https://dilli-khoj.example.workers.dev`
+Production URL: `https://www.vishnugandarapu.in/dilli-khoj/` (OAuth origin `https://www.vishnugandarapu.in`)
 
 Because the game admits any Google account (not just one Workspace organization), the Google app must use an **External** audience and be **published** to production — Internal would block accounts outside the owner's org, and an unpublished app is capped at 100 test users. The requested scopes (`openid`, `email`, `profile`) are non-sensitive, so publishing an External app does not trigger Google's security review.
 
@@ -26,10 +26,9 @@ Because the game admits any Google account (not just one Workspace organization)
 3. Create or copy the publishable key for the browser.
 4. Do not copy a secret key into browser variables or source control.
 5. Go to **Authentication → URL Configuration**.
-6. Set **Site URL** to `https://dilli-khoj.example.workers.dev`.
+6. Set **Site URL** to `https://www.vishnugandarapu.in/dilli-khoj/`.
 7. Add redirect URLs for:
-   - `https://dilli-khoj.example.workers.dev/**`;
-   - a Cloudflare preview URL only when preview sign-in is intentionally enabled;
+   - `https://www.vishnugandarapu.in/dilli-khoj/**`;
    - `http://localhost:5173/**` for development.
 8. Go to **Authentication → Providers → Google**. Leave this page open; it displays the Supabase callback URL needed by Google.
 9. After Google setup, paste the Google Client ID and Client Secret here and enable the provider.
@@ -58,7 +57,7 @@ Official references:
 5. Request only `openid`, `email` and `profile` scopes. The game does not need Google Drive, Calendar or contacts.
 6. Create a client with application type **Web application**.
 7. Add authorized JavaScript origins:
-   - `https://dilli-khoj.example.workers.dev`;
+   - `https://www.vishnugandarapu.in`;
    - `http://localhost:5173` for development.
 8. Add this exact authorized redirect URI:
 
@@ -141,4 +140,4 @@ Official references:
 
 ## Repository access
 
-Clone into your own project folder using remote `https://github.com/gv1shnu/treasure-hunt.git`. Commits use the repository owner's configured Git identity. Never paste a personal access token into chat or store it in the repository.
+Clone into your own project folder using remote `https://github.com/gv1shnu/dilli-khoj.git`. Commits use the repository owner's configured Git identity. Never paste a personal access token into chat or store it in the repository.

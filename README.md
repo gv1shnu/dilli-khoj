@@ -6,7 +6,7 @@
 ![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=three.js&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PGlite-4169E1?logo=postgresql&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
-![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
+![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-222222?logo=github&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white)
 ![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)
@@ -15,7 +15,7 @@ A PostgreSQL learning game set in a fictional, overgrown Delhi. Students explore
 
 ![Dilli Khoj — exploring a ruin and solving its SQL archive](docs/deck/img/03-scene.jpg)
 
-**Status: open-source release.** All twenty server-graded questions, the full judge and trusted progression are complete. The original hosted deployment has been retired; follow the setup below to run your own Supabase + Cloudflare instance. Native-browser and accessibility QA, sustained hosted-load validation and blind human review of every question are still open before any classroom rollout.
+**Status: open-source release.** All twenty server-graded questions, the full judge and trusted progression are complete. The original hosted deployment has been retired; follow the setup below to run your own Supabase + GitHub Pages instance. Native-browser and accessibility QA, sustained hosted-load validation and blind human review of every question are still open before any classroom rollout.
 
 ## Scope
 
@@ -33,8 +33,8 @@ See [credits](CREDITS.md) for shipped assets and attribution.
 See [setup instructions](docs/setup.md) for prerequisites, browser configuration, checks and troubleshooting.
 
 ```bash
-git clone https://github.com/gv1shnu/treasure-hunt.git
-cd treasure-hunt
+git clone https://github.com/gv1shnu/dilli-khoj.git
+cd dilli-khoj
 nvm install
 nvm use
 npm install --global pnpm@11.19.0
@@ -94,7 +94,7 @@ supabase/       functions/judge-query/ (grading Edge Function), functions/_share
 public/         Static build assets      docs/  Specs, evidence, plans and runbooks
 ```
 
-`dist/`, `node_modules/`, `.wrangler/` and `supabase/.temp/` are generated or local state, not authored source.
+`dist/`, `node_modules/` and `supabase/.temp/` are generated or local state, not authored source.
 
 **Runtime flow.** `src/main.tsx` mounts React; [src/App.tsx](src/App.tsx) owns the player/admin/walkthrough routes, archive selection, local practice and dialogs; [src/game/RuinScene.tsx](src/game/RuinScene.tsx) owns WebGL, movement, audio and rendering; [src/game/world/city.ts](src/game/world/city.ts) lazily builds each ruin and its repeating 3×3 field from `src/game/world/levels/levelNN.ts`. The `/#walkthrough` and `/#admin` hashes select local views only — they grant no server permissions.
 
@@ -151,7 +151,7 @@ test -s dist/models/soldier.glb
 
 Keep curriculum order, the infinite world and Soldier's `MODEL_YAW_OFFSET` intact. Regenerate computed content instead of editing expected answers by hand. Update relevant docs alongside behavioral changes. Use personal Git identities and review staged files before committing.
 
-Feature-branch pushes run CI. Merging to `main` triggers the web deployment workflow; backend deployment is manual. Deployment, live migrations, credential changes and paid services require the owner's explicit approval.
+Feature-branch pushes run CI. Web (GitHub Pages) and backend deployments are manual workflows; see [deployment](docs/deployment-runbook.md). Deployment, live migrations, credential changes and paid services require the owner's explicit approval.
 
 
 ## License

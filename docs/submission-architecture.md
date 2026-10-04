@@ -115,7 +115,7 @@ The Edge Function creates at most one executor and one progress connection per w
 
 - Keep the initial compressed application payload below 5 MB if practical.
 - Lazy-load district visuals and non-current content.
-- Cache immutable assets aggressively through Cloudflare.
+- Rely on hashed asset filenames for caching (GitHub Pages sets its own cache headers).
 - Install a service worker only after confirming update/rollback behavior.
 - Ask students to open the landing page 10–15 minutes before play begins, even if the game opens for everyone at the same time.
 - Provide a visible capability check for WebAssembly, IndexedDB and browser version before downloading world content.

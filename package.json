@@ -12,7 +12,6 @@
     "test": "TZ=Asia/Kolkata vitest run --maxWorkers=2",
     "test:watch": "TZ=Asia/Kolkata vitest",
     "typecheck": "tsc -b --pretty false",
-    "deploy": "pnpm build && wrangler deploy",
     "content:judge": "TZ=Asia/Kolkata node scripts/generate-judge.mjs",
     "content:revisits": "TZ=Asia/Kolkata node scripts/generate-revisits.mjs",
     "test:browser": "node scripts/browser-smoke.mjs",
@@ -49,8 +48,7 @@
     "prettier": "3.6.2",
     "typescript": "7.0.2",
     "vite": "8.2.2",
-    "vitest": "5.0.0",
-    "wrangler": "4.128.0"
+    "vitest": "5.0.0"
   },
   "packageManager": "pnpm@11.19.0"
 }

@@ -8,9 +8,8 @@
 | Access | Any Google account (domain restriction removed 2026-09-14) |
 | Identity fields | Fetch Google display name and email; use Supabase UUID as primary identity |
 | Supabase | Project `your-project-ref` |
-| Repository | Private GitHub repository `gv1shnu/treasure-hunt` |
-| Static hosting | Cloudflare Workers Static Assets at `dilli-khoj.example.workers.dev` |
-| Cloudflare account | Owner-confirmed `a34c3ecff69a697ae99c602e883ddb53`; pinned in `wrangler.jsonc` |
+| Repository | Public GitHub repository `gv1shnu/dilli-khoj` (renamed from `treasure-hunt`) |
+| Static hosting | GitHub Pages project site at `https://www.vishnugandarapu.in/dilli-khoj/` (moved from Cloudflare Workers, 2026-10-04) |
 | Google Workspace | OAuth app is **External + published** so any Google account (not one org) can sign in |
 | Development access | Local repository write access granted; use the owner's Git identity |
 | Deadline | No date; release by readiness gate |
@@ -20,7 +19,6 @@
 | Sequential passage | Ruins play strictly in order (1→20); no jumping ahead. Difficulty rises with the module sequence |
 | XP economy | `scoring.ts`: start 100, survey +5, solve +20, first clue free, deeper clue −5, reveal −15. Full-help completion ends at 250; no-help maximum is 600 |
 | Access control | Admin + question pages restricted to owner-supplied admin emails; solutions never ship to students |
-| Worker/project name | Cloudflare Worker `dilli-khoj`; URL `dilli-khoj.example.workers.dev` |
 | Question authoring | Dev-only Question Studio at `#admin`; canonical solutions excluded from production builds |
 | Grading | Any safe query passing all result fixtures is accepted; intended syntax is not a hard gate |
 | Scoring | Wrong submissions cost nothing; hints and reveals cost XP |
@@ -57,7 +55,7 @@
 
 1. ~~Copy the Supabase publishable key into `.env.local`~~ — done.
 2. Export any browser-only Question Studio edits before changing laptops; see [setup](setup.md).
-3. Handoff reports Cloudflare live, Google OAuth/provider/redirects working, migrations applied and judge deployed. Do not recreate these resources; confirm current state before release.
+3. Handoff reported the former Cloudflare site live, Google OAuth/provider/redirects working, migrations applied and judge deployed. Do not recreate these resources; confirm current state before release.
 4. Confirm Before User Created hook enablement, disable unused Email/Anonymous providers, and complete the Google External production rollout when ready. The handoff reports External / Testing today.
 5. Authorize deployment of a reviewed current build when ready; the hosted site reportedly predates recent gameplay changes.
 6. ~~Provide the admin allowlist emails and apply the migration~~ — reported done. Server-protected admin reads are implemented locally; rollout and real-session validation remain pending.
@@ -74,7 +72,7 @@ The invocation quota is likely sufficient, but free shared database compute is t
 
 ### Simultaneous release
 
-Three thousand initial downloads can saturate campus networking even when Cloudflare is healthy. Pre-open the landing page, cache static assets and lazy-load later districts.
+Three thousand initial downloads can saturate campus networking even when the static host is healthy. Pre-open the landing page, cache static assets and lazy-load later districts.
 
 ### Browser breadth
 

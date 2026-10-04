@@ -118,15 +118,27 @@ export function IntroOverlay({ onClose }: IntroOverlayProps) {
         </button>
 
         <p className="intro-legal">
-          <a href="/credits.html" target="_blank" rel="noreferrer">
+          <a
+            href={`${import.meta.env.BASE_URL}credits.html`}
+            target="_blank"
+            rel="noreferrer"
+          >
             Credits
           </a>
           {" · "}
-          <a href="/privacy.html" target="_blank" rel="noreferrer">
+          <a
+            href={`${import.meta.env.BASE_URL}privacy.html`}
+            target="_blank"
+            rel="noreferrer"
+          >
             Privacy
           </a>
           {" · "}
-          <a href="/terms.html" target="_blank" rel="noreferrer">
+          <a
+            href={`${import.meta.env.BASE_URL}terms.html`}
+            target="_blank"
+            rel="noreferrer"
+          >
             Terms
           </a>
         </p>
